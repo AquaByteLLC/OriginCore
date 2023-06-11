@@ -4,7 +4,8 @@ setupOriginModule(
     "origin-core",
         listOf(
             Pair("enchants", listOf("enchants-api", "enchants-impl")),
-            Pair("worldedit", listOf("v6", "v7"))));
+            Pair("server", listOf("packets-api", "commons"))
+        ));
 
 
 fun setupOriginModule(base: String, setup: List<Pair<String, List<String>>>) =

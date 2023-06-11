@@ -6,6 +6,10 @@ dependencies {
     compileOnly(Dependencies.SPIGOT)
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
+    implementation(Dependencies._SPIGOT)
+    compileOnly(Dependencies.GUICE)
     implementation(project(":enchants-api"))
+
+
 
 }
