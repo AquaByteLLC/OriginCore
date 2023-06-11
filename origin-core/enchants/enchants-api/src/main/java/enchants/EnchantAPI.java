@@ -27,29 +27,6 @@ public class EnchantAPI {
 		injector = Guice.createInjector(new EnchantModule(javaPlugin));
 	}
 
-	public interface EnchantType {
-		HashMap<String, OriginEnchant> enchants = new HashMap<>();
-		static OriginEnchant byName(String name) {
-			if (enchants.isEmpty()) try {
-				throw new Exception("The Enchant registry is empty.");
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
-			return enchants.getOrDefault(name, null);
-		}
-
-		static void register(OriginEnchant enchant) {
-			if (enchants.containsKey(enchant.name())) try {
-				throw new Exception("This enchant seems to already be registered.");
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
-			enchants.put(enchant.name(), enchant);
-		}
-	}
-
 	static class EnchantModule extends AbstractModule {
 		private final JavaPlugin plugin;
 
