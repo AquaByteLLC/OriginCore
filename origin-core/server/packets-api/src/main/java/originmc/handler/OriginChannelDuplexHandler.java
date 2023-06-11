@@ -1,11 +1,11 @@
 package originmc.handler;
+import commons.entity.subscription.EventSubscriptions;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import originmc.packets.PacketEvent;
-import originmc.subscription.EventSubscriptions;
 
 public class OriginChannelDuplexHandler extends ChannelDuplexHandler {
 

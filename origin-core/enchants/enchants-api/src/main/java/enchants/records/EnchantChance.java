@@ -7,7 +7,6 @@ import java.util.*;
 
 public class EnchantChance {
 	@Getter private final HashMap<Integer, Double> buffToChance;
-	private final double totalChance;
 
 	/**
 	 *
@@ -23,7 +22,7 @@ public class EnchantChance {
 			buffToChance.put(Integer.valueOf($), configDouble);
 		});
 
-		this.totalChance = buffToChance.values().stream().mapToDouble(Double::doubleValue).sum();
+		double totalChance = buffToChance.values().stream().mapToDouble(Double::doubleValue).sum();
 
 		if (totalChance > 100.0) {
 			try {

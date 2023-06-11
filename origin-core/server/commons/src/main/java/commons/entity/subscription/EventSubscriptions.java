@@ -1,4 +1,4 @@
-package originmc.subscription;
+package commons.entity.subscription;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;

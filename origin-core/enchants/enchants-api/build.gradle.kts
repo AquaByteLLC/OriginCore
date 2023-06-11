@@ -7,6 +7,6 @@ dependencies {
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
     compileOnly(Dependencies.GUICE)
-    implementation(project(":packets-api"))
+    implementation(project(":commons"))
 
 }

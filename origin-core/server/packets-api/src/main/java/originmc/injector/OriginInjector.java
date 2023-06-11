@@ -1,13 +1,16 @@
 package originmc.injector;
 
 
+import commons.entity.subscription.EventSubscription;
+import commons.entity.subscription.EventSubscriptions;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import originmc.handler.OriginChannelDuplexHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.DefaultChannelPromise;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import originmc.subscription.EventSubscriptions;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,7 +27,6 @@ public class OriginInjector {
 	}
 
 	public OriginChannelDuplexHandler inject(Player player) {
-		System.out.println("Starting Injection");
 		if (!playerHandler.containsKey(player)) {
 			OriginChannelDuplexHandler handler = new OriginChannelDuplexHandler(player);
 			startListen(player, handler);
@@ -33,6 +35,16 @@ public class OriginInjector {
 		} else {
 			return playerHandler.get(player);
 		}
+	}
+
+	@EventSubscription
+	public void playerJoinEvent(PlayerJoinEvent event) {
+		inject(event.getPlayer());
+	}
+
+	@EventSubscription
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		unInject(event.getPlayer());
 	}
 
 	public void unInject(Player player) {

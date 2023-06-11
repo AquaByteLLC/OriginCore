@@ -1,4 +1,4 @@
-package originmc.subscription;
+package commons.entity.subscription;
 
 import java.lang.annotation.Annotation;
 import java.lang.ref.WeakReference;

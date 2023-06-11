@@ -3,12 +3,13 @@ package originmc;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import commons.entity.subscription.EventSubscriptions;
 import originmc.injector.OriginInjector;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import originmc.packets.PacketEvent;
-import originmc.packets.event.EntityEvent;
-import originmc.subscription.EventSubscriptions;
+import originmc.packets.event.PacketEntityEvent;
+import originmc.packets.type.PacketPlayOutBlockBreakImpl;
 
 import java.util.function.Consumer;
 
@@ -34,8 +35,8 @@ public class PacketAPI {
 		this.packetInjector = new OriginInjector();
 	}
 
-	public <T extends PacketEvent<?>> EntityEvent<T> mapEvent(final Class<T> packetEvent, final Consumer<T> packetConsumer) {
-		return new EntityEvent<>(packetConsumer);
+	public <T extends PacketEvent<?>> PacketEntityEvent<T> mapEvent(final Class<T> packetEvent, final Consumer<T> packetConsumer) {
+		return new PacketEntityEvent<>(packetConsumer);
 	}
 
 	static class PacketModule extends AbstractModule {

@@ -1,12 +1,11 @@
 package enchants.records;
 
 import com.google.inject.Inject;
+import commons.entity.EntityEvent;
 import enchants.EnchantAPI;
 import enchants.config.EnchantConfig;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import originmc.packets.PacketEvent;
-import originmc.packets.event.EntityEvent;
 
 /**
  *
