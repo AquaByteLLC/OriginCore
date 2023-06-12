@@ -1,3 +1,6 @@
+group = "generators.impl"
+sharedProjectData.main_cls = "$group.Generators"
+
 setupShadowJar()
 copyToPluginsFolder()
 
@@ -7,6 +10,7 @@ dependencies {
     compileOnly(Dependencies.SPIGOT)
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
-    compileOnly(Dependencies.ACF)
+    implementation(Dependencies.ACF)
+    implementation(project(":commons"))
     implementation(project(":generators-api"))
 }

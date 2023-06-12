@@ -7,4 +7,5 @@ dependencies {
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
     compileOnly(Dependencies.ACF)
+    implementation(project(":commons"))
 }

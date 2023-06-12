@@ -1,3 +1,6 @@
+group = "enchants.impl"
+sharedProjectData.main_cls = "$group.EnchantPlugin"
+
 setupShadowJar()
 copyToPluginsFolder()
 
@@ -12,5 +15,4 @@ dependencies {
     implementation(project(":packets-api"))
     compileOnly(Dependencies.GUICE)
     implementation(project(":commons"))
-
 }

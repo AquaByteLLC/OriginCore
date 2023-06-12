@@ -1,4 +1,6 @@
-setupShadowJar()
+allprojects {
+    extensions.create("sharedProjectData", SharedProjectData::class.java)
+}
 
 plugins {
     id("java")
