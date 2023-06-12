@@ -1,0 +1,9 @@
+# Pufferfish Configuration
+# Check out Pufferfish Host for maximum performance server hosting: https://pufferfish.host
+# Join our Discord for support: https://discord.gg/reZw4vQV9H
+# Download new builds at https://ci.pufferfish.host/job/Pufferfish
+info:
+  version: '1.0'
+sentry-dsn: ''
+enable-async-mob-spawning: false
+enable-books: true

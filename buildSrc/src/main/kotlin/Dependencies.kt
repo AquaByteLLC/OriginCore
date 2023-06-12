@@ -7,11 +7,11 @@ object Versions {
     const val LUCKO_HELPER_VERSION = "5.6.10"
     const val LUCKO_SQL_VERSION = "1.3.0"
     const val LUCKO_MONGO_VERSION = "1.2.0"
-    const val  LUCKO_REDIS_VERSION = "1.2.0"
+    const val LUCKO_REDIS_VERSION = "1.2.0"
     const val LUCKO_LILLY_PAD_VERSION = "2.2.0"
     const val LUCKO_PROFILES_VERSION = "1.2.0"
+    const val ACF_VERSION = "0.5.1-SNAPSHOT"
     const val GUICE_VERSION = "5.1.0"
-
 }
 
 object Dependencies {
@@ -26,7 +26,6 @@ object Dependencies {
     const val LUCKO_MONGO = "me.lucko:helper-mongo:${Versions.LUCKO_MONGO_VERSION}"
     const val LUCKO_LILLYPAD = "me.lucko:helper-lilypad:${Versions.LUCKO_LILLY_PAD_VERSION}"
     const val LUCKO_PROFILES = "me.lucko:helper-profiles:${Versions.LUCKO_PROFILES_VERSION}"
+    const val ACF = "co.aikar:acf-paper:${Versions.ACF_VERSION}"
     const val GUICE = "com.google.inject:guice:${Versions.GUICE_VERSION}"
-
-
 }

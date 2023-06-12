@@ -8,8 +8,4 @@ dependencies {
     compileOnly(Dependencies.LUCKO_SQL)
     implementation(Dependencies._SPIGOT)
     compileOnly(Dependencies.GUICE)
-    implementation(project(":enchants-api"))
-
-
-
 }

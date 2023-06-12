@@ -1,4 +1,5 @@
 setupShadowJar()
+copyToPluginsFolder()
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)

@@ -9,7 +9,4 @@ dependencies {
     implementation(Dependencies._SPIGOT)
     compileOnly(Dependencies.GUICE)
     implementation(project(":commons"))
-
-
-
 }
