@@ -5,5 +5,5 @@ dependencies {
     annotationProcessor(Dependencies.LOMBOK)
     compileOnly(Dependencies.SPIGOT)
     compileOnly(Dependencies.ACF)
-    implementation(project(":commons"))
+    compileOnly(project(":commons"))
 }
