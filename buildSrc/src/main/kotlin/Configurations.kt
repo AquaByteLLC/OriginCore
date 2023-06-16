@@ -30,7 +30,7 @@ fun Project.setupShadowJar() {
         withType<ShadowJar> {
             if(System.getProperty("relocate") != null)//run with "-Drelocate" (jvm arg) to relocate for release, but don't do it for debug since it breaks hot-swap and takes longer
                 dependsOn(getByName("relocate"))
-            archiveFileName.set(project.name + "-all.jar")
+            archiveFileName.set(project.name + ".jar")
             minimize()
             val shared = project.extensions.getByType(SharedProjectData::class.java)
             if(shared.main_cls != null)
@@ -50,7 +50,7 @@ fun Project.copyToPluginsFolder() {
         register("serverCopy", Copy::class) {
             dependsOn(withType<ShadowJar>())
 
-            from(fileTree("build/libs").include("*-all.jar"))
+            from(fileTree("build/libs").include("*.jar"))
             into(rootProject.file(".server/plugins"))
         }
 
@@ -59,9 +59,11 @@ fun Project.copyToPluginsFolder() {
         }
 
 		withType<ProcessResources> {
-			filesMatching("plugin.yml") {
-				expand(mapOf("version" to project.version, "name" to project.name, "main" to project.property("main_cls")))
-			}
+            val shared = project.extensions.getByType(SharedProjectData::class.java)
+            if(shared.main_cls != null)
+                filesMatching("plugin.yml") {
+                    expand(mapOf("version" to project.version, "name" to project.name, "main" to shared.main_cls))
+                }
 		}
 	}
 }

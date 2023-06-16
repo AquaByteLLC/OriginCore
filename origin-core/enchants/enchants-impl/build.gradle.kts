@@ -11,8 +11,8 @@ dependencies {
     compileOnly(Dependencies._SPIGOT)
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
+    compileOnly(Dependencies.GUICE)
     implementation(project(":enchants-api"))
     implementation(project(":packets-api"))
-    compileOnly(Dependencies.GUICE)
     implementation(project(":commons"))
 }

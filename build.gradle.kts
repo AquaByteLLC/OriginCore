@@ -14,6 +14,7 @@ subprojects {
 
     // Here we only want to define the needed repositories for the subprojects.
     repositories {
+        mavenLocal()
         mavenCentral()
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://repo.aikar.co/content/groups/aikar/")

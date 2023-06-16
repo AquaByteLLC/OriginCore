@@ -1,4 +1,8 @@
+group = "commons"
+sharedProjectData.main_cls = "$group.CommonsPlugin"
+
 setupShadowJar()
+copyToPluginsFolder()
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)
@@ -8,4 +12,5 @@ dependencies {
     compileOnly(Dependencies.LUCKO_SQL)
     compileOnly(Dependencies._SPIGOT)
     compileOnly(Dependencies.GUICE)
+    compileOnly(Dependencies.ORMLITE)
 }

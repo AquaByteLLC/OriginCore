@@ -12,6 +12,11 @@ object Versions {
     const val LUCKO_PROFILES_VERSION = "1.2.0"
     const val ACF_VERSION = "0.5.1-SNAPSHOT"
     const val GUICE_VERSION = "5.1.0"
+    const val LFC_VERSION = "1.5"
+    const val MENUS_VERSION = "1.0.0"
+    const val ITEMS_VERSION = "1.0"
+    const val FASTUTIL_VERSION = "8.5.6"
+    const val ORMLITE_VERSION = "6.1"
 }
 
 object Dependencies {
@@ -28,4 +33,10 @@ object Dependencies {
     const val LUCKO_PROFILES = "me.lucko:helper-profiles:${Versions.LUCKO_PROFILES_VERSION}"
     const val ACF = "co.aikar:acf-paper:${Versions.ACF_VERSION}"
     const val GUICE = "com.google.inject:guice:${Versions.GUICE_VERSION}"
+    const val LFC_SHARED = "me.vadim.util.conf:LiteConfig-shared:${Versions.LFC_VERSION}"
+    const val LFC_BUKKIT = "me.vadim.util.conf:LiteConfig-bukkit:${Versions.LFC_VERSION}"
+    const val ITEMS = "me.vadim.util.item:Items:${Versions.ITEMS_VERSION}"
+    const val MENUS = "me.vadim.util.menus:Menus:${Versions.MENUS_VERSION}"
+    const val FASTUTIL = "it.unimi.dsi:fastutil:${Versions.FASTUTIL_VERSION}"
+    const val ORMLITE = "com.j256.ormlite:ormlite-jdbc:${Versions.ORMLITE_VERSION}"
 }
