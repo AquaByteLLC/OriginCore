@@ -10,3 +10,5 @@ build/
 .server/world/
 .server/plugins/*.jar
 .server/logs/
+
+the.zip

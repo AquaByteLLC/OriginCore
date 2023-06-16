@@ -3,6 +3,8 @@ package commons;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import commons.data.AccountStorage;
 import commons.data.AccountStorageHandler;
+import me.lucko.helper.Events;
+import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -15,7 +17,7 @@ import java.util.concurrent.Executors;
 /**
  * @author vadim
  */
-public class CommonsPlugin extends JavaPlugin implements Listener {
+public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	private final ExecutorService       loader = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("[AccountLoader]").build());
 	private final AccountStorageHandler storage = new AccountStorageHandler();
@@ -25,17 +27,24 @@ public class CommonsPlugin extends JavaPlugin implements Listener {
 	}
 
 	@Override
-	public void onEnable() {
-		getServer().getPluginManager().registerEvents(this, this);
+	protected void load() {
+		getLogger().info("(load) commons plugin awake");
 	}
 
 	@Override
-	public void onDisable() {
+	public void enable() {
+		getLogger().info("(enable) commons plugin hello");
+		Events.subscribe(AsyncPlayerPreLoginEvent.class).handler(this::onJoin);
+		Events.subscribe(PlayerQuitEvent.class).handler(this::onQuit);
+	}
+
+	@Override
+	public void disable() {
+		getLogger().info("(disable) commons plugin goodbye");
 		storage.saveAll();
 		loader.shutdownNow();
 	}
 
-	@EventHandler
 	void onJoin(AsyncPlayerPreLoginEvent event) {
 		loader.submit(() -> {
 			try {
@@ -47,7 +56,6 @@ public class CommonsPlugin extends JavaPlugin implements Listener {
 		});
 	}
 
-	@EventHandler
 	void onQuit(PlayerQuitEvent event) {
 		loader.submit(() -> {
 			try {

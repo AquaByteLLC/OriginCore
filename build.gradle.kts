@@ -16,6 +16,7 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://repo.aikar.co/content/groups/aikar/")
         maven("https://repo.codemc.org/repository/maven-public/")

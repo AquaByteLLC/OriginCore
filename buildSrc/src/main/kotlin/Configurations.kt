@@ -10,7 +10,7 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
 
-fun Project.setupShadowJar() {
+fun Project.setupShadowJar(mini: Boolean = true) {
     apply<ShadowPlugin>()
 
     tasks {
@@ -31,7 +31,10 @@ fun Project.setupShadowJar() {
             if(System.getProperty("relocate") != null)//run with "-Drelocate" (jvm arg) to relocate for release, but don't do it for debug since it breaks hot-swap and takes longer
                 dependsOn(getByName("relocate"))
             archiveFileName.set(project.name + ".jar")
-            minimize()
+            if(mini) {
+                minimize()
+                exclude("kotlin/**")
+            }
             val shared = project.extensions.getByType(SharedProjectData::class.java)
             if(shared.main_cls != null)
                 manifest {
