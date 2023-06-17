@@ -61,13 +61,13 @@ fun Project.copyToPluginsFolder() {
             dependsOn(getByName("serverCopy"))
         }
 
-		withType<ProcessResources> {
+        withType<ProcessResources> {
             val shared = project.extensions.getByType(SharedProjectData::class.java)
             if(shared.main_cls != null)
                 filesMatching("plugin.yml") {
                     expand(mapOf("version" to project.version, "name" to project.name, "main" to shared.main_cls))
-                }
-		}
+            }
+        }
 	}
 }
 

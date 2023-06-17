@@ -3,14 +3,14 @@ package originmc.injector;
 
 import commons.entity.subscription.EventSubscription;
 import commons.entity.subscription.EventSubscriptions;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import originmc.handler.OriginChannelDuplexHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.DefaultChannelPromise;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import originmc.PacketAPI;
+import originmc.handler.OriginChannelDuplexHandler;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,6 +39,7 @@ public class OriginInjector {
 
 	@EventSubscription
 	public void playerJoinEvent(PlayerJoinEvent event) {
+		System.out.println("Injected");
 		inject(event.getPlayer());
 	}
 
@@ -69,12 +70,13 @@ public class OriginInjector {
 	}
 
 	private void startListen(Player player, OriginChannelDuplexHandler duplexHandler) {
-		ChannelPipeline pipeline = ((CraftPlayer) player).getHandle().b.a.k.pipeline();
+
+		ChannelPipeline pipeline = PacketAPI.getChannel(player).pipeline();
 		pipeline.addBefore("packet_handler", player.getName(), duplexHandler);
 	}
 
 	private void stopListen(Player player) {
-		Channel channel = ((CraftPlayer) player).getHandle().b.a.k;
+		Channel channel = PacketAPI.getChannel(player);
 
 		if (channel == null) return;
 

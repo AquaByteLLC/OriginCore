@@ -2,13 +2,16 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/OriginCore.iml" filepath="$PROJECT_DIR$/.idea/modules/OriginCore.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/server/commons/OriginCore.commons.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/server/commons/OriginCore.commons.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/enchants/enchants-api/OriginCore.enchants-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/enchants/enchants-api/OriginCore.enchants-api.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/enchants/enchants-impl/OriginCore.enchants-impl.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/enchants/enchants-impl/OriginCore.enchants-impl.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/generators/generators-api/OriginCore.generators-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/generators/generators-api/OriginCore.generators-api.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/generators/generators-impl/OriginCore.generators-impl.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/generators/generators-impl/OriginCore.generators-impl.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/server/packets-api/OriginCore.packets-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/server/packets-api/OriginCore.packets-api.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/server/commons/commons.OriginCore.commons.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/server/commons/commons.OriginCore.commons.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/enchants/enchants-api/enchants-api.OriginCore.enchants-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/enchants/enchants-api/enchants-api.OriginCore.enchants-api.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/enchants/enchants-impl/enchants.impl.OriginCore.enchants-impl.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/enchants/enchants-impl/enchants.impl.OriginCore.enchants-impl.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/origin-core/server/packets-api/packets-api.OriginCore.packets-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/origin-core/server/packets-api/packets-api.OriginCore.packets-api.main.iml" />
     </modules>
   </component>
 </project>

@@ -82,6 +82,10 @@ public class ObjectSubscriptions<A extends Annotation> {
 	}
 
 	public <T> void subscribe(T object, Class<?> clazz) {
+		subscribe(object, clazz, null);
+	}
+
+	public <T> void subscribe(T object, Class<?> clazz, Class<?> genericType) {
 		lock.lock();
 		try {
 			if (!classSchema.containsKey(clazz)) {
@@ -90,6 +94,11 @@ public class ObjectSubscriptions<A extends Annotation> {
 
 			ClassSchema schema = classSchema.get(clazz);
 			for (Class<?> key : schema.methods.keySet()) {
+				if(key.equals(Object.class)) {
+					if(genericType == null)
+						throw new IllegalStateException("It appears that a generic method has been found but no generic type has been provided.");
+					key = genericType;
+				}
 				List<Subscription> subscribed = eventToObjects.computeIfAbsent(key, (k) -> new ArrayList<>());
 
 				boolean contains = false;
@@ -151,7 +160,7 @@ public class ObjectSubscriptions<A extends Annotation> {
 
 	private void map(Class<?> c) {
 		ClassSchema schema = new ClassSchema();
-		for (Method declaredMethod : c.getDeclaredMethods()) {
+		for (Method declaredMethod : c.getMethods()) {
 			if (declaredMethod.isAnnotationPresent(annotation)) {
 				Class<?> param = declaredMethod.getParameterTypes()[0];
 				MethodWrapper wrapper = new MethodWrapper();

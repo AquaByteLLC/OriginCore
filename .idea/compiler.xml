@@ -9,12 +9,12 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.20/18bcea7d5df4d49227b4a0743a536208ce4825bb/lombok-1.18.20.jar" />
         </processorPath>
-        <module name="OriginCore.generators-api.main" />
-        <module name="OriginCore.commons.main" />
-        <module name="OriginCore.enchants-api.main" />
-        <module name="OriginCore.enchants-impl.main" />
-        <module name="OriginCore.packets-api.main" />
-        <module name="OriginCore.generators-impl.main" />
+        <module name="enchants.impl.OriginCore.enchants-impl.main" />
+        <module name="commons.OriginCore.commons.main" />
+        <module name="packets-api.OriginCore.packets-api.main" />
+        <module name="generators.impl.OriginCore.generators-impl.main" />
+        <module name="enchants-api.OriginCore.enchants-api.main" />
+        <module name="generators-api.OriginCore.generators-api.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />

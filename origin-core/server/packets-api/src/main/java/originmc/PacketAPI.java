@@ -4,30 +4,36 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.entity.subscription.EventSubscriptions;
-import originmc.injector.OriginInjector;
+import io.netty.channel.Channel;
 import lombok.Getter;
+import lombok.SneakyThrows;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.server.network.PlayerConnection;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import originmc.packets.PacketEvent;
-import originmc.packets.event.PacketEntityEvent;
-import originmc.packets.type.PacketPlayOutBlockBreakImpl;
+import originmc.injector.OriginInjector;
 
-import java.util.function.Consumer;
+import java.lang.reflect.Field;
 
 public class PacketAPI {
 	@Getter private final EventSubscriptions eventSubscriptions;
 	@Getter private final OriginInjector packetInjector;
-	private static Injector injector;
+	@Getter private final Injector injector;
 
-	public static Injector get() {
-		if (injector == null) {
-			try {
-				throw new Exception("The PacketAPI hasn't been initialized anywhere. Create a new instance of the PacketAPI class in the 'onEnable' method.");
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+	private static final Field h;
+
+	static {
+		Field field;
+		try {
+			field = PlayerConnection.class.getDeclaredField("h");
+			field.setAccessible(true);
+		} catch (NoSuchFieldException e) {
+			throw new RuntimeException(e);
 		}
-		return injector;
+		h = field;
 	}
+
 
 	public PacketAPI(JavaPlugin javaPlugin) {
 		injector = Guice.createInjector(new PacketModule(javaPlugin));
@@ -35,14 +41,15 @@ public class PacketAPI {
 		this.packetInjector = new OriginInjector();
 	}
 
-	public <T extends PacketEvent<?>> PacketEntityEvent<T> mapEvent(final Class<T> packetEvent, final Consumer<T> packetConsumer) {
-		return new PacketEntityEvent<>(packetConsumer);
+	@SneakyThrows
+	public static Channel getChannel(Player player) {
+		return ((NetworkManager) h.get(((CraftPlayer) player).getHandle().b)).m;
 	}
 
 	static class PacketModule extends AbstractModule {
 		private final JavaPlugin plugin;
 
-		public PacketModule(final JavaPlugin plugin) {
+		PacketModule(final JavaPlugin plugin) {
 			this.plugin = plugin;
 		}
 

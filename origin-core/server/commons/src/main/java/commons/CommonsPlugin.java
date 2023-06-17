@@ -5,11 +5,9 @@ import commons.data.AccountStorage;
 import commons.data.AccountStorageHandler;
 import me.lucko.helper.Events;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

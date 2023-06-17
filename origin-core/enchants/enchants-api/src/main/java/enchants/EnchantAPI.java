@@ -3,13 +3,9 @@ package enchants;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import enchants.records.OriginEnchant;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class EnchantAPI {
+public final class EnchantAPI {
 	private static Injector injector;
 
 	public static Injector get() {
@@ -30,7 +26,7 @@ public class EnchantAPI {
 	static class EnchantModule extends AbstractModule {
 		private final JavaPlugin plugin;
 
-		public EnchantModule(final JavaPlugin plugin) {
+		EnchantModule(final JavaPlugin plugin) {
 			this.plugin = plugin;
 		}
 
