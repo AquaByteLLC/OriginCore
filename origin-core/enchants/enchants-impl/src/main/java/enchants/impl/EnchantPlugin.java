@@ -3,8 +3,11 @@ package enchants.impl;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import commons.entity.bukkit.BukkitEntityEvent;
+import commons.entity.subscription.EventSubscription;
 import enchants.EnchantAPI;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import originmc.PacketAPI;
 
@@ -14,11 +17,22 @@ public class EnchantPlugin extends ExtendedJavaPlugin {
 	@Override
 	protected void enable() {
 		injector = Guice.createInjector(new EnchantPluginModule(this));
+		System.out.println("Hello World");
+
+
+		BukkitEntityEvent<BlockBreakEvent> bk = new BukkitEntityEvent<BlockBreakEvent>(BlockBreakEvent.class, event -> {
+			System.out.println(event.getBlock().getX());
+		});
+	}
+
+	@EventSubscription
+	public void onBlockBreak(BlockBreakEvent event) {
+		event.getPlayer().sendMessage("This is working: " + event.getBlock().getX());
 	}
 
 	@Override
 	protected void disable() {
-
+		saveConfig();
 	}
 
 	public static Injector get() {

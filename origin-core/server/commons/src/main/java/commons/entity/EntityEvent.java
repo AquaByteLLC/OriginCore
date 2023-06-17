@@ -1,16 +1,18 @@
 package commons.entity;
 
+
 import commons.entity.subscription.EventSubscription;
 import commons.entity.subscription.EventSubscriptions;
+import lombok.Getter;
 
 import java.util.function.Consumer;
 
-public abstract class EntityEvent<T> {
+public class EntityEvent<T> {
 
-	private final Consumer<T> entityEventConsumer;
-	public EntityEvent(Consumer<T> entityEventConsumer) {
+	@Getter private final Consumer<T> entityEventConsumer;
+	public EntityEvent(Class<T> clazz, Consumer<T> entityEventConsumer) {
 		this.entityEventConsumer = entityEventConsumer;
-		EventSubscriptions.instance.subscribe(this, getClass());
+		EventSubscriptions.instance.subscribe(this, getClass(), clazz);
 	}
 
 	@EventSubscription
