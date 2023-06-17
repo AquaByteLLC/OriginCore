@@ -3,26 +3,32 @@ package enchants.impl;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import commons.entity.bukkit.BukkitEntityEvent;
 import commons.entity.subscription.EventSubscription;
 import enchants.EnchantAPI;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import originmc.PacketAPI;
+import originmc.packets.event.PacketEntityEvent;
+import originmc.packets.type.PacketPlayInBlockDigImpl;
 
 public class EnchantPlugin extends ExtendedJavaPlugin {
 	private static Injector injector;
 
+	private PacketEntityEvent<?> STRONGreference;
 	@Override
 	protected void enable() {
 		injector = Guice.createInjector(new EnchantPluginModule(this));
 		System.out.println("Hello World");
 
-
-		BukkitEntityEvent<BlockBreakEvent> bk = new BukkitEntityEvent<BlockBreakEvent>(BlockBreakEvent.class, event -> {
-			System.out.println(event.getBlock().getX());
+		STRONGreference = new PacketEntityEvent<>(PacketPlayInBlockDigImpl.class, packet -> {
+//			System.out.println(packet.getPacket().a().v());
+//			System.out.println("packeg play in block brake");
 		});
+
+//		BukkitEntityEvent<BlockBreakEvent> bk = new BukkitEntityEvent<>(BlockBreakEvent.class, event -> {
+//			System.out.println(event.getBlock().getX());
+//		});
 	}
 
 	@EventSubscription

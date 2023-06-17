@@ -34,7 +34,6 @@ public class ObjectSubscriptions<A extends Annotation> {
 	}
 
 	public void publish(Object event) {
-
 		for (Map.Entry<Object, List<MethodWrapper>> entry : getCalls(event).entrySet()) {
 			for (MethodWrapper methodWrapper : entry.getValue()) {
 				try {
@@ -52,7 +51,6 @@ public class ObjectSubscriptions<A extends Annotation> {
 
 		lock.lock();
 		try {
-
 			Class<?> eventClass = event.getClass();
 
 			for (Class<?> superClass : getSuperClasses(eventClass)) {

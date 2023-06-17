@@ -33,7 +33,6 @@ public class OriginChannelDuplexHandler extends ChannelDuplexHandler {
 
 	@Override
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-
 		this.ctx = ctx;
 		this.promise = promise;
 

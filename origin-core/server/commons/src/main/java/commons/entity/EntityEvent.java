@@ -3,6 +3,7 @@ package commons.entity;
 
 import commons.entity.subscription.EventSubscription;
 import commons.entity.subscription.EventSubscriptions;
+import commons.entity.subscription.ObjectSubscriptions;
 import lombok.Getter;
 
 import java.util.function.Consumer;

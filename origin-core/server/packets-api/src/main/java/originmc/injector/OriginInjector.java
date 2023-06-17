@@ -1,6 +1,7 @@
 package originmc.injector;
 
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import commons.entity.subscription.EventSubscription;
 import commons.entity.subscription.EventSubscriptions;
 import io.netty.channel.Channel;
@@ -13,14 +14,12 @@ import originmc.PacketAPI;
 import originmc.handler.OriginChannelDuplexHandler;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class OriginInjector {
 
-	public static ConcurrentHashMap<Player, OriginChannelDuplexHandler> playerHandler;
-
-	static {
-		playerHandler = new ConcurrentHashMap<>();
-	}
+	private static final ConcurrentHashMap<Player, OriginChannelDuplexHandler> playerHandler = new ConcurrentHashMap<>();
 
 	public OriginInjector() {
 		EventSubscriptions.instance.subscribe(this, getClass());
@@ -53,7 +52,6 @@ public class OriginInjector {
 			stopListen(player);
 			playerHandler.remove(player);
 		}
-
 	}
 
 	public static void sendPacket(Player player, Object packet) {
@@ -70,7 +68,6 @@ public class OriginInjector {
 	}
 
 	private void startListen(Player player, OriginChannelDuplexHandler duplexHandler) {
-
 		ChannelPipeline pipeline = PacketAPI.getChannel(player).pipeline();
 		pipeline.addBefore("packet_handler", player.getName(), duplexHandler);
 	}
