@@ -1,12 +1,20 @@
 package commons.events.impl.bukkit;
 
+import commons.ReflectUtil;
 import commons.events.api.EventRegistry;
 import commons.events.impl.EventListener;
+import lombok.SneakyThrows;
+import org.bukkit.entity.Player;
 import org.bukkit.event.*;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Method;
 
 /**
  * @author vadim
@@ -34,11 +42,12 @@ public class BukkitEventListener<T extends Event> implements EventListener, Even
 	}
 
 	@Override
+	@SneakyThrows
 	public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
 		if (events != null) {
-			if (event instanceof PlayerEvent playerEvent) {
-				events.publish(playerEvent.getPlayer(), playerEvent);
-			}
+			MethodHandle[] getters = ReflectUtil.getPublicMethodsByReturnType(event.getClass(), Player.class);
+			if(getters.length >= 1)
+				events.publish((Player) getters[0].invoke(event), event);
 		}
 	}
 

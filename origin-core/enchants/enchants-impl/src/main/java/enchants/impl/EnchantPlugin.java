@@ -12,13 +12,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class EnchantPlugin extends ExtendedJavaPlugin {
 	private static Injector injector;
 
-	private EventsDemo demo;
 	@Override
 	protected void enable() {
 		injector = Guice.createInjector(new EnchantPluginModule(this));
 
 		EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
-		demo = new EventsDemo(registry); // make sure you save the reference, because if it gets GC'd then the registry will auto-remove your subscription
+		// make sure you save the reference, because if it gets GC'd then the registry will auto-remove your subscription
 		EventsDemoEnum.bind(this, registry);
 	}
 

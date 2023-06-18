@@ -9,11 +9,14 @@ import commons.events.impl.bukkit.BukkitEventListener;
 import commons.events.impl.packet.PacketEventListener;
 import me.lucko.helper.Events;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.lang.reflect.Method;
+import java.sql.Ref;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -63,8 +66,14 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		// - for Bukkit events you have to register it per event class
 		// - for Packet events it's best to only register one Injector per plyaer
 		events.addSubscriptionHook(event ->  {
-			if(org.bukkit.event.Event.class.isAssignableFrom(event))
+			if(org.bukkit.event.Event.class.isAssignableFrom(event)) {
 				new BukkitEventListener<>((Class<Event>) event).startListen(this, events);
+				int len = ReflectUtil.getPublicMethodsByReturnType(event, Player.class).length;
+				if(len < 1)
+					throw new IllegalArgumentException("Bukkit event class " + event.getCanonicalName() + " does not involve a player!");
+				if(len > 1)
+					ReflectUtil.serr("WARN: Bukkit event class " + event.getCanonicalName() + " involves multiple players! EventContext does not gurantee which player will be selected.");
+			}
 		});
 		packetsImpl.startListen(this, events);
 	}
