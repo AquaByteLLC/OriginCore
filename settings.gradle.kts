@@ -5,7 +5,7 @@ setupOriginModule(
         listOf(
             Pair("enchants", listOf("enchants-api", "enchants-impl")),
             Pair("generators", listOf("generators-api", "generators-impl")),
-            Pair("server", listOf("packets-api", "commons"))
+            Pair("server", listOf("commons"))
               ));
 
 

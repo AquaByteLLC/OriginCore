@@ -1,6 +1,6 @@
 package enchants.records;
 
-import commons.entity.EntityEvent;
+import commons.events.impl.EventSubscriber;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -15,4 +15,4 @@ public record OriginEnchant(String name,
                           String information,
                           String lore,
 						  ItemStack menuItem,
-                          EntityEvent<?> handleEnchant){}
+                          EventSubscriber handleEnchant){}

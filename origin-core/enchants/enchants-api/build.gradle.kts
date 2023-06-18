@@ -8,5 +8,5 @@ dependencies {
     compileOnly(Dependencies.LUCKO_SQL)
     implementation(Dependencies.REFLECTIONS)
     compileOnly(Dependencies.GUICE)
-    implementation(project(":commons"))
+    compileOnly(project(":commons"))
 }

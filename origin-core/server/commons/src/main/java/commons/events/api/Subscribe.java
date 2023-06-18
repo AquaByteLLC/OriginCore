@@ -1,14 +1,17 @@
-package commons.entity.subscription;
-
-import org.bukkit.event.EventPriority;
+package commons.events.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * @author vadim
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface EventSubscription {
-	EventPriority priority() default EventPriority.NORMAL;
+public @interface Subscribe {
+
+	// I do not care about EventPriority
+
 }
