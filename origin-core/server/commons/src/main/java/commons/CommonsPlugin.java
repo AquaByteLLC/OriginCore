@@ -31,7 +31,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	public static CommonsPlugin commons() {
 		if(instance == null)
-			throw new NullPointerException("Not initialized! Did you accidentaly shade in the entire commons lib?");
+			throw new NullPointerException("Not initialized! Did you accidentally shade in the entire commons lib?");
 		return instance;
 	}
 
