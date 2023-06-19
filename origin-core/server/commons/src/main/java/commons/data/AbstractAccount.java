@@ -1,5 +1,6 @@
 package commons.data;
 
+import com.j256.ormlite.field.DatabaseField;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
  */
 public abstract class AbstractAccount implements Account {
 
+	@DatabaseField(id = true)
 	private final UUID uuid;
 
 	public AbstractAccount(UUID uuid) {

@@ -1,5 +1,8 @@
 package generators.impl;
 
+import commons.events.api.EventContext;
+import commons.events.api.EventRegistry;
+import commons.events.api.Subscribe;
 import generators.impl.conf.Config;
 import generators.impl.wrapper.Drops;
 import generators.wrapper.Generator;
@@ -14,6 +17,7 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.util.Vector;
 
 /**
@@ -25,14 +29,13 @@ public class GenHandler {
 	private final GenRegistry reg;
 	private final Task drops;
 
-	public GenHandler(ConfigurationProvider conf, GenRegistry registry) {
+	public GenHandler(ConfigurationProvider conf, EventRegistry events, GenRegistry registry) {
 		this.conf = conf;
 		this.reg = registry;
 
 		Config config = conf.open(Config.class);
 
-		Events.merge(BlockEvent.class, BlockDamageEvent.class, BlockBreakEvent.class).handler(this::onCreateGen);
-		Events.subscribe(BlockPlaceEvent.class).handler(this::onDestroyGen);
+		events.subscribeAll(this);
 
 		drops = Schedulers.sync().runRepeating(this::drop, config.getDropRateTicks(), config.getDropRateTicks());
 	}
@@ -52,11 +55,14 @@ public class GenHandler {
 		}
 	}
 
-	void onCreateGen(BlockEvent event){
+	@Subscribe
+	void onUnlinkGen(EventContext context, BlockBreakEvent event){
+		System.out.println(context.getPlayer().getName());
 	}
 
-	void onDestroyGen(BlockEvent event) {
-
+	@Subscribe
+	void onCreateGen(EventContext context, BlockPlaceEvent event) {
+		System.out.println(context.getPlayer().getName());
 	}
 
 	public void shutdown() {

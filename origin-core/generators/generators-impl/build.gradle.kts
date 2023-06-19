@@ -21,7 +21,8 @@ dependencies {
     compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(Dependencies.ITEMS)
     compileOnly(Dependencies.MENUS)
-    compileOnly(Dependencies.ORMLITE)
+    compileOnly(Dependencies.ORMLITE_CORE)
+    compileOnly(Dependencies.ORMLITE_JDBC)
     compileOnly(project(":commons"))
     implementation(project(":generators-api"))
 }

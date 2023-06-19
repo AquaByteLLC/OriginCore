@@ -3,11 +3,15 @@ package commons;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import commons.data.AccountStorage;
 import commons.data.AccountStorageHandler;
+import commons.data.DatabaseSession;
+import commons.data.SessionProvider;
+import commons.data.impl.PostgresDatabaseSession;
+import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
+import commons.events.api.Subscribe;
 import commons.events.api.impl.PlayerEventRegistry;
 import commons.events.impl.bukkit.BukkitEventListener;
 import commons.events.impl.packet.PacketEventListener;
-import me.lucko.helper.Events;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -15,8 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.lang.reflect.Method;
-import java.sql.Ref;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -48,6 +50,11 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return events;
 	}
 
+	public SessionProvider getDatabase(){
+		// todo
+		return PostgresDatabaseSession::new;
+	}
+
 	@Override
 	protected void load() {
 		instance = this;
@@ -58,8 +65,6 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 	@SuppressWarnings("unchecked")
 	public void enable() {
 		getLogger().info("(enable) commons plugin hello");
-		Events.subscribe(AsyncPlayerPreLoginEvent.class).handler(this::onJoin);
-		Events.subscribe(PlayerQuitEvent.class).handler(this::onQuit);
 
 		// special publishers for EventRegistry
 		// the underlying impls work differently
@@ -76,6 +81,9 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 			}
 		});
 		packetsImpl.startListen(this, events);
+		//
+
+		events.subscribeAll(this);
 	}
 
 	@Override
@@ -86,7 +94,9 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		packetsImpl.ceaseListen();
 	}
 
-	void onJoin(AsyncPlayerPreLoginEvent event) {
+	@Subscribe
+	private void onJoin(EventContext context, AsyncPlayerPreLoginEvent event) {
+		System.out.println("(temp) commons onJoin");
 		loader.submit(() -> {
 			try {
 				storage.loadOne(event.getUniqueId());
@@ -97,7 +107,9 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		});
 	}
 
-	void onQuit(PlayerQuitEvent event) {
+	@Subscribe
+	private void onQuit(EventContext context, PlayerQuitEvent event) {
+		System.out.println("(temp) commons onQuit");
 		loader.submit(() -> {
 			try {
 				storage.saveOne(event.getPlayer().getUniqueId());

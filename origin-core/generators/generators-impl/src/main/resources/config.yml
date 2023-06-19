@@ -1,2 +1,9 @@
 drop_rate_seconds: 5
 default_slots: 10
+
+drop_item:
+  name: "&f%drop_name%"
+  lore:
+    - ""
+    - "&eSell Price: &f$%drop_price%"
+    - ""

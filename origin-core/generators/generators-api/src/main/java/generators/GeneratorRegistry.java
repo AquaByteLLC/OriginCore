@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author vadim
@@ -18,7 +19,7 @@ public interface GeneratorRegistry {
 
 	List<Generator> getGenerators(OfflinePlayer owner);
 
-	int countGenerators(OfflinePlayer owner);
+	int countGenerators(UUID ownerUUID);
 
 	/**
 	 * Save all generators, and prune the cache, unregistering any generators belonging to offline players.

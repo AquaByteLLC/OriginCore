@@ -1,0 +1,34 @@
+tiers:
+  1:
+    block: STONE
+    name: "Stone Age"
+    upgrade:
+      price: 100
+    drop:
+      item: COBBLESTONE
+      price: 1
+  
+  2:
+    block: GOLD_BLOCK
+    name: "Medieval Age"
+    upgrade:
+      price: 500
+    drop:
+      item: GOLD_INGOT
+      price: 10
+  
+  3:
+    block: IRON_BLOCK
+    name: "Industrial Age"
+    upgrade:
+      price: 1000
+    drop:
+      item: IRON_INGOT
+      price: 20
+  
+  4:
+    block: DIAMOND_BLOCK
+    name: "New Age"
+    drop:
+      item: DIAMOND
+      price: 100

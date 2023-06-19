@@ -39,5 +39,6 @@ object Dependencies {
     const val ITEMS = "me.vadim.util.item:Items:${Versions.ITEMS_VERSION}"
     const val MENUS = "me.vadim.util.menus:Menus:${Versions.MENUS_VERSION}"
     const val FASTUTIL = "it.unimi.dsi:fastutil:${Versions.FASTUTIL_VERSION}"
-    const val ORMLITE = "com.j256.ormlite:ormlite-jdbc:${Versions.ORMLITE_VERSION}"
+    const val ORMLITE_CORE = "com.j256.ormlite:ormlite-core:${Versions.ORMLITE_VERSION}"
+    const val ORMLITE_JDBC = "com.j256.ormlite:ormlite-jdbc:${Versions.ORMLITE_VERSION}"
 }

@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author vadim
@@ -57,10 +58,10 @@ public class GenRegistry implements GeneratorRegistry {
 	}
 
 	@Override
-	public int countGenerators(OfflinePlayer owner) {
+	public int countGenerators(UUID ownerUUID) {
 		int num = 0;
 		for (Long2ObjectMap.Entry<Generator> entry : Long2ObjectMaps.fastIterable(gens))
-			if(entry.getValue().getOwnerUUID().equals(owner.getUniqueId()))
+			if(entry.getValue().getOwnerUUID().equals(ownerUUID))
 				num++;
 		return num;
 	}
