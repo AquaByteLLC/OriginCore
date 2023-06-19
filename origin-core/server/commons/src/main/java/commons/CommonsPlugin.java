@@ -1,22 +1,25 @@
 package commons;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.j256.ormlite.logger.Level;
 import commons.data.AccountStorage;
 import commons.data.AccountStorageHandler;
-import commons.data.DatabaseSession;
 import commons.data.SessionProvider;
-import commons.data.impl.PostgresDatabaseSession;
+import commons.data.impl.PostgreSQLSession;
+import commons.data.impl.SQLiteSession;
 import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import commons.events.api.impl.PlayerEventRegistry;
 import commons.events.impl.bukkit.BukkitEventListener;
 import commons.events.impl.packet.PacketEventListener;
+import lombok.SneakyThrows;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.concurrent.ExecutorService;
@@ -35,7 +38,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return instance;
 	}
 
-	private final ExecutorService loader = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("[AccountLoader]").build());
+	private final ExecutorService pool = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("[AccountStorage]").build());
 
 	private final AccountStorageHandler storage = new AccountStorageHandler();
 
@@ -52,13 +55,16 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	public SessionProvider getDatabase(){
 		// todo
-		return PostgresDatabaseSession::new;
+//		return PostgreSQLSession::new;
+		return () -> new SQLiteSession(getDataFolder());
 	}
 
 	@Override
 	protected void load() {
 		instance = this;
 		getLogger().info("(load) commons plugin awaken");
+		com.j256.ormlite.logger.Logger.setGlobalLogLevel(Level.WARNING); // supress spam from TableUtils class
+		getDataFolder().mkdirs();
 	}
 
 	@Override
@@ -90,18 +96,18 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 	public void disable() {
 		getLogger().info("(disable) commons plugin goodbye");
 		storage.saveAll();
-		loader.shutdownNow();
+		pool.shutdownNow();
 		packetsImpl.ceaseListen();
 	}
 
 	@Subscribe
-	private void onJoin(EventContext context, AsyncPlayerPreLoginEvent event) {
+	private void onJoin(EventContext context, PlayerJoinEvent event) {
 		System.out.println("(temp) commons onJoin");
-		loader.submit(() -> {
+		pool.submit(() -> {
 			try {
-				storage.loadOne(event.getUniqueId());
+				storage.loadOne(event.getPlayer().getUniqueId());
 			} catch (Exception e) {
-				getLogger().severe("Problem loading accounts for " + event.getUniqueId());
+				getLogger().severe("Problem loading accounts for " + event.getPlayer().getUniqueId());
 				e.printStackTrace();
 			}
 		});
@@ -110,7 +116,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 	@Subscribe
 	private void onQuit(EventContext context, PlayerQuitEvent event) {
 		System.out.println("(temp) commons onQuit");
-		loader.submit(() -> {
+		pool.submit(() -> {
 			try {
 				storage.saveOne(event.getPlayer().getUniqueId());
 			} catch (Exception e) {

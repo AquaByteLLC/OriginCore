@@ -2,12 +2,16 @@ package commons.data.impl;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.logger.Level;
+import com.j256.ormlite.logger.Logger;
+import com.j256.ormlite.logger.LoggerFactory;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.table.TableUtils;
 import commons.data.DatabaseSession;
 import lombok.SneakyThrows;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +48,7 @@ public abstract class AbstractSession implements DatabaseSession {
 	public final void close() {
 		for (Dao<?, UUID> dao : daos)
 			try(DatabaseConnection connection = source.getReadWriteConnection(dao.getTableName())) {
+				connection.setAutoCommit(false);
 				dao.commit(connection);
 			}
 

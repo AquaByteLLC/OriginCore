@@ -3,6 +3,7 @@ package generators.impl;
 import co.aikar.commands.PaperCommandManager;
 import commons.CommonsPlugin;
 import commons.StringUtil;
+import commons.data.AccountStorage;
 import commons.events.api.EventRegistry;
 import generators.impl.conf.Tiers;
 import generators.impl.data.GenAccount;
@@ -25,6 +26,7 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider {
 	private PaperCommandManager commands;
 	private GenRegistry         registry;
 	private GenHandler          handler;
+	private AccountStorage<GenAccount> storage;
 
 	public Config config() {
 		return lfc.open(Config.class);
@@ -46,13 +48,15 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider {
 
 		EventRegistry events = commons.getEventRegistry();
 
-		commands = new PaperCommandManager(this);
-		commands.registerCommand(new GenCommand());
+		storage = new GenAccountStorage(registry, lfc, commons.getDatabase());
 
 		registry = new GenRegistry(lfc);
 		handler  = new GenHandler(lfc, events, registry);
 
-		commons.registerAccountLoader(new GenAccountStorage(registry, lfc, commons.getDatabase()));
+		commands = new PaperCommandManager(this);
+		commands.registerCommand(new GenCommand(storage));
+
+		commons.registerAccountLoader(storage);
 	}
 
 	@Override

@@ -19,6 +19,10 @@ public class GenAccount extends AbstractAccount {
 
 	GeneratorRegistry registry;
 
+	private GenAccount() { // ORMLite
+		super(null);
+	}
+
 	public GenAccount(UUID uuid, GeneratorRegistry registry, ConfigurationProvider conf) {
 		super(uuid);
 

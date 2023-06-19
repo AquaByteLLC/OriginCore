@@ -1,10 +1,12 @@
 package commons.data;
 
+import java.sql.SQLException;
+
 /**
  * @author vadim
  */
 public interface SessionProvider {
 
-	DatabaseSession session();
+	DatabaseSession session() throws SQLException;
 
 }

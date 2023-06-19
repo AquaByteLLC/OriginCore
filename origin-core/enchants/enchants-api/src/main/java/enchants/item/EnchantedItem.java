@@ -31,7 +31,7 @@ public class EnchantedItem {
 		@Getter
 		private final OriginEnchant enchant;
 
-		public EnchantHolder(OriginEnchant enchant) {
+		EnchantHolder(OriginEnchant enchant) {
 			this.level = 1;
 			this.enchant = enchant;
 		}

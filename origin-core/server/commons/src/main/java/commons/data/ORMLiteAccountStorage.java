@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
  */
 public abstract class ORMLiteAccountStorage<T extends Account> implements AccountStorage<T> {
 
-	private final Map<UUID, T>      cache = new HashMap<>(500);
-	private final AccountFactory<T> factory;
+	private final Map<UUID, T> cache = new HashMap<>(500);
 
-	protected final SessionProvider provider;
-	protected final Class<T>        clazz;
+	protected final AccountFactory<T> factory;
+	protected final SessionProvider   provider;
+	protected final Class<T>          clazz;
 
 	public ORMLiteAccountStorage(AccountFactory<T> factory, SessionProvider provider, Class<T> clazz) {
 		this.factory  = factory;
@@ -40,23 +40,24 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 	@Override
 	@SneakyThrows
 	public final void flushAndSave() {
-		try(DatabaseSession sesh = provider.session()) {
+		try (DatabaseSession sesh = provider.session()) {
 			Set<UUID>    online = Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
 			Dao<T, UUID> dao    = sesh.getDAO(clazz);
 
-			UUID uuid;
+			UUID           uuid;
 			Iterator<UUID> iter = cache.keySet().iterator();
-			while(iter.hasNext()) {
+			while (iter.hasNext()) {
 				uuid = iter.next();
 				save(cache.get(uuid), dao);
 
-				if(!online.contains(uuid))
+				if (!online.contains(uuid))
 					iter.remove();
 			}
 		}
 	}
 
 	protected abstract void save(T account, Dao<T, UUID> dao) throws SQLException;
+
 	protected abstract T load(UUID uuid, Dao<T, UUID> dao) throws SQLException;
 
 	@Override
@@ -67,7 +68,7 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 	@Override
 	@SneakyThrows
 	public final void savePlayer(UUID uuid) {
-		try(DatabaseSession sesh = provider.session()) {
+		try (DatabaseSession sesh = provider.session()) {
 			Dao<T, UUID> dao = sesh.getDAO(clazz);
 			save(getAccount(uuid), dao);
 		}
@@ -81,7 +82,7 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 	@Override
 	@SneakyThrows
 	public final void loadPlayer(UUID uuid) {
-		try(DatabaseSession sesh = provider.session()) {
+		try (DatabaseSession sesh = provider.session()) {
 			Dao<T, UUID> dao = sesh.getDAO(clazz);
 			cache.put(uuid, load(uuid, dao));
 		}

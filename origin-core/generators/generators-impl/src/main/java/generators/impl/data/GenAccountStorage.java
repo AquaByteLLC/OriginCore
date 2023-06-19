@@ -29,6 +29,8 @@ public class GenAccountStorage extends ORMLiteAccountStorage<GenAccount> {
 	@Override
 	protected GenAccount load(UUID uuid, Dao<GenAccount, UUID> dao) throws SQLException {
 		GenAccount account = dao.queryForId(uuid);
+		if(account == null)
+			account = factory.create(uuid);
 		account.registry = registry;
 		return account;
 	}

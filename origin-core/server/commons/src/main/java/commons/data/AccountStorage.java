@@ -7,11 +7,7 @@ import java.util.UUID;
 /**
  * @author vadim
  */
-public interface AccountStorage<T extends Account> {
-
-	T getAccount(OfflinePlayer player);
-
-	T getAccount(UUID uuid);
+public interface AccountStorage<T extends Account> extends AccountProvider<T> {
 
 	void flushAndSave();
 
