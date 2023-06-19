@@ -3,7 +3,7 @@ package commons.data;
 import java.util.UUID;
 
 /**
- * typealias for {@code Supplier<Account>} or {@code Supplier<T>} in {@link  AccountStorage} implementations
+ * type alias for {@code Supplier<Account>} or {@code Supplier<T>} in {@link  AccountStorage} implementations
  * @author vadim
  */
 @FunctionalInterface

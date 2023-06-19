@@ -17,6 +17,7 @@ object Versions {
     const val ITEMS_VERSION = "1.0"
     const val FASTUTIL_VERSION = "8.5.6"
     const val ORMLITE_VERSION = "6.1"
+    const val APACHE_COMMONS_VERSION = "3.12.0"
 }
 
 object Dependencies {
@@ -40,4 +41,5 @@ object Dependencies {
     const val MENUS = "me.vadim.util.menus:Menus:${Versions.MENUS_VERSION}"
     const val FASTUTIL = "it.unimi.dsi:fastutil:${Versions.FASTUTIL_VERSION}"
     const val ORMLITE = "com.j256.ormlite:ormlite-jdbc:${Versions.ORMLITE_VERSION}"
+    const val APACHE_COMMONS = "org.apache.commons:commons-lang3:${Versions.APACHE_COMMONS_VERSION}"
 }

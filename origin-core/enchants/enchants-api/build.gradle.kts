@@ -8,5 +8,6 @@ dependencies {
     compileOnly(Dependencies.LUCKO_SQL)
     implementation(Dependencies.REFLECTIONS)
     compileOnly(Dependencies.GUICE)
+    compileOnly(Dependencies.APACHE_COMMONS)
     compileOnly(project(":commons"))
 }
