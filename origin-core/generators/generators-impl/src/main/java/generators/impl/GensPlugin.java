@@ -41,7 +41,7 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider {
 		lfc = new LiteConfig(this);
 		lfc.register(Config.class, Config::new);
 		lfc.register(Messages.class, Messages::new);
-		lfc.register(Tiers.class, Tiers::new);
+		lfc.register(Tiers.class, (rp) -> new Tiers(rp, lfc));
 		lfc.reload();
 
 		CommonsPlugin commons = CommonsPlugin.commons();
@@ -51,7 +51,7 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider {
 		storage = new GenAccountStorage(registry, lfc, commons.getDatabase());
 
 		registry = new GenRegistry(lfc);
-		handler  = new GenHandler(lfc, events, registry);
+		handler  = new GenHandler(lfc, events, registry, storage);
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new GenCommand(storage));

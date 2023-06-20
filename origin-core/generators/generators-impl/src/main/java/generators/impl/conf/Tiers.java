@@ -13,6 +13,7 @@ import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 
+import javax.swing.plaf.basic.BasicButtonUI;
 import java.util.*;
 
 /**
@@ -20,11 +21,28 @@ import java.util.*;
  */
 public class Tiers extends YamlFile {
 
-	public Tiers(ResourceProvider resourceProvider) {
+	private final ConfigurationProvider prov;
+
+	public Tiers(ResourceProvider resourceProvider, ConfigurationProvider prov) {
 		super("tiers.yml", resourceProvider);
+		this.prov = prov;
 	}
 
-	public Tier getFirstTier(ConfigurationProvider prov) {
+	private Tier first;
+	private final Map<Material, Tier> byMaterial = new HashMap<>();
+
+	public Tier findTier(Material material) {
+		return byMaterial.get(material);
+	}
+
+	public Tier getFirstTier() {
+		return first;
+	}
+
+	@Override
+	public void load() {
+		super.load();
+
 		ConfigurationAccessor   conf = getConfigurationAccessor().getObject("tiers");
 		ConfigurationAccessor[] keys = conf.getChildren();
 
@@ -46,6 +64,7 @@ public class Tiers extends YamlFile {
 			return Integer.compare(i2, i1);
 		});
 
+		byMaterial.clear();
 		Tier       last = null;
 		for (ConfigurationAccessor child : conf.getChildren()) {
 			if(last != null && !child.has("upgrade")) // non-leaf tier missing upgrade block
@@ -74,10 +93,12 @@ public class Tiers extends YamlFile {
 											  .build();
 
 			last = new GenInfo(name, block, upgrade, new GenDrop(price, prov.open(Config.class).getGeneratorDrop().format(drop, pl).build()));
+			if(byMaterial.containsKey(block))
+				logError(resourceProvider.getLogger(), conf.currentPath() + '.' + child.currentPath() + ".block", "DUPLICATE gen block material");
+			byMaterial.put(block, last);
 		}
 
-		return last;
+		first = last;
 	}
-
 
 }

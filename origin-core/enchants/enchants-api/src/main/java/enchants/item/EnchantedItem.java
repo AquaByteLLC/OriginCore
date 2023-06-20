@@ -5,11 +5,13 @@ import lombok.SneakyThrows;
 import me.lucko.helper.text3.Text;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class EnchantedItem {
 
@@ -19,13 +21,17 @@ public class EnchantedItem {
 		this.itemStack = itemStack;
 	}
 
-	private PersistentDataContainer container() {
+	private PersistentDataContainer readContainer() {
 		return this.itemStack.getItemMeta().getPersistentDataContainer();
 	}
 
+	private void writeContainer(Consumer<PersistentDataContainer> consumer) {
+		itemStack.editMeta(meta -> consumer.accept(meta.getPersistentDataContainer()));
+	}
+
 	public void addEnchant(NamespacedKey enchantKey, int level) {
-		itemStack.editMeta(meta -> {
-			container().set(enchantKey, PersistentDataType.INTEGER, level);
+		writeContainer(pdc -> {
+			pdc.set(enchantKey, PersistentDataType.INTEGER, level);;
 		});
 		updateLore();
 	}
@@ -33,14 +39,14 @@ public class EnchantedItem {
 	public void removeEnchant(NamespacedKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return;
 		itemStack.editMeta(meta -> {
-			container().remove(enchantKey);
+			readContainer().remove(enchantKey);
 		});
 		updateLore();
 	}
 
 	public void removeAllEnchants() {
-		if (!container().getKeys().isEmpty())
-			container().getKeys().forEach(this::removeEnchant);
+		if (!readContainer().getKeys().isEmpty())
+			readContainer().getKeys().forEach(this::removeEnchant);
 		updateLore();
 	}
 
@@ -53,7 +59,7 @@ public class EnchantedItem {
 		final double startChance = holder.startChance();
 		final double maxChance = holder.maxChance();
 		final int maxLvl = holder.maxLevel();
-		final int currentLvl = container().get(enchantKey, PersistentDataType.INTEGER);
+		final int currentLvl = readContainer().get(enchantKey, PersistentDataType.INTEGER);
 
 		if (maxLvl == 1) return maxChance;
 		else {
@@ -75,7 +81,7 @@ public class EnchantedItem {
 		final double startCost = holder.startCost();
 		final double maxCost = holder.maxCost();
 		final int maxLvl = holder.maxLevel();
-		final int currentLvl = container().get(enchantKey, PersistentDataType.INTEGER);
+		final int currentLvl = readContainer().get(enchantKey, PersistentDataType.INTEGER);
 
 		if (maxLvl == 1) return maxCost;
 		else {
@@ -90,11 +96,11 @@ public class EnchantedItem {
 	@SneakyThrows
 	public int getLevel(NamespacedKey enchantKey) {
 		if (!hasEnchant(enchantKey)) throw new IllegalArgumentException("You aren't able to update this enchant because it hasn't been added to the item.");
-		return container().get(enchantKey, PersistentDataType.INTEGER);
+		return readContainer().get(enchantKey, PersistentDataType.INTEGER);
 	}
 
 	public boolean hasEnchant(NamespacedKey enchant) {
-		return container().has(enchant, PersistentDataType.INTEGER);
+		return readContainer().has(enchant, PersistentDataType.INTEGER);
 	}
 
 	private void updateLore() {
@@ -108,13 +114,13 @@ public class EnchantedItem {
 				lore.add(" ");
 			}
 
-			for (NamespacedKey enchantKey : container().getKeys()) {
+			for (NamespacedKey enchantKey : readContainer().getKeys()) {
 				final int level = getLevel(enchantKey);
 				final OriginEnchant enchant = OriginEnchant.enchantRegistry.get(enchantKey);
 				lore.add(Text.colorize(enchant.lore().replaceAll("%level%", String.valueOf(level))));
 			}
 
-			System.out.println(container().getKeys());
+			System.out.println(readContainer().getKeys());
 			meta.setLore(lore);
 		});
 	}
