@@ -15,7 +15,7 @@ public enum EnchantTypes {
 
 	SPEED_ENCHANT(new OriginEnchant("Speed",
 			"This enchant applies the speed effect!",
-			"Speed ->",
+			"&bSpeed &f-> &b%level%",
 			ItemStackBuilder.of(Material.WOODEN_AXE).build(),
 			10,
 			100,
