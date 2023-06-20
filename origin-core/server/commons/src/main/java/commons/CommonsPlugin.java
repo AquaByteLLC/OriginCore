@@ -5,7 +5,6 @@ import com.j256.ormlite.logger.Level;
 import commons.data.AccountStorage;
 import commons.data.AccountStorageHandler;
 import commons.data.SessionProvider;
-import commons.data.impl.PostgreSQLSession;
 import commons.data.impl.SQLiteSession;
 import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
@@ -13,9 +12,10 @@ import commons.events.api.Subscribe;
 import commons.events.api.impl.PlayerEventRegistry;
 import commons.events.impl.bukkit.BukkitEventListener;
 import commons.events.impl.packet.PacketEventListener;
-import lombok.SneakyThrows;
+import commons.impl.account.PlayerDefaultAccount;
+import commons.impl.account.PlayerDefaultAccountStorage;
+import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
-import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	private static CommonsPlugin instance;
+	@Getter private AccountStorage<PlayerDefaultAccount> dataStorage;
 
 	public static CommonsPlugin commons() {
 		if(instance == null)
@@ -65,6 +66,9 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		getLogger().info("(load) commons plugin awaken");
 		com.j256.ormlite.logger.Logger.setGlobalLogLevel(Level.WARNING); // supress spam from TableUtils class
 		getDataFolder().mkdirs();
+
+		dataStorage = new PlayerDefaultAccountStorage(getDatabase());
+		registerAccountLoader(dataStorage);
 	}
 
 	@Override

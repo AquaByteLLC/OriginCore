@@ -1,15 +1,19 @@
-package enchants.impl;
+package enchants.impl.type;
 
 import commons.events.api.EventRegistry;
 import commons.events.impl.bukkit.BukkitEventSubscriber;
+import enchants.EnchantAPI;
 import enchants.item.EnchantedItem;
 import enchants.records.OriginEnchant;
 import lombok.Getter;
 import me.lucko.helper.item.ItemStackBuilder;
+import me.lucko.helper.text3.Text;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public enum EnchantTypes {
 
@@ -25,16 +29,17 @@ public enum EnchantTypes {
 			OriginEnchant.EnchantProgressionType.EXPONENTIAL,
 			OriginEnchant.EnchantProgressionType.EXPONENTIAL,
 			new BukkitEventSubscriber<>(BlockBreakEvent.class, (event) -> {
-				final EnchantedItem item = new EnchantedItem(event.getPlayer().getItemInUse());
+				final NamespacedKey enchantKey = new NamespacedKey(EnchantAPI.get().getInstance(JavaPlugin.class), "Speed");
+				final ItemStack playersItem = event.getPlayer().getInventory().getItemInMainHand();
 
-				if (item.hasEnchant(NamespacedKey.minecraft("Speed"))) {
-					if (item.getLevel(NamespacedKey.minecraft("Speed")) > 4) {
-						System.out.println("Greater than 4 for lvl");
-					} else if (item.getLevel(NamespacedKey.minecraft("Speed")) < 4) {
-						System.out.println("Less than 4 for lvl");
-					}
+				if (playersItem.getType().isAir()) return;
+
+				final EnchantedItem item = new EnchantedItem(playersItem);
+
+				if (item.activate(enchantKey)) {
+					event.getPlayer().sendMessage(Text.colorize("&b&lSPEEEEED!"));
 				}
-			})));
+			})).addToRegistry());
 	@Getter private final OriginEnchant enchant;
 	EnchantTypes(OriginEnchant enchant) {
 		this.enchant = enchant;

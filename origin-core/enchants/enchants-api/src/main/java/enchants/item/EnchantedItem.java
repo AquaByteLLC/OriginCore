@@ -5,12 +5,12 @@ import lombok.SneakyThrows;
 import me.lucko.helper.text3.Text;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class EnchantedItem {
@@ -31,15 +31,21 @@ public class EnchantedItem {
 
 	public void addEnchant(NamespacedKey enchantKey, int level) {
 		writeContainer(pdc -> {
-			pdc.set(enchantKey, PersistentDataType.INTEGER, level);;
+			final OriginEnchant enchant = OriginEnchant.enchantRegistry.get(enchantKey);
+			if (enchant.maxLevel() <= level) {
+				System.out.println("Larger than maxLvl");
+				pdc.set(enchantKey, PersistentDataType.INTEGER, enchant.maxLevel());
+			} else {
+				pdc.set(enchantKey, PersistentDataType.INTEGER, level);
+			}
 		});
 		updateLore();
 	}
 
 	public void removeEnchant(NamespacedKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return;
-		itemStack.editMeta(meta -> {
-			readContainer().remove(enchantKey);
+		writeContainer(pdc -> {
+			pdc.remove(enchantKey);
 		});
 		updateLore();
 	}
@@ -105,14 +111,17 @@ public class EnchantedItem {
 
 	private void updateLore() {
 		itemStack.editMeta(meta -> {
-			List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+			final List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
 
 			if (lore == null) return;
 
-			if (!lore.contains("&c&lEnchants")) {
-				lore.add(Text.colorize("&c&lEnchants"));
-				lore.add(" ");
+			if (lore.contains(Text.colorize("&c&lEnchants"))) {
+				System.out.println("It do contain it doeeee");
+				lore.removeIf(string -> lore.indexOf(Text.colorize(string)) >= lore.indexOf(Text.colorize("&c&lEnchants")));
 			}
+
+			lore.add(Text.colorize("&c&lEnchants"));
+			lore.add(" ");
 
 			for (NamespacedKey enchantKey : readContainer().getKeys()) {
 				final int level = getLevel(enchantKey);
@@ -123,6 +132,15 @@ public class EnchantedItem {
 			System.out.println(readContainer().getKeys());
 			meta.setLore(lore);
 		});
+	}
+
+	public boolean activate(NamespacedKey key) {
+		if (!hasEnchant(key)) return false;
+		final Random random = new Random();
+		final int randomNumber = random.nextInt(100);
+		final double chance = getChance(key);
+		System.out.println(chance);
+		return randomNumber <= chance;
 	}
 
 	/**

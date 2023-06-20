@@ -6,7 +6,9 @@ import com.google.inject.Injector;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import commons.events.impl.bukkit.BukkitEventSubscriber;
+import commons.impl.account.PlayerDefaultAccount;
 import enchants.EnchantAPI;
+import enchants.impl.type.EnchantTypes;
 import enchants.item.EnchantedItem;
 import me.lucko.helper.Commands;
 import me.lucko.helper.item.ItemStackBuilder;
@@ -41,8 +43,14 @@ public class EnchantPlugin extends ExtendedJavaPlugin {
 		Commands.create().assertPermission("test.giveEnchant").assertPlayer().handler(handler -> {
 			final String arg1 = handler.arg(0).parseOrFail(String.class);
 			final int level = handler.arg(1).parseOrFail(Integer.class);
+
 			final EnchantedItem item = new EnchantedItem(handler.sender().getInventory().getItemInMainHand());
 			item.addEnchant(EnchantTypes.SPEED_ENCHANT.getEnchant().getKey(), level);
+
+			final CommonsPlugin plugin = CommonsPlugin.commons();
+			final PlayerDefaultAccount account = plugin.getDataStorage().getAccount(handler.sender().getUniqueId());
+			account.tokenCount += 10;
+			System.out.println(account.tokenCount);
 		}).register("origintest");
 	}
 

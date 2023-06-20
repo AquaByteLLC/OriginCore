@@ -23,13 +23,14 @@ public record OriginEnchant(String name,
 
 	public static HashMap<NamespacedKey, OriginEnchant> enchantRegistry = new HashMap<>();
 
-	public OriginEnchant {
-		enchantRegistry.put(NamespacedKey.fromString(name), this);
-	}
-
 	public NamespacedKey getKey() {
 		final JavaPlugin plugin = EnchantAPI.get().getInstance(JavaPlugin.class);
 		return new NamespacedKey(plugin, name);
+	}
+
+	public OriginEnchant addToRegistry() {
+		enchantRegistry.put(getKey(), this);
+		return this;
 	}
 
 	public enum EnchantProgressionType {
