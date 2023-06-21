@@ -4,6 +4,7 @@ import generators.wrapper.Generator;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,8 +23,8 @@ public interface GeneratorRegistry {
 	int countGenerators(UUID ownerUUID);
 
 	/**
-	 * Save all generators, and prune the cache, unregistering any generators belonging to offline players.
+	 * @return a fast iterator over all loaded {@link Generator}s
 	 */
-	void flushAndSave();
+	Iterator<Generator> all();
 
 }

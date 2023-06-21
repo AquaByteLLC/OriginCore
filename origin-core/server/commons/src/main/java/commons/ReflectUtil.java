@@ -48,6 +48,7 @@ public class ReflectUtil {
 		synchronized (System.out) {
 			for (char c : string.toCharArray())
 				System.out.print(c);
+			System.out.println();
 		}
 	}
 

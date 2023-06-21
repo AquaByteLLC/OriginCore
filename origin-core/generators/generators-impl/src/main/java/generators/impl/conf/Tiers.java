@@ -1,5 +1,6 @@
 package generators.impl.conf;
 
+import commons.ReflectUtil;
 import commons.StringUtil;
 import generators.impl.wrapper.GenDrop;
 import generators.impl.wrapper.GenInfo;
@@ -30,9 +31,18 @@ public class Tiers extends YamlFile {
 
 	private Tier first;
 	private final Map<Material, Tier> byMaterial = new HashMap<>();
+	private final List<Tier> byIndex = new ArrayList<>();
 
 	public Tier findTier(Material material) {
 		return byMaterial.get(material);
+	}
+
+	public Tier findTier(int index) {
+		return index < byIndex.size() ? byIndex.get(index) : null;
+	}
+
+	public List<Tier> allTiers() {
+		return new ArrayList<>(byIndex);
 	}
 
 	public Tier getFirstTier() {
@@ -49,26 +59,29 @@ public class Tiers extends YamlFile {
 		Arrays.sort(keys, (k1, k2) -> {
 			int i1;
 			try {
-				i1 = Integer.parseInt(k1.currentPath());
+				i1 = Integer.parseInt(k1.currentPath().split("\\.")[1]);
 			} catch (NumberFormatException x) {
-				logError(resourceProvider.getLogger(), conf.currentPath() + "." + k1.currentPath());
+				logError(resourceProvider.getLogger(), k1.currentPath());
 				return 0;
 			}
 			int i2;
 			try {
-				i2 = Integer.parseInt(k2.currentPath());
+				i2 = Integer.parseInt(k2.currentPath().split("\\.")[1]);
 			} catch (NumberFormatException x) {
-				logError(resourceProvider.getLogger(), conf.currentPath() + "." + k2.currentPath());
+				logError(resourceProvider.getLogger(), k2.currentPath());
 				return 0;
 			}
 			return Integer.compare(i2, i1);
-		});
+		}); // sort keys desc
 
 		byMaterial.clear();
-		Tier       last = null;
-		for (ConfigurationAccessor child : conf.getChildren()) {
+		byIndex.clear();
+
+		int i = keys.length;
+		Tier last = null;
+		for (ConfigurationAccessor child : keys) {
 			if(last != null && !child.has("upgrade")) // non-leaf tier missing upgrade block
-				logError(resourceProvider.getLogger(), conf.currentPath() + '.' + child.currentPath() + ".upgrade", "tier upgrade cost");
+				logError(resourceProvider.getLogger(), child.currentPath() + ".upgrade", "tier upgrade cost");
 
 			String name = child.getString("name");
 			Material block = Material.matchMaterial(child.getString("block"));
@@ -80,11 +93,11 @@ public class Tiers extends YamlFile {
 				upgrade = new TierUp(last, child.getObject("upgrade").getDouble("price"));
 
 			if(block == null || !block.isBlock())
-				logError(resourceProvider.getLogger(), conf.currentPath() + '.' + child.currentPath() + ".block", "gen block material");
+				logError(resourceProvider.getLogger(), child.currentPath() + ".block", "gen block material");
 			assert block != null;
 
 			if(drop == null || !drop.isItem())
-				logError(resourceProvider.getLogger(), conf.currentPath() + '.' + child.currentPath() + ".block", "gen drop material");
+				logError(resourceProvider.getLogger(), child.currentPath() + ".block", "gen drop material");
 			assert drop != null;
 
 			Placeholder pl = StringPlaceholder.builder()
@@ -92,12 +105,14 @@ public class Tiers extends YamlFile {
 											  .set("drop_price", String.valueOf(price))
 											  .build();
 
-			last = new GenInfo(name, block, upgrade, new GenDrop(price, prov.open(Config.class).getGeneratorDrop().format(drop, pl).build()));
+			last = new GenInfo(--i, name, block, upgrade, new GenDrop(price, prov.open(Config.class).getGeneratorDrop().format(drop, pl).build()), prov);
 			if(byMaterial.containsKey(block))
-				logError(resourceProvider.getLogger(), conf.currentPath() + '.' + child.currentPath() + ".block", "DUPLICATE gen block material");
+				logError(resourceProvider.getLogger(), child.currentPath() + ".block", "DUPLICATE gen block material");
 			byMaterial.put(block, last);
+			byIndex.add(last);
 		}
 
+		Collections.reverse(byIndex);
 		first = last;
 	}
 

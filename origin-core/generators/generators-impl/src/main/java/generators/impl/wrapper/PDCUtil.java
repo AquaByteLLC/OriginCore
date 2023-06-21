@@ -127,4 +127,8 @@ public final class PDCUtil {
 		});
 	}
 
+	public static boolean isGen(ItemStack potentialGen) {
+		return potentialGen.hasItemMeta() && potentialGen.getItemMeta().getPersistentDataContainer().has(GEN_OWNER);
+	}
+
 }

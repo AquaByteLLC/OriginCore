@@ -42,7 +42,7 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 	public final void flushAndSave() {
 		try (DatabaseSession sesh = provider.session()) {
 			Set<UUID>    online = Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
-			Dao<T, UUID> dao    = sesh.getDAO(clazz);
+			Dao<T, UUID> dao    = sesh.getDAO(clazz, UUID.class);
 
 			UUID           uuid;
 			Iterator<UUID> iter = cache.keySet().iterator();
@@ -69,7 +69,7 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 	@SneakyThrows
 	public final void savePlayer(UUID uuid) {
 		try (DatabaseSession sesh = provider.session()) {
-			Dao<T, UUID> dao = sesh.getDAO(clazz);
+			Dao<T, UUID> dao = sesh.getDAO(clazz, UUID.class);
 			save(getAccount(uuid), dao);
 		}
 	}
@@ -83,7 +83,7 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 	@SneakyThrows
 	public final void loadPlayer(UUID uuid) {
 		try (DatabaseSession sesh = provider.session()) {
-			Dao<T, UUID> dao = sesh.getDAO(clazz);
+			Dao<T, UUID> dao = sesh.getDAO(clazz, UUID.class);
 			cache.put(uuid, load(uuid, dao));
 		}
 	}

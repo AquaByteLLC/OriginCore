@@ -2,6 +2,8 @@ package commons.data.impl;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.field.DataPersisterManager;
+import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.logger.Level;
 import com.j256.ormlite.logger.Logger;
 import com.j256.ormlite.logger.LoggerFactory;
@@ -32,13 +34,17 @@ public abstract class AbstractSession implements DatabaseSession {
 		return source;
 	}
 
-	private final List<Dao<?, UUID>> daos = new ArrayList<>();
+	private final List<Dao<?, ?>> daos = new ArrayList<>();
+
+	private final void table(Dao<?, ?> dao) throws SQLException {
+		TableUtils.createTableIfNotExists(source, dao.getDataClass());
+	}
 
 	@Override
 	@SneakyThrows
-	public <T> Dao<T, UUID> getDAO(Class<T> clazz) {
-		TableUtils.createTableIfNotExists(source, clazz);
-		Dao<T, UUID> dao = DaoManager.createDao(source, clazz);
+	public <T, I> Dao<T, I> getDAO(Class<T> objClass, Class<I> idClass) {
+		Dao<T, I> dao = DaoManager.createDao(source, objClass);
+		table(dao);
 		daos.add(dao);
 		return dao;
 	}
@@ -46,8 +52,9 @@ public abstract class AbstractSession implements DatabaseSession {
 	@Override
 	@SneakyThrows
 	public final void close() {
-		for (Dao<?, UUID> dao : daos)
+		for (Dao<?, ?> dao : daos)
 			try(DatabaseConnection connection = source.getReadWriteConnection(dao.getTableName())) {
+				table(dao);
 				connection.setAutoCommit(false);
 				dao.commit(connection);
 			}

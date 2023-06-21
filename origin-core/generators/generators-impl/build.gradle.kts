@@ -26,3 +26,20 @@ dependencies {
     compileOnly(project(":commons"))
     implementation(project(":generators-api"))
 }
+
+
+
+tasks {
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
+    }
+
+    compileJava {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
+    }
+}

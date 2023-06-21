@@ -1,23 +1,22 @@
 package commons;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.logger.Level;
 import commons.data.AccountStorage;
 import commons.data.AccountStorageHandler;
 import commons.data.SessionProvider;
+import commons.data.impl.LocationPersister;
 import commons.data.impl.SQLiteSession;
 import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
-import commons.events.api.impl.PlayerEventRegistry;
-import commons.events.impl.bukkit.BukkitEventListener;
-import commons.events.impl.packet.PacketEventListener;
+import commons.events.impl.PluginEventWrapper;
 import commons.impl.account.PlayerDefaultAccount;
 import commons.impl.account.PlayerDefaultAccountStorage;
-import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import me.vadim.util.menu.Menus;
+import me.vadim.util.menu.MenusKt;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -31,7 +30,6 @@ import java.util.concurrent.Executors;
 public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	private static CommonsPlugin instance;
-	@Getter private AccountStorage<PlayerDefaultAccount> dataStorage;
 
 	public static CommonsPlugin commons() {
 		if(instance == null)
@@ -47,11 +45,16 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		storage.track(accounts);
 	}
 
-	private final EventRegistry       events      = new PlayerEventRegistry();
-	private final PacketEventListener packetsImpl = new PacketEventListener();
+	private AccountStorage<PlayerDefaultAccount> dataStorage;
+
+	public AccountStorage<PlayerDefaultAccount> getDataStorage() {
+		return dataStorage;
+	}
+
+	private PluginEventWrapper events;
 
 	public EventRegistry getEventRegistry() {
-		return events;
+		return events.getEventRegistry();
 	}
 
 	public SessionProvider getDatabase(){
@@ -63,45 +66,34 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 	@Override
 	protected void load() {
 		instance = this;
+		MenusKt.makesMeCry = this;
 		getLogger().info("(load) commons plugin awaken");
 		com.j256.ormlite.logger.Logger.setGlobalLogLevel(Level.WARNING); // supress spam from TableUtils class
+		DataPersisterManager.registerDataPersisters(new LocationPersister());
 		getDataFolder().mkdirs();
-
-		dataStorage = new PlayerDefaultAccountStorage(getDatabase());
-		registerAccountLoader(dataStorage);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void enable() {
+		Menus.enable();
 		getLogger().info("(enable) commons plugin hello");
 
-		// special publishers for EventRegistry
-		// the underlying impls work differently
-		// - for Bukkit events you have to register it per event class
-		// - for Packet events it's best to only register one Injector per plyaer
-		events.addSubscriptionHook(event ->  {
-			if(org.bukkit.event.Event.class.isAssignableFrom(event)) {
-				new BukkitEventListener<>((Class<Event>) event).startListen(this, events);
-				int len = ReflectUtil.getPublicMethodsByReturnType(event, Player.class).length;
-				if(len < 1)
-					throw new IllegalArgumentException("Bukkit event class " + event.getCanonicalName() + " does not involve a player!");
-				if(len > 1)
-					ReflectUtil.serr("WARN: Bukkit event class " + event.getCanonicalName() + " involves multiple players! EventContext does not gurantee which player will be selected.");
-			}
-		});
-		packetsImpl.startListen(this, events);
-		//
+		dataStorage = new PlayerDefaultAccountStorage(getDatabase());
+		registerAccountLoader(dataStorage);
 
-		events.subscribeAll(this);
+		events = new PluginEventWrapper(this);
+		events.enable();
+
+		getEventRegistry().subscribeAll(this);
 	}
 
 	@Override
 	public void disable() {
+		Menus.disable();
 		getLogger().info("(disable) commons plugin goodbye");
 		storage.saveAll();
 		pool.shutdownNow();
-		packetsImpl.ceaseListen();
+		events.disable();
 	}
 
 	@Subscribe

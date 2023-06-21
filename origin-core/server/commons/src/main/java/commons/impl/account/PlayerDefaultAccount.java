@@ -15,7 +15,7 @@ public class PlayerDefaultAccount extends AbstractAccount {
 		super(null);
 	}
 
-	public PlayerDefaultAccount(UUID uuid) {
+	PlayerDefaultAccount(UUID uuid) {
 		super(uuid);
 	}
 

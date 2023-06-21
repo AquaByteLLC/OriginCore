@@ -1,11 +1,14 @@
 package generators.wrapper;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * @author vadim
  */
 public interface Tier {
+
+	int getIndex();
 
 	String getName();
 
@@ -19,5 +22,7 @@ public interface Tier {
 	boolean isMaxed();
 
 	Drop getDrop();
+
+	ItemStack getMenuItem();
 
 }

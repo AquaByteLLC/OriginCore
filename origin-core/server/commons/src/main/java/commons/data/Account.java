@@ -1,5 +1,6 @@
 package commons.data;
 
+import commons.Owned;
 import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;
@@ -7,10 +8,4 @@ import java.util.UUID;
 /**
  * @author vadim
  */
-public interface Account {
-
-	UUID getUUID();
-
-	OfflinePlayer getOwner();
-
-}
+public interface Account extends Owned { }

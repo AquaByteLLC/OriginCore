@@ -12,7 +12,7 @@ public interface DatabaseSession extends AutoCloseable {
 
 	ConnectionSource getConnectionSource();
 
-	<T> Dao<T, UUID> getDAO(Class<T> clazz);
+	<T, I> Dao<T, I> getDAO(Class<T> objClass, Class<I> idClass);
 
 	@Override
 	void close();

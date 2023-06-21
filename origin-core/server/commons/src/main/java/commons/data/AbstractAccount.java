@@ -19,12 +19,12 @@ public abstract class AbstractAccount implements Account {
 	}
 
 	@Override
-	public UUID getUUID() {
+	public UUID getOwnerUUID() {
 		return uuid;
 	}
 
 	@Override
-	public OfflinePlayer getOwner() {
+	public OfflinePlayer getOfflineOwner() {
 		return Bukkit.getOfflinePlayer(uuid);
 	}
 

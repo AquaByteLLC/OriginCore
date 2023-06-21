@@ -22,7 +22,7 @@ public class GenAccount extends AbstractAccount {
 		super(null);
 	}
 
-	public GenAccount(UUID uuid, GeneratorRegistry registry, ConfigurationProvider conf) {
+	GenAccount(UUID uuid, GeneratorRegistry registry, ConfigurationProvider conf) {
 		super(uuid);
 
 		this.registry = registry;
@@ -32,7 +32,7 @@ public class GenAccount extends AbstractAccount {
 	@DatabaseField
 	public int slotLimit;
 
-	public int getSlotsUsed() { return registry.countGenerators(getUUID()); }
+	public int getSlotsUsed() { return registry.countGenerators(getOwnerUUID()); }
 
 	public boolean isAtSlotLimit() { return getSlotsUsed() >= slotLimit; }
 

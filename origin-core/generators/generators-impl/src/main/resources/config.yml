@@ -1,9 +1,39 @@
 drop_rate_seconds: 5
 default_slots: 10
+autosave_interval_minutes: 20
 
 drop_item:
-  name: "&f%drop_name%"
+  name: "&f{drop_name}"
   lore:
     - ""
-    - "&eSell Price: &f$%drop_price%"
+    - "&eSell Price: &f${drop_price}"
     - ""
+
+gen_menu_item:
+  name: "&f{drop_name} Generator &7(Right Click)"
+  lore:
+    - ""
+    - "&eGen Upgrade Price: {price_symbol}&f{upgrade_price}"
+    - "&eDrop Sell Price: &b$&f{drop_price}"
+    - ""
+  price_symbol: "&b$" # this will be blank when the max level message is shown
+  upgrade_price_max: "&4Max level."
+
+menu:
+  button:
+    next:
+      type: LIME_STAINED_GLASS_PANE
+      name: "Next page"
+      lore:
+        - "Click me!"
+    back:
+      type: RED_STAINED_GLASS_PANE
+      name: "Previous page"
+      lore:
+        - "Click me!"
+    done:
+      type: NETHER_STAR
+      name: "Done"
+      lore:
+        - "Goes back to last menu,"
+        - "or closes the current menu."

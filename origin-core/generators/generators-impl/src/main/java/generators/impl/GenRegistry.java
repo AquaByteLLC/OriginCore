@@ -8,10 +8,12 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import me.vadim.util.conf.ConfigurationProvider;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +24,7 @@ public class GenRegistry implements GeneratorRegistry {
 
 	private final Long2ObjectMap<Generator> gens = Long2ObjectMaps.synchronize(new Long2ObjectOpenHashMap<>(5000));
 
-	protected Iterable<Long2ObjectMap.Entry<Generator>> all() {
+	protected Iterable<Long2ObjectMap.Entry<Generator>> iterable() {
 		return Long2ObjectMaps.fastIterable(gens);
 	}
 
@@ -67,8 +69,8 @@ public class GenRegistry implements GeneratorRegistry {
 	}
 
 	@Override
-	public void flushAndSave() {
-
+	public Iterator<Generator> all() {
+		return gens.values().iterator();
 	}
 
 }

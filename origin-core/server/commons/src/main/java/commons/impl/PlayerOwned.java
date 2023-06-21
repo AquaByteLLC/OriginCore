@@ -1,5 +1,6 @@
 package commons.impl;
 
+import com.j256.ormlite.field.DatabaseField;
 import commons.Owned;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -11,6 +12,9 @@ import java.util.UUID;
  */
 public abstract class PlayerOwned implements Owned {
 
+	public static final String uuid_COLUMN = "owner_uuid";
+
+	@DatabaseField(columnName = uuid_COLUMN)
 	private final UUID uuid;
 
 	public PlayerOwned(UUID uuid) {
