@@ -9,7 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 
 public record OriginEnchant(String name,
-                          String information,
+                          String[] information,
                           String lore,
 						  ItemStack menuItem,
 						  int maxLevel,

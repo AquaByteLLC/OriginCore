@@ -5,47 +5,38 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
-import commons.events.impl.bukkit.BukkitEventSubscriber;
 import commons.impl.account.PlayerDefaultAccount;
 import enchants.EnchantAPI;
+import enchants.impl.config.EnchantsConfig;
 import enchants.impl.type.EnchantTypes;
 import enchants.item.EnchantedItem;
 import me.lucko.helper.Commands;
-import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
-import me.lucko.helper.text3.Text;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.event.player.PlayerJoinEvent;
+import me.vadim.util.conf.LiteConfig;
+import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
-
-public class EnchantPlugin extends ExtendedJavaPlugin {
+public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvider {
 	private static Injector injector;
+	private static LiteConfig lfc;
 
 	@Override
 	protected void enable() {
 		injector = Guice.createInjector(new EnchantPluginModule(this));
 
-		EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
-		EnchantTypes.bind(this, registry);
+		lfc = new LiteConfig(this);
+		lfc.register(EnchantsConfig.class, EnchantsConfig::new);
+		lfc.reload();
 
-		new BukkitEventSubscriber<>(PlayerJoinEvent.class, event -> {
-			final ItemStackBuilder builder = ItemStackBuilder.of(Material.STONE_AXE);
-			builder.transformMeta(meta -> {
-				meta.setLore(List.of(Text.colorize("&c&fTesting the lore")));
-				meta.addEnchant(Enchantment.ARROW_INFINITE, 2, true);
-			});
-			event.getPlayer().getInventory().addItem(builder.build());
-		}).bind(this, registry);
+		EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
+		new EnchantTypes(this, registry);
 
 		Commands.create().assertPermission("test.giveEnchant").assertPlayer().handler(handler -> {
 			final String arg1 = handler.arg(0).parseOrFail(String.class);
 			final int level = handler.arg(1).parseOrFail(Integer.class);
 
 			final EnchantedItem item = new EnchantedItem(handler.sender().getInventory().getItemInMainHand());
-			item.addEnchant(EnchantTypes.SPEED_ENCHANT.getEnchant().getKey(), level);
+			item.addEnchant(EnchantTypes.SPEED_ENCHANT_KEY, level);
 
 			final CommonsPlugin plugin = CommonsPlugin.commons();
 			final PlayerDefaultAccount account = plugin.getDataStorage().getAccount(handler.sender().getUniqueId());
@@ -58,6 +49,10 @@ public class EnchantPlugin extends ExtendedJavaPlugin {
 	protected void disable() {
 		saveConfig();
 
+	}
+
+	public static EnchantsConfig getEnchantsConfig() {
+		return lfc.open(EnchantsConfig.class);
 	}
 
 	public static Injector get() {
