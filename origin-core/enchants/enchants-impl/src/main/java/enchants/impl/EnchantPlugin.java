@@ -1,16 +1,14 @@
 package enchants.impl;
 
+import co.aikar.commands.PaperCommandManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
-import commons.impl.account.PlayerDefaultAccount;
 import enchants.EnchantAPI;
-import enchants.impl.config.EnchantsConfig;
+import enchants.impl.commands.EnchantCommands;
 import enchants.impl.type.EnchantTypes;
-import enchants.item.EnchantedItem;
-import me.lucko.helper.Commands;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
@@ -24,35 +22,16 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 	protected void enable() {
 		injector = Guice.createInjector(new EnchantPluginModule(this));
 
-		lfc = new LiteConfig(this);
-		lfc.register(EnchantsConfig.class, EnchantsConfig::new);
-		lfc.reload();
-
 		EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
 		new EnchantTypes(this, registry);
 
-		Commands.create().assertPermission("test.giveEnchant").assertPlayer().handler(handler -> {
-			final String arg1 = handler.arg(0).parseOrFail(String.class);
-			final int level = handler.arg(1).parseOrFail(Integer.class);
-
-			final EnchantedItem item = new EnchantedItem(handler.sender().getInventory().getItemInMainHand());
-			item.addEnchant(EnchantTypes.SPEED_ENCHANT_KEY, level);
-
-			final CommonsPlugin plugin = CommonsPlugin.commons();
-			final PlayerDefaultAccount account = plugin.getDataStorage().getAccount(handler.sender().getUniqueId());
-			account.tokenCount += 10;
-			System.out.println(account.tokenCount);
-		}).register("origintest");
+		PaperCommandManager commands = new PaperCommandManager(this);
+		commands.registerCommand(new EnchantCommands());
 	}
 
 	@Override
 	protected void disable() {
 		saveConfig();
-
-	}
-
-	public static EnchantsConfig getEnchantsConfig() {
-		return lfc.open(EnchantsConfig.class);
 	}
 
 	public static Injector get() {

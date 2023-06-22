@@ -1,18 +1,21 @@
-package enchants.impl.type;
+package enchants.builder;
 
 import commons.events.api.EventRegistry;
 import commons.events.impl.EventSubscriber;
-import enchants.impl.EnchantPlugin;
-import enchants.impl.config.EnchantsConfig;
+import enchants.EnchantAPI;
+import enchants.config.EnchantmentConfiguration;
 import enchants.records.OriginEnchant;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.util.List;
+
 public class OriginEnchantBuilder {
 	private final String enchantName;
 	private String lore;
-	private String[] information;
+	private List<String> information;
 	private int maxLevel;
 	private ItemStack menuItem;
 	private double startCost;
@@ -21,14 +24,19 @@ public class OriginEnchantBuilder {
 	private double maxChance;
 	private OriginEnchant.EnchantProgressionType chanceType;
 	private OriginEnchant.EnchantProgressionType costType;
+	private final YamlConfiguration enchantConfiguration;
 
 	public OriginEnchantBuilder(String enchantName) {
 		this.enchantName = enchantName;
 
-		final EnchantsConfig config = EnchantPlugin.getEnchantsConfig();
-		final YamlConfiguration configuration = config.getConfiguration();
+		final EnchantmentConfiguration config;
+		try {
+			config = new EnchantmentConfiguration(EnchantAPI.get().getInstance(JavaPlugin.class), enchantName);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
-		EnchantsConfig.EnchantConfigPaths.createSections(enchantName, configuration, config);
+		this.enchantConfiguration = config.getConfiguration();
 
 		this.lore = config.getEnchantLore(enchantName);
 		this.information = config.getDescription(enchantName);
@@ -47,7 +55,7 @@ public class OriginEnchantBuilder {
 		return this;
 	}
 
-	public OriginEnchantBuilder setInfo(String[] information) {
+	public OriginEnchantBuilder setInfo(List<String> information) {
 		this.information = information;
 		return this;
 	}
@@ -107,6 +115,6 @@ public class OriginEnchantBuilder {
 				chanceType,
 				costType,
 				handleEnchant
-		).addToRegistry();
+		).addToRegistry(enchantConfiguration);
 	}
 }

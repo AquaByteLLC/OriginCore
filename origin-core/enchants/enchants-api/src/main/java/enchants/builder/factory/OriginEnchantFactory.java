@@ -1,4 +1,6 @@
-package enchants.impl.type;
+package enchants.builder.factory;
+
+import enchants.builder.OriginEnchantBuilder;
 
 public interface OriginEnchantFactory {
 	static OriginEnchantBuilder create(String enchantName) {

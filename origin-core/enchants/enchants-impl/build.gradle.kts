@@ -6,6 +6,7 @@ copyToPluginsFolder()
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)
+    compileOnly(Dependencies.ACF)
     annotationProcessor(Dependencies.LOMBOK)
     compileOnly(Dependencies.PAPER)
     compileOnly(Dependencies._SPIGOT)

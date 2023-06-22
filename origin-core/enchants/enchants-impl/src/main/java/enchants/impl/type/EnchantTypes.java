@@ -3,6 +3,7 @@ package enchants.impl.type;
 import commons.events.api.EventRegistry;
 import commons.events.impl.bukkit.BukkitEventSubscriber;
 import enchants.EnchantAPI;
+import enchants.builder.factory.OriginEnchantFactory;
 import enchants.item.EnchantedItem;
 import me.lucko.helper.text3.Text;
 import org.bukkit.NamespacedKey;
