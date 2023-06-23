@@ -41,8 +41,6 @@ public class EnchantCommands extends BaseCommand {
 		for (OriginEnchant enchant : OriginEnchant.enchantRegistry.values()) {
 			final String enchantName = enchant.name();
 			final List<String> enchantInformation = enchant.information();
-			enchantInformation.forEach(Text::colorize);
-			Text.colorize(enchantName);
 
 			AtomicInteger count = new AtomicInteger();
 			TextComponent hoverText = TextComponent.builder(enchantName, TextColor.GREEN).hoverEvent(HoverEvent.showText(TextComponent.make(text -> {
