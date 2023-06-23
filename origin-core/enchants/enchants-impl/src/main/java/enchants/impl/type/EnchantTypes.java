@@ -33,9 +33,6 @@ public class EnchantTypes {
 			}
 		}));
 
-		OriginEnchantFactory.create(EXPLOSIVE_ENCHANT_NAME).build(plugin, registry, new BukkitEventSubscriber<>(BlockBreakEvent.class, event -> {
-
-		}));
 	}
 }
 
