@@ -18,9 +18,11 @@ import java.util.function.Consumer;
 public class PlayerEventRegistry implements EventRegistry {
 
 	private static class Subscription {
-		WeakReference<Object>                   listener;
+
+		WeakReference<Object>              listener;
 		Set<Class<?>>                      events;
 		Map<Class<?>, List<Subscriber<?>>> callbacks;
+
 	}
 
 	private final Map<Class<?>, List<Subscription>> subscriptions = new ConcurrentHashMap<>();
@@ -55,9 +57,7 @@ public class PlayerEventRegistry implements EventRegistry {
 		for (Class<?> event : subscription.events)
 			subscriptions.computeIfAbsent(event, x -> new ArrayList<>()).add(subscription);
 
-		for (Consumer<Class<?>> hook : subscriptionHooks)
-			for (Class<?> event : subscription.events)
-				hook.accept(event);
+		invokeSubscriptionHooks(subscription);
 	}
 
 	@Override
@@ -68,18 +68,16 @@ public class PlayerEventRegistry implements EventRegistry {
 		subscription.callbacks = Map.of(eventClass, Collections.singletonList(subscriber));
 
 		subscriptions.computeIfAbsent(eventClass, x -> new ArrayList<>()).add(subscription);
+		invokeSubscriptionHooks(subscription);
 	}
 
 	@Override
 	public void unsubscribe(Object listener) {
-		if(listener == null) throw new IllegalArgumentException("Null listener in #unsubscribe.");
+		if (listener == null)
+			throw new IllegalArgumentException("Null listener in #unsubscribe.");
 
-		Map<Class<?>, List<Method>> methods = map(listener.getClass());
-		for (Class<?> event : methods.keySet()) {
-			List<Subscription> subs = subscriptions.get(event);
-			if(subs != null)
-				subs.removeIf(sub -> sub.listener.refersTo(listener));
-		}
+		for (List<Subscription> list : subscriptions.values())
+			list.removeIf(subscription -> subscription.listener.refersTo(listener));
 	}
 
 	@Override
@@ -113,6 +111,12 @@ public class PlayerEventRegistry implements EventRegistry {
 			methodsByEventType.computeIfAbsent(params[1], x -> new ArrayList<>()).add(method);
 		}
 		return methodsByEventType;
+	}
+
+	private void invokeSubscriptionHooks(Subscription subscription){
+		for (Consumer<Class<?>> hook : subscriptionHooks)
+			for (Class<?> event : subscription.events)
+				hook.accept(event);
 	}
 
 }

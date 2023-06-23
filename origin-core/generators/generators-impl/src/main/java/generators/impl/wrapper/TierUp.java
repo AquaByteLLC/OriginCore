@@ -1,7 +1,12 @@
 package generators.impl.wrapper;
 
+import generators.GeneratorRegistry;
+import generators.wrapper.Generator;
 import generators.wrapper.Tier;
 import generators.wrapper.Upgrade;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 /**
  * @author vadim

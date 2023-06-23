@@ -12,6 +12,7 @@ import me.vadim.util.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,21 +33,62 @@ public class Config extends YamlFile {
 	public int getAutosaveIntervalTicks() { return getConfigurationAccessor().getInt("autosave_interval_minutes") * 60 * 20; }
 
 	public UnformattedItem getGeneratorDrop() {
-		ConfigurationAccessor conf = getConfigurationAccessor().getObject("drop_item");
-		return new UnformattedItem(conf.getPlaceholder("name"), Arrays.stream(conf.getStringArray("lore")).map(UnformattedMessage::new).map(PlaceholderMessage.class::cast).toList());
+		return getUnformatted("drop_item");
 	}
 
-	public UnformattedItem getGeneratorMenuItem() {
-		ConfigurationAccessor conf = getConfigurationAccessor().getObject("gen_menu_item");
-		return new UnformattedItem(conf.getPlaceholder("name"), Arrays.stream(conf.getStringArray("lore")).map(UnformattedMessage::new).map(PlaceholderMessage.class::cast).toList());
+	public UnformattedItem getGeneratorItem() {
+		return getUnformatted("gen_item");
+	}
+
+	public UnformattedItem getBuyMenuTierItem() {
+		return getUnformatted("buy_menu.tier_item");
+	}
+
+	public String getBuyMenuTitle() {
+		return getConfigurationAccessor().getObject("buy_menu").getString("title");
+	}
+
+	public String getManageMenuTitle() {
+		return getConfigurationAccessor().getObject("manage_menu").getString("title");
+	}
+
+	public ItemStack getBulkUpgradePlus1() {
+		return getItem("manage_menu.list_view.bulk_upgrade_plus1");
+	}
+
+	public ItemStack getBulkUpgradeMax() {
+		return getItem("manage_menu.list_view.bulk_upgrade_max");
+	}
+
+	public List<String> getBulkUpgradeAd() {
+		return Arrays.asList(getConfigurationAccessor().getObject("manage_menu").getObject("list_view").getStringArray("bulk_upgrade_ad"));
+	}
+
+	public UnformattedItem getManageMenuIndividualUpgrade() {
+		return getUnformatted("manage_menu.individual_view.upgrade");
+	}
+
+	public UnformattedItem getManageMenuIndividualDelete() {
+		return getUnformatted("manage_menu.individual_view.delete");
 	}
 
 	private String getGenMenuItemMaxLevel() {
-		return getConfigurationAccessor().getObject("gen_menu_item").getString("upgrade_price_max");
+		return getConfigurationAccessor().getObject("gen_item").getString("upgrade_price_max");
 	}
 
 	private String getGenMenuItemPriceSymbol() {
-		return getConfigurationAccessor().getObject("gen_menu_item").getString("price_symbol");
+		return getConfigurationAccessor().getObject("gen_item").getString("price_symbol");
+	}
+
+	private UnformattedItem getUnformatted(String path) {
+		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
+		Material type = null;
+		if(conf.has("type")) {
+			type = Material.matchMaterial(conf.getString("type"));
+			if(type == null)
+				logError(resourceProvider.getLogger(), path + ".type", "item type");
+		}
+		return new UnformattedItem(type, conf.getPlaceholder("name"), Arrays.stream(conf.getStringArray("lore")).map(UnformattedMessage::new).map(PlaceholderMessage.class::cast).toList());
 	}
 
 	private ItemStack getItem(String path) {
@@ -77,18 +119,20 @@ public class Config extends YamlFile {
 
 	public final class UnformattedItem {
 
+		private final Material material;
 		private final PlaceholderMessage       name;
 		private final List<PlaceholderMessage> lore;
 
-		private UnformattedItem(PlaceholderMessage name, List<PlaceholderMessage> lore) {
-			this.name = name;
-			this.lore = lore;
+		private UnformattedItem(Material material, PlaceholderMessage name, List<PlaceholderMessage> lore) {
+			this.material = material;
+			this.name     = name;
+			this.lore     = lore;
 		}
 
 		private double upgradePrice;
 
 		public UnformattedItem asMaxLevel() {
-			upgradePrice = -1;
+			upgradePrice = Double.NaN;
 			return this;
 		}
 
@@ -104,11 +148,18 @@ public class Config extends YamlFile {
 				return withUpgradePrice(upgrade.getPrice());
 		}
 
+		public ItemBuilder format(Placeholder placeholder) {
+			if(material == null)
+				throw new UnsupportedOperationException("type unset, call #format(Material, Placeholder)");
+			return format(material, placeholder);
+		}
+
 		public ItemBuilder format(Material material, Placeholder placeholder) {
 			Placeholder pl = StringPlaceholder.builder()
-											  .set("price_symbol", upgradePrice == -1 ? "" : getGenMenuItemPriceSymbol())
-											  .set("upgrade_price", upgradePrice == -1 ? getGenMenuItemMaxLevel() : String.valueOf(upgradePrice))
+											  .set("price_symbol", Double.isNaN(upgradePrice) ? "" : getGenMenuItemPriceSymbol())
+											  .set("upgrade_price", Double.isNaN(upgradePrice) ? getGenMenuItemMaxLevel() : String.valueOf(upgradePrice))
 											  .build();
+
 			return ItemBuilder.create(material)
 							  .displayName(pl.format(name.format(placeholder)))
 							  .lore(lore.stream().map(msg -> pl.format(msg.format(placeholder))).toList());

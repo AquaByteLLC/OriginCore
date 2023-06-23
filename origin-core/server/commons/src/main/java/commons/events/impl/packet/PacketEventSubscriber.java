@@ -20,7 +20,7 @@ public class PacketEventSubscriber<T extends Packet<?>> implements EventSubscrib
 	}
 
 	@Override
-	public void bind(Plugin plugin, EventRegistry registry) {
+	public void bind(EventRegistry registry) {
 		registry.subscribeOne(this, subscriber, clazz);
 	}
 

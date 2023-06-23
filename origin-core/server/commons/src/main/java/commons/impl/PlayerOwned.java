@@ -27,4 +27,10 @@ public abstract class PlayerOwned implements Owned {
 	@Override
 	public UUID getOwnerUUID() { return uuid; }
 
+	@Override
+	public boolean isOwnedBy(OfflinePlayer test) { return isOwnedBy(test == null ? null : test.getUniqueId()); }
+
+	@Override
+	public boolean isOwnedBy(UUID test) { return uuid.equals(test); }
+
 }

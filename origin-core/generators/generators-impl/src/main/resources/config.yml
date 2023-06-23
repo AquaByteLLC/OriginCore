@@ -7,17 +7,76 @@ drop_item:
   lore:
     - ""
     - "&eSell Price: &f${drop_price}"
+    - "{drop_name}"
+    - "{drop_price}"
+    - "{gen_tier}"
+    - "{buy_price}"
     - ""
 
-gen_menu_item:
-  name: "&f{drop_name} Generator &7(Right Click)"
+gen_item:
+  name: "&f{drop_name} Generator"
   lore:
     - ""
-    - "&eGen Upgrade Price: {price_symbol}&f{upgrade_price}"
-    - "&eDrop Sell Price: &b$&f{drop_price}"
+    - "&eUpgrade Price: {price_symbol}&f{upgrade_price}"
+    - "&eSell Price: &b$&f{drop_price}"
+    - "{drop_name}"
+    - "{drop_price}"
+    - "{gen_tier}"
+    - "{buy_price}"
     - ""
   price_symbol: "&b$" # this will be blank when the max level message is shown
   upgrade_price_max: "&4Max level."
+
+buy_menu:
+  title: "&6Buy Menu"
+  tier_item:
+    name: "&bTier {gen_tier}&f: {drop_name} Generator"
+    lore:
+      - ""
+      - "&ePrice: &b$&f{buy_price}"
+      - "{drop_name}"
+      - "{drop_price}"
+      - "{gen_tier}"
+      - ""
+
+manage_menu:
+  title: "&6Manage Generators"
+  list_view:
+    bulk_upgrade_plus1:
+      type: MAGMA_CREAM
+      name: "+1 lvl"
+      lore:
+        - "adds 1 level to as many as possible"
+    bulk_upgrade_max:
+      type: DRAGON_BREATH
+      name: "upgrade all"
+      lore:
+        - "upgrades all as much as possible"
+    
+    bulk_upgrade_ad: # for when they don't have permission to click the button this is added to the lore
+      - "Give us your fucking"
+      - "money if you want to"
+      - "use this conveniently"
+      - "advertised feature."
+  individual_view:
+    upgrade:
+      type: MAGMA_CREAM
+      name: "&3upgrade"
+      lore:
+        - "+1lvl 2 this gen"
+        - "{drop_name}"
+        - "{drop_price}"
+        - "{gen_tier}"
+        - "{buy_price}"
+    delete:
+      type: STRUCTURE_VOID
+      name: "&4delete"
+      lore:
+        - "breaks this gen"
+        - "{drop_name}"
+        - "{drop_price}"
+        - "{gen_tier}"
+        - "{buy_price}"
 
 menu:
   button:
@@ -32,7 +91,7 @@ menu:
       lore:
         - "Click me!"
     done:
-      type: NETHER_STAR
+      type: BARRIER
       name: "Done"
       lore:
         - "Goes back to last menu,"

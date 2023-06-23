@@ -29,9 +29,9 @@ public class Tiers extends YamlFile {
 		this.prov = prov;
 	}
 
-	private Tier first;
+	private       Tier                first;
 	private final Map<Material, Tier> byMaterial = new HashMap<>();
-	private final List<Tier> byIndex = new ArrayList<>();
+	private final List<Tier>          byIndex    = new ArrayList<>();
 
 	public Tier findTier(Material material) {
 		return byMaterial.get(material);
@@ -77,37 +77,43 @@ public class Tiers extends YamlFile {
 		byMaterial.clear();
 		byIndex.clear();
 
-		int i = keys.length;
+		int  i    = keys.length;
 		Tier last = null;
 		for (ConfigurationAccessor child : keys) {
-			if(last != null && !child.has("upgrade")) // non-leaf tier missing upgrade block
-				logError(resourceProvider.getLogger(), child.currentPath() + ".upgrade", "tier upgrade cost");
+			ConfigurationAccessor price    = child.getObject("price");
+			ConfigurationAccessor material = child.getObject("material");
 
-			String name = child.getString("name");
-			Material block = Material.matchMaterial(child.getString("block"));
-			Material drop = Material.matchMaterial(child.getObject("drop").getString("item"));
-			double  price   = child.getObject("drop").getDouble("price");
-			Upgrade upgrade = null;
+			Material block   = Material.matchMaterial(material.getString("gen"));
+			Material drop    = Material.matchMaterial(material.getString("drop"));
+			double   sell    = price.getDouble("sell");
+			double   buy     = price.getDouble("buy");
+			Upgrade  upgrade = null;
 
-			if(last != null)
-				upgrade = new TierUp(last, child.getObject("upgrade").getDouble("price"));
+			if (last != null && !price.has("upgrade")) // non-leaf tier missing upgrade block
+				logError(resourceProvider.getLogger(), price.currentPath() + ".upgrade", "tier upgrade cost");
+			else
+				upgrade = new TierUp(last, price.getDouble("upgrade"));
 
-			if(block == null || !block.isBlock())
-				logError(resourceProvider.getLogger(), child.currentPath() + ".block", "gen block material");
+			if (block == null || !block.isBlock())
+				logError(resourceProvider.getLogger(), material.currentPath() + ".gen", "gen block material");
 			assert block != null;
 
-			if(drop == null || !drop.isItem())
-				logError(resourceProvider.getLogger(), child.currentPath() + ".block", "gen drop material");
+			if (drop == null || !drop.isItem())
+				logError(resourceProvider.getLogger(), material.currentPath() + ".drop", "gen drop material");
 			assert drop != null;
 
 			Placeholder pl = StringPlaceholder.builder()
 											  .set("drop_name", StringUtil.convertToUserFriendlyCase(drop.name()))
-											  .set("drop_price", String.valueOf(price))
+											  .set("drop_price", String.valueOf(sell))
+											  .set("buy_price", String.valueOf(buy))
+											  .set("gen_tier", String.valueOf(i + 1))
 											  .build();
 
-			last = new GenInfo(--i, name, block, upgrade, new GenDrop(price, prov.open(Config.class).getGeneratorDrop().format(drop, pl).build()), prov);
-			if(byMaterial.containsKey(block))
-				logError(resourceProvider.getLogger(), child.currentPath() + ".block", "DUPLICATE gen block material");
+			last = new GenInfo(--i, buy, block, upgrade, new GenDrop(sell, prov.open(Config.class).getGeneratorDrop().format(drop, pl).build()), prov);
+
+			if (byMaterial.containsKey(block))
+				logError(resourceProvider.getLogger(), material.currentPath() + ".gen", "gen block material [DUPLICATE]");
+
 			byMaterial.put(block, last);
 			byIndex.add(last);
 		}

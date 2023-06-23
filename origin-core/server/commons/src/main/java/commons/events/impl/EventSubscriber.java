@@ -8,7 +8,7 @@ import org.bukkit.plugin.Plugin;
  */
 public interface EventSubscriber {
 
-	void bind(Plugin plugin, EventRegistry registry);
+	void bind(EventRegistry registry);
 
 	void unbind(EventRegistry registry);
 

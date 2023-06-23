@@ -16,6 +16,7 @@ dependencies {
     compileOnly(Dependencies.LUCKO_PROFILES)
     compileOnly(Dependencies.LUCKO_SQL)
     compileOnly(Dependencies.FASTUTIL)
+    compileOnly(Dependencies.ACF_CORE)
     compileOnly(Dependencies.ACF)
     compileOnly(Dependencies.LFC_SHARED)
     compileOnly(Dependencies.LFC_BUKKIT)

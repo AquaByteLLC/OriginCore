@@ -7,7 +7,11 @@ import commons.events.impl.bukkit.BukkitEventListener;
 import commons.events.impl.packet.PacketEventListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author vadim
@@ -16,7 +20,8 @@ public class PluginEventWrapper {
 
 	private final Plugin              plugin;
 	private final EventRegistry       events;
-	private final PacketEventListener packets;
+	private final PacketEventListener                        packets;
+	private final Map<Class<? extends Event>, EventListener> bukkit = new HashMap<>();
 
 	public PluginEventWrapper(Plugin plugin) {
 		this.plugin = plugin;
@@ -36,7 +41,11 @@ public class PluginEventWrapper {
 		// - for Packet events it's best to only register one Injector per plyaer
 		events.addSubscriptionHook(event -> {
 			if (org.bukkit.event.Event.class.isAssignableFrom(event)) {
-				new BukkitEventListener<>((Class<Event>) event).startListen(plugin, events);
+				bukkit.computeIfAbsent((Class<? extends Event>) event, e -> {
+					EventListener el = new BukkitEventListener<>(e);
+					el.startListen(plugin, events);
+					return el;
+				});
 				int len = ReflectUtil.getPublicMethodsByReturnType(event, Player.class).length;
 				if (len < 1)
 					throw new IllegalArgumentException("Bukkit event class " + event.getCanonicalName() + " does not involve a player!");
@@ -49,6 +58,7 @@ public class PluginEventWrapper {
 
 	public void disable() {
 		packets.ceaseListen();
+		bukkit.values().forEach(EventListener::ceaseListen);
 	}
 
 }

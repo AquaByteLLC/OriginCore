@@ -7,11 +7,9 @@ import commons.events.api.Subscribe;
 import generators.impl.conf.Config;
 import generators.impl.conf.Tiers;
 import generators.impl.data.GenAccount;
-import generators.impl.wrapper.Gen;
 import generators.impl.wrapper.PDCUtil;
 import generators.wrapper.Generator;
 import generators.wrapper.Tier;
-import generators.wrapper.Upgrade;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.scheduler.Task;
@@ -77,6 +75,9 @@ public class GenHandler {
 			return;
 		}
 
+		if(!PDCUtil.isGen(event.getItemInHand()))
+			return;
+
 		Tier tier = conf.open(Tiers.class).findTier(event.getItemInHand().getType());
 		if (tier == null) return;
 
@@ -93,7 +94,7 @@ public class GenHandler {
 			return;
 		}
 
-		Generator gen = new Gen(player, tier, location);
+		Generator gen = tier.toGenerator(player, location);
 		reg.createGen(gen);
 		player.sendMessage("made a new gen ;P");
 	}
@@ -101,31 +102,23 @@ public class GenHandler {
 	@Subscribe
 	void onDeleteGen(EventContext context, BlockBreakEvent event) {
 		Player     player   = context.getPlayer();
-		GenAccount account  = provider.getAccount(player);
 		Location   location = event.getBlock().getLocation();
 
 		Generator generator = reg.getGenAt(location);
 		if (generator == null) return;
 
-		boolean isOwner = generator.getOwnerUUID().equals(player.getUniqueId());
-		if (!isOwner && !player.isOp()) {
-			player.sendMessage("dont break other ppl's gens >:[");
-			event.setCancelled(true);
-			return;
-		}
+		event.setCancelled(true);
 
-		reg.deleteGen(generator);
-		player.sendMessage("broke " + (isOwner ? "ur" : generator.getOfflineOwner().getName() + "'s") + " gen :o");
+		generator.destroy(reg, player);
 	}
 
 	@Subscribe
 	void onUpgradeGen(EventContext context, PlayerInteractEvent event) {
-		if (event.getHand() != EquipmentSlot.HAND) return;
+		if(event.getHand() != EquipmentSlot.HAND) return;
 		if(event.isBlockInHand()) return;
 		if(!event.getPlayer().isSneaking()) return;
 
 		Player     player  = context.getPlayer();
-		GenAccount account = provider.getAccount(player);
 		Block      block   = event.getClickedBlock();
 		if (block == null) return;
 
@@ -133,17 +126,9 @@ public class GenHandler {
 		Generator generator = reg.getGenAt(location);
 		if (generator == null) return;
 
-		Upgrade upgrade = generator.getCurrentTier().getNextUpgrade();
-		if (upgrade == null) return; // max lvl
+		if(!generator.isOwnedBy(player)) return; // do not allow upgrading other's gens
 
-		Tier tier = upgrade.getNextTier();
-
-		//todo: econ
-		//todo: sound
-		Generator upgraded = new Gen(player, tier, location);
-		reg.createGen(upgraded);
-		block.setType(tier.getBlock());
-		player.sendMessage("upgraded <3");
+		generator.upgrade(reg);
 	}
 
 	@Subscribe

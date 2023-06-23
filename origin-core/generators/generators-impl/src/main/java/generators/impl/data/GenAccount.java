@@ -36,4 +36,8 @@ public class GenAccount extends AbstractAccount {
 
 	public boolean isAtSlotLimit() { return getSlotsUsed() >= slotLimit; }
 
+	public boolean canBulkUpgrade(){
+		return getOfflineOwner().getPlayer().hasPermission("gens.bulk");
+	}
+
 }

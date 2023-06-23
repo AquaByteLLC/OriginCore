@@ -1,17 +1,18 @@
 package generators.impl.cmd;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import commons.StringUtil;
 import commons.data.AccountProvider;
 import commons.data.AccountStorage;
+import generators.GeneratorRegistry;
 import generators.impl.GenRegistry;
+import generators.impl.GensPlugin;
 import generators.impl.conf.Tiers;
 import generators.impl.data.GenAccount;
 import generators.impl.data.GenStorage;
-import generators.impl.menu.TiersMenu;
-import generators.impl.wrapper.Gen;
+import generators.impl.menu.ManageGensMenu;
+import generators.impl.menu.BuyMenu;
 import generators.wrapper.Tier;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.menu.Menu;
@@ -20,8 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.concurrent.ExecutorService;
-
 /**
  * @author vadim
  */
@@ -29,19 +28,19 @@ import java.util.concurrent.ExecutorService;
 public class GenCommand extends BaseCommand {
 
 
-	private final Plugin      plugin;
-	private final GenStorage  genStorage;
-	private final GenRegistry reg;
+	private final GensPlugin plugin;
+	private final GenStorage genStorage;
 
+	private final GeneratorRegistry           reg;
 	private final ConfigurationProvider       conf;
 	private final AccountProvider<GenAccount> accounts;
 
-	public GenCommand(Plugin plugin, GenStorage genStorage, GenRegistry reg, ConfigurationProvider conf, AccountProvider<GenAccount> accounts) {
+	public GenCommand(GensPlugin plugin, GenStorage genStorage) {
 		this.plugin     = plugin;
 		this.genStorage = genStorage;
-		this.reg        = reg;
-		this.conf       = conf;
-		this.accounts   = accounts;
+		this.reg        = plugin.getRegistry();
+		this.conf       = plugin.getConfiguration();
+		this.accounts   = plugin.getAccounts();
 	}
 
 	@Subcommand("setmaxslots")
@@ -83,7 +82,7 @@ public class GenCommand extends BaseCommand {
 			for (int y = 0; y < each; y++) {
 				for (int z = 0; z < each; z++) {
 					L.set(sX + x, sY + y, sZ + z);
-					reg.createGen(new Gen(sender, tier, L));
+					reg.createGen(tier.toGenerator(sender, L));
 				}
 			}
 		}
@@ -97,12 +96,28 @@ public class GenCommand extends BaseCommand {
 		sender.sendMessage("hehehehaw");
 	}
 
-	@Subcommand("menu")
-	public void menu(Player sender) {
-		Menu menu = new TiersMenu(conf).getMenu();
+	@Subcommand("buy")
+	@CommandAlias("gens")
+	public void buyMenu(Player sender) {
+		Menu menu = new BuyMenu(plugin).getMenu();
 		menu.regen();
 		menu.open(sender);
-		sender.sendMessage("the");
+	}
+
+	@Subcommand("manage")
+	@CommandAlias("managegens")
+	public void manage(Player sender) {
+		Menu menu = new ManageGensMenu(plugin, sender).getMenu();
+		menu.regen();
+		menu.open(sender);
+	}
+
+	@Subcommand("manage")
+	@CommandPermission("*")
+	public void manage(Player sender, @Flags("other") Player target) {
+		Menu menu = new ManageGensMenu(plugin, target).getMenu();
+		menu.regen();
+		menu.open(sender);
 	}
 
 }

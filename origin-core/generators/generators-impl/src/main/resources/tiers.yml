@@ -1,34 +1,35 @@
 tiers:
   1:
-    block: STONE
-    name: "Stone Age"
-    upgrade:
-      price: 100
-    drop:
-      item: COBBLESTONE
-      price: 1
+    price:
+      sell: 1           # drop sell price
+      upgrade: 100      # gen upgrade price
+      buy: 500          # gen buy price
+    material:
+      gen: STONE        # gen block type
+      drop: COBBLESTONE # gen drop type
   
   2:
-    block: GOLD_BLOCK
-    name: "Medieval Age"
-    upgrade:
-      price: 500
-    drop:
-      item: GOLD_INGOT
-      price: 10
+    price:
+      sell: 10
+      upgrade: 500
+      buy: 600          # tier 1 buy + tier 1 upgrade
+    material:
+      gen: GOLD_BLOCK
+      drop: GOLD_INGOT
   
   3:
-    block: IRON_BLOCK
-    name: "Industrial Age"
-    upgrade:
-      price: 1000
-    drop:
-      item: IRON_INGOT
-      price: 20
-  
+    price:
+      sell: 20
+      upgrade: 1000     # tier 2 buy + tier 2 upgrade
+      buy: 1100
+    material:
+      gen: IRON_BLOCK
+      drop: IRON_INGOT
+      
   4:
-    block: DIAMOND_BLOCK
-    name: "New Age"
-    drop:
-      item: DIAMOND
-      price: 100
+    price:
+      sell: 100
+      buy: 2100         # tier 3 buy + tier 3 upgrade
+    material:
+      gen: DIAMOND_BLOCK
+      drop: DIAMOND

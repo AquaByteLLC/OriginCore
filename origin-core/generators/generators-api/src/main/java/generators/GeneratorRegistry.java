@@ -3,6 +3,7 @@ package generators;
 import generators.wrapper.Generator;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import java.util.Iterator;
 import java.util.List;

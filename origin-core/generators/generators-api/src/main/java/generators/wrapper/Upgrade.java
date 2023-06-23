@@ -1,5 +1,8 @@
 package generators.wrapper;
 
+import generators.GeneratorRegistry;
+import org.bukkit.entity.Player;
+
 /**
  * @author vadim
  */

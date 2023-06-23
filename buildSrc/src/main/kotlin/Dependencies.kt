@@ -33,6 +33,7 @@ object Dependencies {
     const val LUCKO_MONGO = "me.lucko:helper-mongo:${Versions.LUCKO_MONGO_VERSION}"
     const val LUCKO_LILLYPAD = "me.lucko:helper-lilypad:${Versions.LUCKO_LILLY_PAD_VERSION}"
     const val LUCKO_PROFILES = "me.lucko:helper-profiles:${Versions.LUCKO_PROFILES_VERSION}"
+    const val ACF_CORE = "co.aikar:acf-core:${Versions.ACF_VERSION}"
     const val ACF = "co.aikar:acf-paper:${Versions.ACF_VERSION}"
     const val GUICE = "com.google.inject:guice:${Versions.GUICE_VERSION}"
     const val LFC_SHARED = "me.vadim.util.conf:LiteConfig-shared:${Versions.LFC_VERSION}"

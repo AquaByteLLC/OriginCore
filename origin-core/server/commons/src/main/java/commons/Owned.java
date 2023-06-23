@@ -14,4 +14,8 @@ public interface Owned {
 
 	UUID getOwnerUUID();
 
+	boolean isOwnedBy(OfflinePlayer test);
+
+	boolean isOwnedBy(UUID test);
+
 }

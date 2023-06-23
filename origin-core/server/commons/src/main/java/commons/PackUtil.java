@@ -10,6 +10,8 @@ import java.util.UUID;
  */
 public class PackUtil {
 
+	public static final Location ZERO = new Location(null, 0, 0, 0);
+
 	public static long packLoc(int x, int y, int z) {
 		return ((long)x & 67108863L) << 38 | (long)y & 4095L | ((long)z & 67108863L) << 12;
 	}

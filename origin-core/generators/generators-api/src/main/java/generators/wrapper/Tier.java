@@ -1,6 +1,8 @@
 package generators.wrapper;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -10,7 +12,7 @@ public interface Tier {
 
 	int getIndex();
 
-	String getName();
+	double getBuyPrice();
 
 	Material getBlock();
 
@@ -24,5 +26,9 @@ public interface Tier {
 	Drop getDrop();
 
 	ItemStack getMenuItem();
+
+	ItemStack getGeneratorItem(OfflinePlayer owner);
+
+	Generator toGenerator(OfflinePlayer owner, Location location);
 
 }

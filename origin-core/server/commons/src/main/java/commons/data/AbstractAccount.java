@@ -28,4 +28,14 @@ public abstract class AbstractAccount implements Account {
 		return Bukkit.getOfflinePlayer(uuid);
 	}
 
+	@Override
+	public boolean isOwnedBy(OfflinePlayer test) {
+		return isOwnedBy(test == null ? null : test.getUniqueId());
+	}
+
+	@Override
+	public boolean isOwnedBy(UUID test) {
+		return uuid.equals(test);
+	}
+
 }
