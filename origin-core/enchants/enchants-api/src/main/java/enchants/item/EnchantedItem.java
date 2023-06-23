@@ -1,5 +1,6 @@
 package enchants.item;
 
+import enchants.EnchantAPI;
 import enchants.records.OriginEnchant;
 import lombok.SneakyThrows;
 import me.lucko.helper.text3.Text;
@@ -7,10 +8,9 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class EnchantedItem {
@@ -32,28 +32,38 @@ public class EnchantedItem {
 	public void addEnchant(NamespacedKey enchantKey, int level) {
 		writeContainer(pdc -> {
 			final OriginEnchant enchant = OriginEnchant.enchantRegistry.get(enchantKey);
-			if (enchant.maxLevel() <= level) {
-				System.out.println("Larger than maxLvl");
-				pdc.set(enchantKey, PersistentDataType.INTEGER, enchant.maxLevel());
-			} else {
-				pdc.set(enchantKey, PersistentDataType.INTEGER, level);
+			if (OriginEnchant.canEnchant(pdc)) {
+				if (enchant.maxLevel() <= level) {
+					pdc.set(enchantKey, PersistentDataType.INTEGER, enchant.maxLevel());
+				} else {
+					pdc.set(enchantKey, PersistentDataType.INTEGER, level);
+				}
 			}
 		});
 		updateLore();
 	}
 
+	public void makeEnchantable() {
+		writeContainer(pdc -> pdc.set(OriginEnchant.requiredKey, PersistentDataType.BOOLEAN, true));
+	}
+
 	public void removeEnchant(NamespacedKey enchantKey) {
+
 		if (!hasEnchant(enchantKey)) return;
 		writeContainer(pdc -> {
-			pdc.remove(enchantKey);
+			if (OriginEnchant.canEnchant(pdc)) {
+				pdc.remove(enchantKey);
+			}
 		});
 		updateLore();
 	}
 
 	public void removeAllEnchants() {
-		if (!readContainer().getKeys().isEmpty())
-			readContainer().getKeys().forEach(this::removeEnchant);
-		updateLore();
+		if (OriginEnchant.canEnchant(readContainer())) {
+			if (!readContainer().getKeys().isEmpty())
+				readContainer().getKeys().forEach(this::removeEnchant);
+			updateLore();
+		}
 	}
 
 	@SuppressWarnings("all")
@@ -115,18 +125,21 @@ public class EnchantedItem {
 
 			if (lore == null) return;
 
-			if (lore.contains(Text.colorize("&c&lEnchants"))) {
-				System.out.println("It do contain it doeeee");
-				lore.removeIf(string -> lore.indexOf(Text.colorize(string)) >= lore.indexOf(Text.colorize("&c&lEnchants")));
+			final List<String> header = EnchantAPI.get().getInstance(JavaPlugin.class).getConfig().getStringList("enchantHeader");
+			final ArrayDeque<String> deque = new ArrayDeque<>(header);
+
+			if (new HashSet<>(lore).containsAll(deque)) {
+				lore.removeIf(string -> lore.indexOf(Text.colorize(string)) >= lore.indexOf(deque.getLast()));
 			}
 
-			lore.add(Text.colorize("&c&lEnchants"));
-			lore.add(" ");
+			lore.addAll(deque);
 
 			for (NamespacedKey enchantKey : readContainer().getKeys()) {
 				final int level = getLevel(enchantKey);
 				final OriginEnchant enchant = OriginEnchant.enchantRegistry.get(enchantKey);
-				lore.add(Text.colorize(enchant.lore().replaceAll("%level%", String.valueOf(level))));
+				lore.add(Text.colorize(enchant.lore())
+						.replaceAll("%level%", Integer.toString(level))
+						.replaceAll("%name%", enchant.name()));
 			}
 
 			System.out.println(readContainer().getKeys());
