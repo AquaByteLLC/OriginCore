@@ -81,12 +81,12 @@ manage_menu:
 menu:
   button:
     next:
-      type: LIME_STAINED_GLASS_PANE
+      type: ARROW
       name: "Next page"
       lore:
         - "Click me!"
     back:
-      type: RED_STAINED_GLASS_PANE
+      type: ARROW
       name: "Previous page"
       lore:
         - "Click me!"

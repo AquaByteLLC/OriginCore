@@ -7,7 +7,8 @@ dependencies {
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
     implementation(Dependencies.REFLECTIONS)
+    compileOnly(Dependencies.LFC_SHARED)
+    compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(Dependencies.GUICE)
-    compileOnly(Dependencies.APACHE_COMMONS)
     compileOnly(project(":commons"))
 }

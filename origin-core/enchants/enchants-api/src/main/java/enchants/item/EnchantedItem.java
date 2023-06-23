@@ -1,7 +1,9 @@
 package enchants.item;
 
 import enchants.EnchantAPI;
+import enchants.config.EnchantsConfig;
 import enchants.records.OriginEnchant;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import me.lucko.helper.text3.Text;
 import org.bukkit.NamespacedKey;
@@ -9,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -48,7 +51,6 @@ public class EnchantedItem {
 	}
 
 	public void removeEnchant(NamespacedKey enchantKey) {
-
 		if (!hasEnchant(enchantKey)) return;
 		writeContainer(pdc -> {
 			if (OriginEnchant.canEnchant(pdc)) {
@@ -66,7 +68,8 @@ public class EnchantedItem {
 		}
 	}
 
-	@SuppressWarnings("all")
+
+	@SuppressWarnings("DuplicatedCode,DataFlowIssue")
 	@SneakyThrows
 	public double getChance(NamespacedKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return 0.0;
@@ -87,7 +90,7 @@ public class EnchantedItem {
 		}
 	}
 
-	@SuppressWarnings("all")
+	@SuppressWarnings("DuplicatedCode,DataFlowIssue")
 	@SneakyThrows
 	public double getCost(NamespacedKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return 0.0;
@@ -108,7 +111,7 @@ public class EnchantedItem {
 			return 0.0;
 		}
 	}
-	@SuppressWarnings("all")
+	@SuppressWarnings("DataFlowIssue")
 	@SneakyThrows
 	public int getLevel(NamespacedKey enchantKey) {
 		if (!hasEnchant(enchantKey)) throw new IllegalArgumentException("You aren't able to update this enchant because it hasn't been added to the item.");
@@ -125,7 +128,7 @@ public class EnchantedItem {
 
 			if (lore == null) return;
 
-			final List<String> header = EnchantAPI.get().getInstance(JavaPlugin.class).getConfig().getStringList("enchantHeader");
+			final List<String> header = EnchantAPI.get().getInstance(EnchantsConfig.class).getEnchantHeader();
 			final ArrayDeque<String> deque = new ArrayDeque<>(header);
 
 			if (new HashSet<>(lore).containsAll(deque)) {
@@ -142,7 +145,6 @@ public class EnchantedItem {
 						.replaceAll("%name%", enchant.name()));
 			}
 
-			System.out.println(readContainer().getKeys());
 			meta.setLore(lore);
 		});
 	}
@@ -152,7 +154,6 @@ public class EnchantedItem {
 		final Random random = new Random();
 		final int randomNumber = random.nextInt(100);
 		final double chance = getChance(key);
-		System.out.println(chance);
 		return randomNumber <= chance;
 	}
 

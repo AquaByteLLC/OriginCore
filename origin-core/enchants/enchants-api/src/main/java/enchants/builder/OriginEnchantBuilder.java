@@ -100,8 +100,8 @@ public class OriginEnchantBuilder {
 		return this;
 	}
 
-	public void build(JavaPlugin plugin, EventRegistry events, EventSubscriber handleEnchant) {
-		handleEnchant.bind(plugin, events);
+	public void build(EventRegistry events, EventSubscriber handleEnchant) {
+		handleEnchant.bind(events);
 		new OriginEnchant(
 				enchantName,
 				information,
