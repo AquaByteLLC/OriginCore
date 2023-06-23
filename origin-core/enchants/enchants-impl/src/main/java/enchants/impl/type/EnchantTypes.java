@@ -20,8 +20,8 @@ public class EnchantTypes {
 	public static final String EXPLOSIVE_ENCHANT_NAME = "EXPLOSIVE";
 	public static final NamespacedKey EXPLOSIVE_ENCHANT_KEY = new NamespacedKey(plugin, EXPLOSIVE_ENCHANT_NAME);
 
-	public EnchantTypes(JavaPlugin plugin, EventRegistry registry) {
-		OriginEnchantFactory.create(SPEED_ENCHANT_NAME).build(plugin, registry, new BukkitEventSubscriber<>(BlockBreakEvent.class, event -> {
+	public EnchantTypes(EventRegistry registry) {
+		OriginEnchantFactory.create(SPEED_ENCHANT_NAME).build(registry, new BukkitEventSubscriber<>(BlockBreakEvent.class, event -> {
 			final ItemStack playersItem = event.getPlayer().getInventory().getItemInMainHand();
 
 			if (playersItem.getType().isAir()) return;

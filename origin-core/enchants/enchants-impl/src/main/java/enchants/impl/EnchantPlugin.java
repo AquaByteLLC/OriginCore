@@ -8,6 +8,7 @@ import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import enchants.EnchantAPI;
 import enchants.impl.commands.EnchantCommands;
+import enchants.impl.conf.GeneralConfig;
 import enchants.impl.type.EnchantTypes;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.conf.LiteConfig;
@@ -22,8 +23,12 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 	protected void enable() {
 		injector = Guice.createInjector(new EnchantPluginModule(this));
 
+		lfc = new LiteConfig(this);
+		lfc.register(GeneralConfig.class, GeneralConfig::new);
+		lfc.reload();
+
 		EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
-		new EnchantTypes(this, registry);
+		new EnchantTypes(registry);
 
 		PaperCommandManager commands = new PaperCommandManager(this);
 		commands.registerCommand(new EnchantCommands(this));
@@ -31,7 +36,11 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 
 	@Override
 	protected void disable() {
-		saveConfig();
+		lfc.save();
+	}
+
+	public static GeneralConfig getGeneralConfig() {
+		return lfc.open(GeneralConfig.class);
 	}
 
 	public static Injector get() {
