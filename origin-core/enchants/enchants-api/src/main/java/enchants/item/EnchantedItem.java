@@ -32,28 +32,38 @@ public class EnchantedItem {
 	public void addEnchant(NamespacedKey enchantKey, int level) {
 		writeContainer(pdc -> {
 			final OriginEnchant enchant = OriginEnchant.enchantRegistry.get(enchantKey);
-			if (enchant.maxLevel() <= level) {
-				System.out.println("Larger than maxLvl");
-				pdc.set(enchantKey, PersistentDataType.INTEGER, enchant.maxLevel());
-			} else {
-				pdc.set(enchantKey, PersistentDataType.INTEGER, level);
+			if (OriginEnchant.canEnchant(pdc)) {
+				if (enchant.maxLevel() <= level) {
+					pdc.set(enchantKey, PersistentDataType.INTEGER, enchant.maxLevel());
+				} else {
+					pdc.set(enchantKey, PersistentDataType.INTEGER, level);
+				}
 			}
 		});
 		updateLore();
 	}
 
+	public void makeEnchantable() {
+		writeContainer(pdc -> pdc.set(OriginEnchant.requiredKey, PersistentDataType.BOOLEAN, true));
+	}
+
 	public void removeEnchant(NamespacedKey enchantKey) {
+
 		if (!hasEnchant(enchantKey)) return;
 		writeContainer(pdc -> {
-			pdc.remove(enchantKey);
+			if (OriginEnchant.canEnchant(pdc)) {
+				pdc.remove(enchantKey);
+			}
 		});
 		updateLore();
 	}
 
 	public void removeAllEnchants() {
-		if (!readContainer().getKeys().isEmpty())
-			readContainer().getKeys().forEach(this::removeEnchant);
-		updateLore();
+		if (OriginEnchant.canEnchant(readContainer())) {
+			if (!readContainer().getKeys().isEmpty())
+				readContainer().getKeys().forEach(this::removeEnchant);
+			updateLore();
+		}
 	}
 
 	@SuppressWarnings("all")

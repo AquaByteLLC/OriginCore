@@ -26,7 +26,7 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 		new EnchantTypes(this, registry);
 
 		PaperCommandManager commands = new PaperCommandManager(this);
-		commands.registerCommand(new EnchantCommands());
+		commands.registerCommand(new EnchantCommands(this));
 	}
 
 	@Override
