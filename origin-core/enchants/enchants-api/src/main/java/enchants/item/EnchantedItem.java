@@ -1,28 +1,21 @@
 package enchants.item;
 
 import enchants.EnchantAPI;
-import enchants.config.EnchantsConfig;
 import enchants.records.OriginEnchant;
-import lombok.NonNull;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import me.lucko.helper.text3.Text;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
-public class EnchantedItem {
-
-	private final ItemStack itemStack;
-
-	public EnchantedItem(ItemStack itemStack) {
-		this.itemStack = itemStack;
-	}
+public record EnchantedItem(@Getter ItemStack itemStack) {
 
 	private PersistentDataContainer readContainer() {
 		return this.itemStack.getItemMeta().getPersistentDataContainer();
@@ -35,9 +28,11 @@ public class EnchantedItem {
 	public void addEnchant(NamespacedKey enchantKey, int level) {
 		writeContainer(pdc -> {
 			final OriginEnchant enchant = OriginEnchant.enchantRegistry.get(enchantKey);
-			if (OriginEnchant.canEnchant(pdc)) {
+			if (OriginEnchant.canEnchant(readContainer())) {
 				if (enchant.maxLevel() <= level) {
+					System.out.println("Adding");
 					pdc.set(enchantKey, PersistentDataType.INTEGER, enchant.maxLevel());
+					System.out.println(readContainer().getKeys());
 				} else {
 					pdc.set(enchantKey, PersistentDataType.INTEGER, level);
 				}
@@ -47,17 +42,19 @@ public class EnchantedItem {
 	}
 
 	public void makeEnchantable() {
-		writeContainer(pdc -> pdc.set(OriginEnchant.requiredKey, PersistentDataType.BOOLEAN, true));
+		writeContainer(pdc -> pdc.set(OriginEnchant.reqKey, PersistentDataType.STRING, "true"));
 	}
 
 	public void removeEnchant(NamespacedKey enchantKey) {
+
 		if (!hasEnchant(enchantKey)) return;
 		writeContainer(pdc -> {
-			if (OriginEnchant.canEnchant(pdc)) {
+			if (OriginEnchant.canEnchant(readContainer())) {
 				pdc.remove(enchantKey);
 			}
 		});
 		updateLore();
+
 	}
 
 	public void removeAllEnchants() {
@@ -68,8 +65,7 @@ public class EnchantedItem {
 		}
 	}
 
-
-	@SuppressWarnings("DuplicatedCode,DataFlowIssue")
+	@SuppressWarnings("all")
 	@SneakyThrows
 	public double getChance(NamespacedKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return 0.0;
@@ -83,14 +79,18 @@ public class EnchantedItem {
 		if (maxLvl == 1) return maxChance;
 		else {
 			switch (chanceType) {
-				case EXPONENTIAL -> {return startChance * Math.pow(maxChance / startChance, (double) (currentLvl - 1) / (maxLvl - 1));}
-				case LOGARITHMIC -> {return handleLog(startChance, maxChance, currentLvl, maxLvl);}
+				case EXPONENTIAL -> {
+					return startChance * Math.pow(maxChance / startChance, (double) (currentLvl - 1) / (maxLvl - 1));
+				}
+				case LOGARITHMIC -> {
+					return handleLog(startChance, maxChance, currentLvl, maxLvl);
+				}
 			}
 			return 0.0;
 		}
 	}
 
-	@SuppressWarnings("DuplicatedCode,DataFlowIssue")
+	@SuppressWarnings("all")
 	@SneakyThrows
 	public double getCost(NamespacedKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return 0.0;
@@ -105,16 +105,21 @@ public class EnchantedItem {
 		if (maxLvl == 1) return maxCost;
 		else {
 			switch (costType) {
-				case EXPONENTIAL -> {return startCost * Math.pow(maxCost / startCost, (double) (currentLvl - 1) / (maxLvl - 1));}
-				case LOGARITHMIC -> {return handleLog(startCost, maxCost, currentLvl, maxLvl);}
+				case EXPONENTIAL -> {
+					return startCost * Math.pow(maxCost / startCost, (double) (currentLvl - 1) / (maxLvl - 1));
+				}
+				case LOGARITHMIC -> {
+					return handleLog(startCost, maxCost, currentLvl, maxLvl);
+				}
 			}
 			return 0.0;
 		}
 	}
-	@SuppressWarnings("DataFlowIssue")
+
+	@SuppressWarnings("all")
 	@SneakyThrows
 	public int getLevel(NamespacedKey enchantKey) {
-		if (!hasEnchant(enchantKey)) throw new IllegalArgumentException("You aren't able to update this enchant because it hasn't been added to the item.");
+		if (!hasEnchant(enchantKey)) return 0;
 		return readContainer().get(enchantKey, PersistentDataType.INTEGER);
 	}
 
@@ -128,23 +133,29 @@ public class EnchantedItem {
 
 			if (lore == null) return;
 
-			final List<String> header = EnchantAPI.get().getInstance(EnchantsConfig.class).getEnchantHeader();
-			final ArrayDeque<String> deque = new ArrayDeque<>(header);
+			final List<String> header = EnchantAPI.getGeneralConfig().getStringList("enchantHeader");
 
-			if (new HashSet<>(lore).containsAll(deque)) {
-				lore.removeIf(string -> lore.indexOf(Text.colorize(string)) >= lore.indexOf(deque.getLast()));
+			if (lore.contains(Text.colorize(header.get(0)))) {
+				lore.removeIf(string -> lore.indexOf(Text.colorize(string)) >= lore.indexOf(Text.colorize(header.get(0))));
 			}
 
-			lore.addAll(deque);
+			if (readContainer().getKeys().size() > 1) {
+				for (String str : header) {
+					lore.add(Text.colorize(str));
+				}
+			}
 
 			for (NamespacedKey enchantKey : readContainer().getKeys()) {
-				final int level = getLevel(enchantKey);
-				final OriginEnchant enchant = OriginEnchant.enchantRegistry.get(enchantKey);
-				lore.add(Text.colorize(enchant.lore())
-						.replaceAll("%level%", Integer.toString(level))
-						.replaceAll("%name%", enchant.name()));
+				if (!enchantKey.equals(OriginEnchant.reqKey)) {
+					final int level = getLevel(enchantKey);
+					final OriginEnchant enchant = OriginEnchant.enchantRegistry.get(enchantKey);
+					lore.add(Text.colorize(enchant.lore())
+							.replaceAll("%level%", Integer.toString(level))
+							.replaceAll("%name%", enchant.name()));
+				}
 			}
 
+			System.out.println(readContainer().getKeys());
 			meta.setLore(lore);
 		});
 	}
@@ -154,18 +165,16 @@ public class EnchantedItem {
 		final Random random = new Random();
 		final int randomNumber = random.nextInt(100);
 		final double chance = getChance(key);
+		System.out.println(chance);
 		return randomNumber <= chance;
 	}
 
 	/**
-	 *
-	 * @param startC This will function as the starting chance or cost variable.
-	 * @param maxC This will function as the maximum chance or cost variable.
+	 * @param startC  This will function as the starting chance or cost variable.
+	 * @param maxC    This will function as the maximum chance or cost variable.
 	 * @param current This will be the current level of the players enchant.
-	 * @param max This will be the maximum level of the players enchant.
-	 *
+	 * @param max     This will be the maximum level of the players enchant.
 	 * @return The return value will be the calculated chance of the enchantment.
-	 *
 	 */
 	private double handleLog(double startC, double maxC, int current, int max) {
 		final double logValue = Math.log(current) / Math.log(max);

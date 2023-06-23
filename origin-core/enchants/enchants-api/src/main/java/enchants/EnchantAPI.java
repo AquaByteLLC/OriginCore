@@ -3,9 +3,10 @@ package enchants;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import enchants.config.EnchantsConfig;
-import me.vadim.util.conf.ConfigurationProvider;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
 
 public final class EnchantAPI {
 	private static Injector injector;
@@ -21,22 +22,34 @@ public final class EnchantAPI {
 		return injector;
 	}
 
-	public EnchantAPI(final JavaPlugin javaPlugin, ConfigurationProvider conf) {
-		injector = Guice.createInjector(new EnchantModule(javaPlugin, conf));
+	private static YamlConfiguration generalConfig;
+
+	public static YamlConfiguration getGeneralConfig() {
+		if (generalConfig == null) {
+			try {
+				throw new Exception("The EnchantAPI hasn't been initialized anywhere. Create a new instance of the EnchantAPI class in the 'onEnable' method.");
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return generalConfig;
+	}
+
+
+	public EnchantAPI(final JavaPlugin javaPlugin) {
+		injector = Guice.createInjector(new EnchantModule(javaPlugin));
+		generalConfig = YamlConfiguration.loadConfiguration(new File(javaPlugin.getDataFolder(), "general.yml"));
 	}
 
 	static class EnchantModule extends AbstractModule {
 		private final JavaPlugin plugin;
-		private final ConfigurationProvider conf;
 
-		EnchantModule(final JavaPlugin plugin, ConfigurationProvider conf) {
+		EnchantModule(final JavaPlugin plugin) {
 			this.plugin = plugin;
-			this.conf = conf;
 		}
 
 		protected void configure() {
 			this.bind(JavaPlugin.class).toInstance(plugin);
-			this.bind(EnchantsConfig.class).toProvider(() -> conf.open(EnchantsConfig.class));
 		}
 	}
 }

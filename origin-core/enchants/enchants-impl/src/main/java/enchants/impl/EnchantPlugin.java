@@ -7,33 +7,28 @@ import com.google.inject.Injector;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import enchants.EnchantAPI;
-import enchants.config.EnchantsConfig;
 import enchants.impl.commands.EnchantCommands;
+import enchants.impl.conf.GeneralConfig;
 import enchants.impl.type.EnchantTypes;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
-import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvider {
 	private static Injector injector;
-
-	private LiteConfig lfc;
-
-	@Override
-	protected void load() {
-		lfc = new LiteConfig(this);
-		injector = Guice.createInjector(new EnchantPluginModule(this, lfc));
-	}
+	private static LiteConfig lfc;
 
 	@Override
 	protected void enable() {
-		lfc.register(EnchantsConfig.class, EnchantsConfig::new);
+		injector = Guice.createInjector(new EnchantPluginModule(this));
+
+		lfc = new LiteConfig(this);
+		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.reload();
 
 		EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
-		EnchantTypes.registerAll(registry);
+		new EnchantTypes(registry);
 
 		PaperCommandManager commands = new PaperCommandManager(this);
 		commands.registerCommand(new EnchantCommands(this));
@@ -41,7 +36,11 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 
 	@Override
 	protected void disable() {
+		lfc.save();
+	}
 
+	public static GeneralConfig getGeneralConfig() {
+		return lfc.open(GeneralConfig.class);
 	}
 
 	public static Injector get() {
@@ -60,9 +59,9 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 		private final EnchantAPI enchantAPI;
 
 		@SuppressWarnings("all")
-		public EnchantPluginModule(final JavaPlugin plugin, ConfigurationProvider conf) {
+		public EnchantPluginModule(final JavaPlugin plugin) {
 			this.plugin = plugin;
-			this.enchantAPI = new EnchantAPI(plugin, conf);
+			this.enchantAPI = new EnchantAPI(plugin);
 		}
 
 		protected void configure() {

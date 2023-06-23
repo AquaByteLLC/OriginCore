@@ -12,18 +12,24 @@ import java.util.HashMap;
 import java.util.List;
 
 public record OriginEnchant(String name,
-							List<String> information,
-							String lore, ItemStack menuItem,
-							int maxLevel, double startCost, double maxCost, double startChance, double maxChance,
-							EnchantProgressionType chanceType, EnchantProgressionType costType,
-							EventSubscriber handleEnchant) {
+                          List<String> information,
+                          String lore,
+						  ItemStack menuItem,
+						  int maxLevel,
+						  double startCost,
+						  double maxCost,
+						  double startChance,
+						  double maxChance,
+						    EnchantProgressionType chanceType,
+						    EnchantProgressionType costType,
+                          EventSubscriber handleEnchant) {
 
-	public static final HashMap<NamespacedKey, OriginEnchant> enchantRegistry = new HashMap<>();
-	public static final HashMap<NamespacedKey, YamlConfiguration> enchantConfiguration = new HashMap<>();
-	public static final NamespacedKey requiredKey = new NamespacedKey(EnchantAPI.get().getInstance(JavaPlugin.class), "CUSTOM_ENCHANT_KEY");
+	public static HashMap<NamespacedKey, OriginEnchant> enchantRegistry = new HashMap<>();
+	public static HashMap<NamespacedKey, YamlConfiguration> enchantConfiguration = new HashMap<>();
+	private static final JavaPlugin plugin = EnchantAPI.get().getInstance(JavaPlugin.class);
+	public static final NamespacedKey reqKey = new NamespacedKey(plugin, "CUSTOM_ENCHANT_KEY");
 
 	public NamespacedKey getKey() {
-		final JavaPlugin plugin = EnchantAPI.get().getInstance(JavaPlugin.class);
 		return new NamespacedKey(plugin, name);
 	}
 
@@ -33,7 +39,7 @@ public record OriginEnchant(String name,
 	}
 
 	public static boolean canEnchant(PersistentDataContainer container) {
-		return container.has(requiredKey);
+		return container.has(reqKey);
 	}
 
 	public enum EnchantProgressionType {

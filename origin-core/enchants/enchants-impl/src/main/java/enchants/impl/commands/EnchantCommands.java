@@ -7,6 +7,7 @@ import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import enchants.impl.Messages;
 import enchants.item.EnchantedItem;
+import enchants.item.builder.SpecialItemFactory;
 import enchants.records.OriginEnchant;
 import me.lucko.helper.text3.Text;
 import me.lucko.helper.text3.TextComponent;
@@ -75,15 +76,47 @@ public class EnchantCommands extends BaseCommand {
 
 	@Subcommand("menu")
 	public void openMenu(Player player) {
+		EnchantedItem item = SpecialItemFactory.create(builder -> {
+			builder.name("&b&lTesting");
+			builder.lore(List.of(
+					"&cTest one",
+					"&aTest two"
+			));
+		});
+
+		player.getInventory().addItem(item.getItemStack());
 		/*
 		Make sure they've got a item in their hand which can be enchanted.
 		 */
 	}
 
+	@Subcommand("admin disenchant all")
+	@CommandPermission("origin.admin.enchants")
+	public void disenchantAll(Player player) {
+		final ItemStack playerStack = player.getInventory().getItemInMainHand();
+
+		if (!playerStack.hasItemMeta()) {
+			Text.sendMessage(player, Messages.DOESNT_HAVE_ITEM_META);
+			return;
+		}
+
+		final PersistentDataContainer container = playerStack.getItemMeta().getPersistentDataContainer();
+
+		if (!OriginEnchant.canEnchant(container)) {
+			Text.sendMessage(player, Messages.DOESNT_HAVE_REQUIRED_KEY);
+			return;
+		}
+
+		final EnchantedItem enchantedItem = new EnchantedItem(playerStack);
+
+		enchantedItem.removeAllEnchants();
+		Text.sendMessage(player, Messages.ALL_ENCHANTS_REMOVED);
+	}
+
 	@Subcommand("admin disenchant")
 	@CommandPermission("origin.admin.enchants")
 	@Syntax("<enchantName> <all>")
-	public void disenchantItem(Player player, String enchantName, boolean all) {
+	public void disenchantItem(Player player, String enchantName) {
 		final HashMap<NamespacedKey, OriginEnchant> registry = OriginEnchant.enchantRegistry;
 		final NamespacedKey key = new NamespacedKey(plugin, enchantName);
 		final ItemStack playerStack = player.getInventory().getItemInMainHand();
@@ -107,13 +140,8 @@ public class EnchantCommands extends BaseCommand {
 
 		final EnchantedItem enchantedItem = new EnchantedItem(playerStack);
 
-		if (all) {
-			enchantedItem.removeAllEnchants();
-			Text.sendMessage(player, Messages.ALL_ENCHANTS_REMOVED);
-		} else {
-			enchantedItem.removeEnchant(key);
-			Text.sendMessage(player, Messages.ENCHANT_REMOVED);
-		}
+		enchantedItem.removeEnchant(key);
+		Text.sendMessage(player, Messages.ENCHANT_REMOVED);
 	}
 
 	@Subcommand("admin enchant")
