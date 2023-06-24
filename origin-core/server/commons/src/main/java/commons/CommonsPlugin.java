@@ -8,12 +8,14 @@ import commons.data.AccountStorageHandler;
 import commons.data.SessionProvider;
 import commons.data.impl.LocationPersister;
 import commons.data.impl.SQLiteSession;
+import commons.entity.registry.EntityRegistry;
 import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import commons.events.impl.PluginEventWrapper;
 import commons.impl.account.PlayerDefaultAccount;
 import commons.impl.account.PlayerDefaultAccountStorage;
+import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.menu.Menus;
 import me.vadim.util.menu.MenusKt;
@@ -30,6 +32,7 @@ import java.util.concurrent.Executors;
 public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	private static CommonsPlugin instance;
+	@Getter private final EntityRegistry entityRegistry = new EntityRegistry();
 
 	public static CommonsPlugin commons() {
 		if(instance == null)

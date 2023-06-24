@@ -1,11 +1,9 @@
 package commons.events.impl.packet;
 
-import commons.events.impl.EventListener;
 import commons.events.api.EventRegistry;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
+import commons.events.impl.EventListener;
+import io.netty.channel.*;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.network.PlayerConnection;
@@ -36,6 +34,21 @@ public final class PacketEventListener implements EventListener, Listener {
 		this.events = events;
 		Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getOnlinePlayers().forEach(this::inject));
 		Bukkit.getPluginManager().registerEvents(this, plugin);
+	}
+
+	public static void sendPacket(Player player, Object packet) {
+		final Channel channel = getChannel(player);
+		PacketInterceptor interceptor = (PacketInterceptor) channel.pipeline().get(PIPELINE);
+
+		if (interceptor == null) {
+			return;
+		}
+
+		try {
+			interceptor.write(interceptor.getCtx(), packet, new DefaultChannelPromise(interceptor.getPromise().channel()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -80,6 +93,10 @@ public final class PacketEventListener implements EventListener, Listener {
 	private final class PacketInterceptor extends ChannelDuplexHandler {
 
 		final Player player;
+		@Getter
+		private ChannelHandlerContext ctx = null;
+		@Getter
+		private ChannelPromise promise = null;
 
 		PacketInterceptor(Player player) {
 			this.player = player;
@@ -87,8 +104,11 @@ public final class PacketEventListener implements EventListener, Listener {
 
 		@Override
 		public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-			if (events == null || !events.publish(player, msg).isCancelled())
+			if (events == null || !events.publish(player, msg).isCancelled()) {
 				super.write(ctx, msg, promise);
+				this.ctx = ctx;
+				this.promise = promise;
+			}
 		}
 
 		@Override

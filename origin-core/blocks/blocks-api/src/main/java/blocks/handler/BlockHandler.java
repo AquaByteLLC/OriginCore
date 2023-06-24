@@ -23,7 +23,7 @@ import java.util.List;
 
 public interface BlockHandler {
 
-	BlockRegistry registry = BlocksAPI.get().getInstance(BlockRegistry.class);
+	BlockRegistry registry = BlocksAPI.getBlockRegistry();
 
 	default void init(FileConfiguration configSection) {
 		for (String blockKey : configSection.getConfigurationSection("Blocks").getKeys(false)) {
