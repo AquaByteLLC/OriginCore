@@ -4,13 +4,12 @@ import commons.events.api.EventContext;
 import commons.events.impl.EventSubscriber;
 import commons.events.impl.bukkit.BukkitEventSubscriber;
 import commons.events.impl.packet.PacketEventSubscriber;
-import enchants.item.Enchant;
-import enchants.item.EnchantFactory;
 import enchants.EnchantKey;
 import enchants.EnchantRegistry;
 import enchants.impl.item.EnchantedItemImpl;
-import enchants.item.EnchantBuilder;
+import enchants.item.EnchantFactory;
 import enchants.item.EnchantedItem;
+import enchants.item.EnchantTarget;
 import net.minecraft.network.protocol.Packet;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -19,8 +18,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 /**
  * @author vadim
@@ -39,16 +36,18 @@ public enum EnchantTypes implements EnchantKey {
 				  event.getPlayer().sendMessage(item.getChance(key) + "%");
 				  event.getPlayer().addPotionEffect(PotionEffectType.SPEED.createEffect(10 * 20, 1));
 			  }
-		  }));
+		  }), EnchantTarget.tools());
 
-	private final String name;
-	private final NamespacedKey key;
+	private final String          name;
+	private final NamespacedKey   key;
 	private final EventSubscriber subscriber;
+	private final EnchantTarget[] targets;
 
-	EnchantTypes(String name, EventSubscriber subscriber) {
+	EnchantTypes(String name, EventSubscriber subscriber, EnchantTarget... targets) {
 		this.name       = name;
 		this.key        = name2key(name);
 		this.subscriber = subscriber;
+		this.targets    = targets;
 	}
 
 	@Override
@@ -97,7 +96,7 @@ public enum EnchantTypes implements EnchantKey {
 			throw new UnsupportedOperationException();
 		init = true;
 		for (EnchantTypes value : values())
-			registry.register(factory.newEnchantBuilder(value).build(value.subscriber));
+			registry.register(factory.newEnchantBuilder(value).build(value.subscriber, value.targets));
 	}
 
 }

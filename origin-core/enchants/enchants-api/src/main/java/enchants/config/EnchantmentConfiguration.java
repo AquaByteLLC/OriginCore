@@ -1,7 +1,6 @@
 package enchants.config;
 
 import enchants.item.Enchant;
-import enchants.item.ToolTarget;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.lucko.helper.item.ItemStackBuilder;
@@ -57,7 +56,6 @@ public class EnchantmentConfiguration {
 		String lorePath = base + ".lore";
 		String descriptionPath = base + ".description";
 		String maxLevelPath = base + ".maxLevel";
-		String toolTargetPath = base + ".toolTarget";
 
 		// COST SECTION STUFF
 		String costTypePath = costSectionPath + ".type";
@@ -110,7 +108,6 @@ public class EnchantmentConfiguration {
 			baseSection.set(getAsRelative(lorePath), "%name% -> %level%");
 			baseSection.set(getAsRelative(descriptionPath), List.of("Description of the enchant", "This enchant is super cool"));
 			baseSection.set(getAsRelative(maxLevelPath), 10);
-			baseSection.set(getAsRelative(toolTargetPath), "AXE");
 
 			chanceSection.set(getAsRelative(chanceTypePath), "EXPONENTIAL");
 			chanceSection.set(getAsRelative(startChancePath), 10.0);
@@ -191,12 +188,6 @@ public class EnchantmentConfiguration {
 		final String path = EnchantConfigPaths.startChancePath;
 		final String startChancePath = EnchantConfigPaths.getAndReplace(path, enchantKey);
 		return configuration.getDouble(startChancePath);
-	}
-
-	public ToolTarget getToolTarget() {
-		final String path = EnchantConfigPaths.toolTargetPath;
-		final String toolTargetPath = EnchantConfigPaths.getAndReplace(path, enchantKey);
-		return ToolTarget.valueOf(configuration.getString(toolTargetPath));
 	}
 
 	public ItemStack getMenuItem() {

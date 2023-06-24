@@ -1,8 +1,6 @@
 package enchants.item;
 
-import commons.events.api.EventRegistry;
 import commons.events.impl.EventSubscriber;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -32,6 +30,6 @@ public interface EnchantBuilder {
 
 	EnchantBuilder setCostType(Enchant.ProgressionType type);
 
-	Enchant build(EventSubscriber handleEnchant);
+	Enchant build(EventSubscriber handleEnchant, EnchantTarget... targets);
 	
 }

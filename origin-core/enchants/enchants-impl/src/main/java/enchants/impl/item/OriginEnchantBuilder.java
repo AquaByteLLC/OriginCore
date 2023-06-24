@@ -6,7 +6,7 @@ import enchants.EnchantKey;
 import enchants.config.EnchantmentConfiguration;
 import enchants.item.Enchant;
 import enchants.item.EnchantBuilder;
-import enchants.item.ToolTarget;
+import enchants.item.EnchantTarget;
 import lombok.SneakyThrows;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,8 +16,8 @@ import java.util.List;
 public class OriginEnchantBuilder implements EnchantBuilder {
 
 	private final EnchantKey key;
-	private ToolTarget target;
-	private String lore;
+	private EnchantTarget[]  targets;
+	private String           lore;
 	private List<String> information;
 	private int maxLevel;
 	private ItemStack menuItem;
@@ -37,7 +37,6 @@ public class OriginEnchantBuilder implements EnchantBuilder {
 		this.config = new EnchantmentConfiguration(EnchantAPI.get().getInstance(JavaPlugin.class), enchantName);
 
 		this.lore        = config.getEnchantLore();
-		this.target      = config.getToolTarget();
 		this.information = config.getDescription();
 		this.maxLevel    = config.getMaxLevel();
 		this.menuItem    = config.getMenuItem();
@@ -47,11 +46,6 @@ public class OriginEnchantBuilder implements EnchantBuilder {
 		this.maxChance   = config.getMaxChance();
 		this.chanceType  = config.getChanceType();
 		this.costType    = config.getCostType();
-	}
-
-	public EnchantBuilder setToolTarget(ToolTarget target) {
-		this.target = target;
-		return this;
 	}
 
 	public EnchantBuilder setLore(String lore) {
@@ -104,10 +98,10 @@ public class OriginEnchantBuilder implements EnchantBuilder {
 		return this;
 	}
 
-	public Enchant build(EventSubscriber handleEnchant) {
+	public Enchant build(EventSubscriber handleEnchant, EnchantTarget... targets) {
 		return new OriginEnchant(
 				key,
-				target,
+				List.of(targets),
 				information,
 				lore,
 				menuItem,
