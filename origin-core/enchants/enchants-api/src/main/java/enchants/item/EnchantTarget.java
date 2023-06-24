@@ -32,7 +32,19 @@ public enum EnchantTarget {
 	}
 
 	public static EnchantTarget[] tools() {
-		return new EnchantTarget[] {HOE, AXE, PICK, SPADE };
+		return new EnchantTarget[] { HOE, AXE, PICK, SPADE };
+	}
+
+	public static EnchantTarget[] weapons() {
+		return new EnchantTarget[] { SWORD };
+	}
+
+	public static EnchantTarget[] special() {
+		return new EnchantTarget[] { ROD };
+	}
+
+	public static EnchantTarget[] all() {
+		return values();
 	}
 
 }
