@@ -41,7 +41,7 @@ public final class BlocksAPI {
 		private final BlockRegistry registry;
 
 		BlocksModule(JavaPlugin plugin, BlockRegistry registry) {
-			this.plugin   = plugin;
+			this.plugin = plugin;
 			this.registry = registry;
 		}
 

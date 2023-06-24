@@ -13,11 +13,16 @@ import java.util.Map;
 
 public abstract class BlockRegeneration {
 
-	@Getter private final JavaPlugin instance;
-	@Getter private final Location blockPosition;
-	@Getter private final Block block;
-	@Getter private final long end;
-	@Getter private final Player player;
+	@Getter
+	private final JavaPlugin instance;
+	@Getter
+	private final Location blockPosition;
+	@Getter
+	private final Block block;
+	@Getter
+	private final long end;
+	@Getter
+	private final Player player;
 	private static final BlockRegistry registry = BlocksAPI.get().getInstance(BlockRegistry.class);
 
 	public BlockRegeneration(Player player, Location blockPosition, Block block, long end) {
@@ -30,6 +35,7 @@ public abstract class BlockRegeneration {
 	}
 
 	abstract void makeRegen();
+
 	static void cancelRegenerations() {
 		for (Player user : Bukkit.getOnlinePlayers()) {
 			for (Map.Entry<Location, Block> blocks : registry.getRegeneratingBlocks().entrySet()) {

@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 public interface EffectType<T> {
 
 	T getType();
+
 	EffectType<T> setType(T type);
 
 	void handleEffectGlobal(World world, Location location);

@@ -8,8 +8,10 @@ import org.bukkit.block.Block;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockRegistry {
-	@Getter private final ConcurrentHashMap<String, OriginBlock> blocks;
-	@Getter private final ConcurrentHashMap<Location, Block> regeneratingBlocks;
+	@Getter
+	private final ConcurrentHashMap<String, OriginBlock> blocks;
+	@Getter
+	private final ConcurrentHashMap<Location, Block> regeneratingBlocks;
 
 	public BlockRegistry() {
 		this.blocks = new ConcurrentHashMap<>();
