@@ -13,29 +13,17 @@ import java.util.List;
  */
 public enum ToolTarget {
 
-	HOE(),
+	HOE(Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE),
 	ROD(Material.FISHING_ROD),
-	AXE(),
-	PICK("_PICKAXE"),
-	SWORD(),
-	SPADE("_SHOVEL");
-	
-	private final List<Material> allowed;
+	AXE(Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE),
+	PICK(Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE),
+	SWORD(Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD),
+	SPADE(Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL);
 
-	ToolTarget() {
-		this.allowed = Arrays.stream(Material.values()).filter(it -> it.name().endsWith('_' + name())).toList();
-	}
+	private final List<Material> allowed;
 
 	ToolTarget(Material... allowed) {
 		this.allowed = List.of(allowed);
-	}
-
-	ToolTarget(@RegExp String pattern) {
-		this.allowed = Arrays.stream(Material.values()).filter(it -> it.name().endsWith(pattern)).toList();
-	}
-
-	ToolTarget(List<Material> allowed) {
-		this.allowed = Collections.unmodifiableList(allowed);
 	}
 
 	public boolean appliesToItem(ItemStack item) {
