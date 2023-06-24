@@ -98,7 +98,6 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	@Subscribe
 	private void onJoin(EventContext context, PlayerJoinEvent event) {
-		System.out.println("(temp) commons onJoin");
 		pool.submit(() -> {
 			try {
 				storage.loadOne(event.getPlayer().getUniqueId());
@@ -111,7 +110,6 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	@Subscribe
 	private void onQuit(EventContext context, PlayerQuitEvent event) {
-		System.out.println("(temp) commons onQuit");
 		pool.submit(() -> {
 			try {
 				storage.saveOne(event.getPlayer().getUniqueId());

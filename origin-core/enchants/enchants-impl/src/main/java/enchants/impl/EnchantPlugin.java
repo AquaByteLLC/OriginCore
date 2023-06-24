@@ -7,9 +7,13 @@ import com.google.inject.Injector;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import enchants.EnchantAPI;
-import enchants.impl.commands.EnchantCommands;
+import enchants.item.EnchantFactory;
+import enchants.EnchantKey;
+import enchants.impl.commands.EnchantCommand;
+import enchants.EnchantRegistry;
 import enchants.impl.conf.GeneralConfig;
-import enchants.impl.type.EnchantTypes;
+import enchants.impl.item.OriginEnchantFactory;
+import enchants.item.Enchant;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
@@ -17,21 +21,29 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvider {
 	private static Injector injector;
-	private static LiteConfig lfc;
+
+	private LiteConfig lfc;
+	private EnchantRegistry registry;
+	private EnchantFactory factory;
 
 	@Override
 	protected void enable() {
-		injector = Guice.createInjector(new EnchantPluginModule(this));
+		EventRegistry events = CommonsPlugin.commons().getEventRegistry();
+		registry = new OriginEnchantRegistry(events);
+		factory = new OriginEnchantFactory();
+
+		injector = Guice.createInjector(new EnchantPluginModule(this, registry, factory));
 
 		lfc = new LiteConfig(this);
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.reload();
 
-		EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
-		new EnchantTypes(registry);
+		EnchantTypes.init(registry, factory);
 
 		PaperCommandManager commands = new PaperCommandManager(this);
-		commands.registerCommand(new EnchantCommands(this));
+		commands.getCommandContexts().registerContext(EnchantKey.class, c -> EnchantTypes.fromName(c.popFirstArg()));
+		commands.getCommandCompletions().registerCompletion("enchants", c -> registry.getAllEnchants().stream().map(Enchant::getKey).map(EnchantKey::getName).toList());
+		commands.registerCommand(new EnchantCommand(factory, registry));
 	}
 
 	@Override
@@ -39,7 +51,7 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 		lfc.save();
 	}
 
-	public static GeneralConfig getGeneralConfig() {
+	public GeneralConfig getGeneralConfig() {
 		return lfc.open(GeneralConfig.class);
 	}
 
@@ -58,10 +70,9 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 		private final JavaPlugin plugin;
 		private final EnchantAPI enchantAPI;
 
-		@SuppressWarnings("all")
-		public EnchantPluginModule(final JavaPlugin plugin) {
+		EnchantPluginModule(JavaPlugin plugin, EnchantRegistry registry, EnchantFactory factory) {
 			this.plugin = plugin;
-			this.enchantAPI = new EnchantAPI(plugin);
+			this.enchantAPI = new EnchantAPI(plugin, registry, factory);
 		}
 
 		protected void configure() {

@@ -16,6 +16,8 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +30,7 @@ public class GenRegistry implements GeneratorRegistry {
 
 	private final Long2ObjectMap<Generator> gens = Long2ObjectMaps.synchronize(new Long2ObjectOpenHashMap<>(5000));
 
-	protected Iterable<Long2ObjectMap.Entry<Generator>> iterable() {
+	protected @NotNull Iterable<Long2ObjectMap.Entry<Generator>> iterable() {
 		return Long2ObjectMaps.fastIterable(gens);
 	}
 
@@ -49,14 +51,14 @@ public class GenRegistry implements GeneratorRegistry {
 	}
 
 	@Override
-	public Generator getGenAt(Location location) {
+	public @Nullable Generator getGenAt(Location location) {
 		return gens.get(PackUtil.packLoc(location.getBlock().getLocation()));
 	}
 
 	// we use fastutil on methods that will be called a lot
 
 	@Override
-	public List<Generator> getGenerators(OfflinePlayer owner) {
+	public @NotNull List<Generator> getGenerators(OfflinePlayer owner) {
 		ObjectList<Generator> g = new ObjectArrayList<>(100);
 		for (Long2ObjectMap.Entry<Generator> entry : Long2ObjectMaps.fastIterable(gens))
 			if (entry.getValue().isOwnedBy(owner))
@@ -74,7 +76,7 @@ public class GenRegistry implements GeneratorRegistry {
 	}
 
 	@Override
-	public Iterator<Generator> all() {
+	public @NotNull Iterator<Generator> all() {
 		return gens.values().iterator();
 	}
 

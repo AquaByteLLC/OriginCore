@@ -4,6 +4,8 @@ import generators.wrapper.Generator;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -17,15 +19,15 @@ public interface GeneratorRegistry {
 	void createGen(Generator generator);
 	void deleteGen(Generator generator);
 
-	Generator getGenAt(Location location);
+	@Nullable Generator getGenAt(Location location);
 
-	List<Generator> getGenerators(OfflinePlayer owner);
+	@NotNull List<Generator> getGenerators(OfflinePlayer owner);
 
 	int countGenerators(UUID ownerUUID);
 
 	/**
 	 * @return a fast iterator over all loaded {@link Generator}s
 	 */
-	Iterator<Generator> all();
+	@NotNull Iterator<Generator> all();
 
 }

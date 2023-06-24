@@ -86,7 +86,7 @@ class ManageGensMenu(plugin: GensPlugin, private val owner: OfflinePlayer) : Gen
 			click = { event, button ->
 				if (account.canBulkUpgrade())
 					for (loc in items.map { it.blockLocation })
-						if (reg.getGenAt(loc).upgrade(reg) == UpgradeResult.NOT_ENOUGH_CURRENCY)
+						if (reg.getGenAt(loc)?.upgrade(reg) == UpgradeResult.NOT_ENOUGH_CURRENCY)
 							break
 				refresh()
 			}
@@ -100,7 +100,7 @@ class ManageGensMenu(plugin: GensPlugin, private val owner: OfflinePlayer) : Gen
 					up@ while (true) {
 						var allMax = true
 						for (loc in items.map { it.blockLocation }) {
-							val lastMax = when (reg.getGenAt(loc).upgrade(reg)) {
+							val lastMax = when (reg.getGenAt(loc)?.upgrade(reg)) {
 								UpgradeResult.NOT_ENOUGH_CURRENCY -> break@up
 								UpgradeResult.MAX_LEVEL           -> true
 								else                              -> false

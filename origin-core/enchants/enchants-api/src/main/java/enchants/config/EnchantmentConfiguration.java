@@ -1,6 +1,6 @@
 package enchants.config;
 
-import enchants.records.OriginEnchant;
+import enchants.item.Enchant;
 import lombok.Getter;
 import me.lucko.helper.item.ItemStackBuilder;
 import org.bukkit.Material;
@@ -86,14 +86,8 @@ public class EnchantmentConfiguration {
 			if (configuration.isConfigurationSection(enchantsSectionReplaced)) return;
 
 
-			System.out.println("I'm here");
 			final ConfigurationSection enchantsSection = configuration.isConfigurationSection(enchantsSectionReplaced) ? configuration.getConfigurationSection(enchantsSectionReplaced) : configuration.createSection(enchantsSectionReplaced);
 			assert enchantsSection != null;
-			System.out.println("I'm here");
-
-			System.out.println(
-					baseSectionReplaced
-			);
 
 			final ConfigurationSection baseSection = configuration.isConfigurationSection(baseSectionReplaced) ? configuration.getConfigurationSection(baseSectionReplaced) : configuration.createSection(baseSectionReplaced);
 			assert baseSection != null;
@@ -147,18 +141,18 @@ public class EnchantmentConfiguration {
 		final String descriptionPath = EnchantConfigPaths.getAndReplace(path, enchantKey);
 		return configuration.getStringList(descriptionPath);
 	}
-	public OriginEnchant.EnchantProgressionType getChanceType(String enchantKey) {
+	public Enchant.ProgressionType getChanceType(String enchantKey) {
 		final String path = EnchantConfigPaths.chanceTypePath;
 		final String chanceTypePath = EnchantConfigPaths.getAndReplace(path, enchantKey);
 		final String type = configuration.getString(chanceTypePath, "EXPONENTIAL");
-		return OriginEnchant.EnchantProgressionType.valueOf(type);
+		return Enchant.ProgressionType.valueOf(type);
 	}
 
-	public OriginEnchant.EnchantProgressionType getCostType(String enchantKey) {
+	public Enchant.ProgressionType getCostType(String enchantKey) {
 		final String path = EnchantConfigPaths.costTypePath;
 		final String costTypePath = EnchantConfigPaths.getAndReplace(path, enchantKey);
 		final String type = configuration.getString(costTypePath, "EXPONENTIAL");
-		return OriginEnchant.EnchantProgressionType.valueOf(type);
+		return Enchant.ProgressionType.valueOf(type);
 	}
 
 	public int getMaxLevel(String enchantKey) {
