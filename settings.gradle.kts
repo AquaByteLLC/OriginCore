@@ -3,6 +3,10 @@ rootProject.name = "OriginCore"
 setupOriginModule(
     "origin-core",
         listOf(
+            Pair("mining", listOf("mining-api", "mining-impl")),
+            Pair("farming", listOf("farming-api", "farming-impl")),
+            Pair("fishing", listOf("fishing-api", "fishing-impl")),
+            Pair("blocks", listOf("blocks-api")),
             Pair("enchants", listOf("enchants-api", "enchants-impl")),
             Pair("generators", listOf("generators-api", "generators-impl")),
             Pair("server", listOf("commons"))
