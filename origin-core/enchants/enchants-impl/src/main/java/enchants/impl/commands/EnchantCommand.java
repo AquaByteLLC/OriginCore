@@ -36,7 +36,7 @@ public class EnchantCommand extends BaseCommand {
 	public void sendTypes(CommandSender player) {
 		List<TextComponent> sendables = new ArrayList<>();
 		for (Enchant enchant : registry.getAllEnchants()) {
-			final String enchantName = enchant.getName();
+			final String enchantName = enchant.getKey().getName();
 			final List<String> enchantInformation = enchant.getInformation();
 
 			AtomicInteger count = new AtomicInteger();

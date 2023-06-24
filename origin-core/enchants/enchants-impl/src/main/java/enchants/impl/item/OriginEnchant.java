@@ -5,6 +5,7 @@ import enchants.EnchantKey;
 import enchants.EnchantRegistry;
 import enchants.config.EnchantmentConfiguration;
 import enchants.item.Enchant;
+import enchants.item.ToolTarget;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -15,6 +16,7 @@ import java.util.List;
 public class OriginEnchant implements Enchant {
 
 	private final EnchantKey key;
+	private final ToolTarget target;
 	private final List<String> information;
 	private final String lore;
 	private final ItemStack menuItem;
@@ -28,12 +30,13 @@ public class OriginEnchant implements Enchant {
 	private final EventSubscriber handleEnchant;
 	private final EnchantmentConfiguration config;
 
-	public OriginEnchant(EnchantKey key,
+	public OriginEnchant(EnchantKey key, ToolTarget target,
 						 List<String> information, String lore, ItemStack menuItem,
 						 int maxLevel, double startCost, double maxCost, double startChance, double maxChance,
 						 ProgressionType chanceType, ProgressionType costType,
 						 EventSubscriber handleEnchant, EnchantmentConfiguration config) {
 		this.key           = key;
+		this.target        = target;
 		this.information   = information;
 		this.lore          = lore;
 		this.menuItem      = menuItem;
@@ -54,8 +57,8 @@ public class OriginEnchant implements Enchant {
 	}
 
 	@Override
-	public String getName() {
-		return key.getName();
+	public ToolTarget getToolTarget() {
+		return target;
 	}
 
 	@Override

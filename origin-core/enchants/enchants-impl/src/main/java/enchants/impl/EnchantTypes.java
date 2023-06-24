@@ -39,26 +39,16 @@ public enum EnchantTypes implements EnchantKey {
 				  event.getPlayer().sendMessage(item.getChance(key) + "%");
 				  event.getPlayer().addPotionEffect(PotionEffectType.SPEED.createEffect(10 * 20, 1));
 			  }
-		  }),
-		  builder -> {
-			builder.setStartChance(10.0)
-				   .setMaxChance(100.0)
-				   .setChanceType(Enchant.ProgressionType.EXPONENTIAL)
-				   .setCostType(Enchant.ProgressionType.EXPONENTIAL);
-		  }),
-
-	;
+		  }));
 
 	private final String name;
 	private final NamespacedKey key;
 	private final EventSubscriber subscriber;
-	private final Consumer<EnchantBuilder> build;
 
-	EnchantTypes(String name, EventSubscriber subscriber, Consumer<EnchantBuilder> build) {
+	EnchantTypes(String name, EventSubscriber subscriber) {
 		this.name       = name;
 		this.key        = name2key(name);
 		this.subscriber = subscriber;
-		this.build      = build;
 	}
 
 	@Override
@@ -106,11 +96,8 @@ public enum EnchantTypes implements EnchantKey {
 		if (init)
 			throw new UnsupportedOperationException();
 		init = true;
-		for (EnchantTypes value : values()) {
-			EnchantBuilder builder = factory.newEnchantBuilder(value);
-			value.build.accept(builder);
-			registry.register(builder.build(value.subscriber));
-		}
+		for (EnchantTypes value : values())
+			registry.register(factory.newEnchantBuilder(value).build(value.subscriber));
 	}
 
 }

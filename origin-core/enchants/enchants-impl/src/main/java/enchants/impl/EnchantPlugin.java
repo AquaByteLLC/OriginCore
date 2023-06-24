@@ -7,6 +7,7 @@ import com.google.inject.Injector;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import enchants.EnchantAPI;
+import enchants.config.EnchantmentConfiguration;
 import enchants.item.EnchantFactory;
 import enchants.EnchantKey;
 import enchants.impl.commands.EnchantCommand;
@@ -48,6 +49,7 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 
 	@Override
 	protected void disable() {
+		EnchantmentConfiguration.save();
 		lfc.save();
 	}
 

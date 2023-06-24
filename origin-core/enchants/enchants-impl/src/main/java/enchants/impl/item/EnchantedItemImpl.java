@@ -52,15 +52,11 @@ public class EnchantedItemImpl implements EnchantedItem {
 	@Override
 	public void addEnchant(EnchantKey enchantKey, int level) {
 		final Enchant enchant = getRegistry().getByKey(enchantKey);
+		if(!enchant.getToolTarget().appliesToItem(getItemStack()))
+			return;
 		writeContainer(pdc -> {
-			if (getFactory().canEnchant(pdc)) {
-				if (enchant.getMaxLevel() <= level) {
-					pdc.set(enchantKey.getNamespacedKey(), PersistentDataType.INTEGER, enchant.getMaxLevel());
-					System.out.println(pdc.getKeys());
-				} else {
-					pdc.set(enchantKey.getNamespacedKey(), PersistentDataType.INTEGER, level);
-				}
-			}
+			if (getFactory().canEnchant(pdc))
+				pdc.set(enchantKey.getNamespacedKey(), PersistentDataType.INTEGER, Math.min(enchant.getMaxLevel(), level));
 		});
 		updateMeta();
 	}
@@ -68,10 +64,7 @@ public class EnchantedItemImpl implements EnchantedItem {
 	@Override
 	public void removeEnchant(EnchantKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return;
-		writeContainer(pdc -> {
-			if (getFactory().canEnchant(pdc))
-				pdc.remove(enchantKey.getNamespacedKey());
-		});
+		writeContainer(pdc -> pdc.remove(enchantKey.getNamespacedKey()));
 		updateMeta();
 	}
 
@@ -203,7 +196,7 @@ public class EnchantedItemImpl implements EnchantedItem {
 
 				lore.add(Text.colorize(enchant.getLore())
 							 .replaceAll("%level%", Integer.toString(level))
-							 .replaceAll("%name%", enchant.getName()));
+							 .replaceAll("%name%", enchant.getKey().getName()));
 			}
 
 			meta.setLore(lore);

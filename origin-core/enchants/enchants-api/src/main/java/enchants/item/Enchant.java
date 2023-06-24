@@ -3,9 +3,7 @@ package enchants.item;
 import commons.events.impl.EventSubscriber;
 import enchants.EnchantKey;
 import enchants.config.EnchantmentConfiguration;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.List;
 
@@ -16,7 +14,7 @@ public interface Enchant {
 
 	EnchantKey getKey();
 
-	String getName();
+	ToolTarget getToolTarget();
 
 	List<String> getInformation();
 

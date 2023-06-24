@@ -6,6 +6,7 @@ import enchants.EnchantKey;
 import enchants.config.EnchantmentConfiguration;
 import enchants.item.Enchant;
 import enchants.item.EnchantBuilder;
+import enchants.item.ToolTarget;
 import lombok.SneakyThrows;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +16,7 @@ import java.util.List;
 public class OriginEnchantBuilder implements EnchantBuilder {
 
 	private final EnchantKey key;
+	private ToolTarget target;
 	private String lore;
 	private List<String> information;
 	private int maxLevel;
@@ -34,16 +36,22 @@ public class OriginEnchantBuilder implements EnchantBuilder {
 
 		this.config = new EnchantmentConfiguration(EnchantAPI.get().getInstance(JavaPlugin.class), enchantName);
 
-		this.lore        = config.getEnchantLore(enchantName);
-		this.information = config.getDescription(enchantName);
-		this.maxLevel    = config.getMaxLevel(enchantName);
-		this.menuItem    = config.getMenuItem(enchantName);
-		this.startCost   = config.getStartCost(enchantName);
-		this.maxCost     = config.getMaxCost(enchantName);
-		this.startChance = config.getStartChance(enchantName);
-		this.maxChance   = config.getMaxChance(enchantName);
-		this.chanceType  = config.getChanceType(enchantName);
-		this.costType    = config.getCostType(enchantName);
+		this.lore        = config.getEnchantLore();
+		this.target      = config.getToolTarget();
+		this.information = config.getDescription();
+		this.maxLevel    = config.getMaxLevel();
+		this.menuItem    = config.getMenuItem();
+		this.startCost   = config.getStartCost();
+		this.maxCost     = config.getMaxCost();
+		this.startChance = config.getStartChance();
+		this.maxChance   = config.getMaxChance();
+		this.chanceType  = config.getChanceType();
+		this.costType    = config.getCostType();
+	}
+
+	public EnchantBuilder setToolTarget(ToolTarget target) {
+		this.target = target;
+		return this;
 	}
 
 	public EnchantBuilder setLore(String lore) {
@@ -99,6 +107,7 @@ public class OriginEnchantBuilder implements EnchantBuilder {
 	public Enchant build(EventSubscriber handleEnchant) {
 		return new OriginEnchant(
 				key,
+				target,
 				information,
 				lore,
 				menuItem,
