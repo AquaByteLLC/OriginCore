@@ -2,16 +2,13 @@ package enchants.item;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.intellij.lang.annotations.RegExp;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author vadim
  */
-public enum ToolTarget {
+public enum EnchantTarget {
 
 	HOE(Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE),
 	ROD(Material.FISHING_ROD),
@@ -22,12 +19,20 @@ public enum ToolTarget {
 
 	private final List<Material> allowed;
 
-	ToolTarget(Material... allowed) {
+	EnchantTarget(Material... allowed) {
 		this.allowed = List.of(allowed);
 	}
 
 	public boolean appliesToItem(ItemStack item) {
 		return item != null && allowed.contains(item.getType());
+	}
+
+	public boolean appliesToType(Material type) {
+		return type != null && allowed.contains(type);
+	}
+
+	public static EnchantTarget[] tools() {
+		return new EnchantTarget[] {HOE, AXE, PICK, SPADE };
 	}
 
 }

@@ -3,6 +3,7 @@ package enchants.item;
 import commons.events.impl.EventSubscriber;
 import enchants.EnchantKey;
 import enchants.config.EnchantmentConfiguration;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -14,7 +15,9 @@ public interface Enchant {
 
 	EnchantKey getKey();
 
-	ToolTarget getToolTarget();
+	List<EnchantTarget> getEnchantTargets();
+
+	boolean targetsItem(Material type);
 
 	List<String> getInformation();
 

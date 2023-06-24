@@ -2,22 +2,19 @@ package enchants.impl.item;
 
 import commons.events.impl.EventSubscriber;
 import enchants.EnchantKey;
-import enchants.EnchantRegistry;
 import enchants.config.EnchantmentConfiguration;
 import enchants.item.Enchant;
-import enchants.item.ToolTarget;
-import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.file.YamlConfiguration;
+import enchants.item.EnchantTarget;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class OriginEnchant implements Enchant {
 
-	private final EnchantKey key;
-	private final ToolTarget target;
-	private final List<String> information;
+	private final EnchantKey          key;
+	private final List<EnchantTarget> targets;
+	private final List<String>        information;
 	private final String lore;
 	private final ItemStack menuItem;
 	private final int maxLevel;
@@ -30,13 +27,13 @@ public class OriginEnchant implements Enchant {
 	private final EventSubscriber handleEnchant;
 	private final EnchantmentConfiguration config;
 
-	public OriginEnchant(EnchantKey key, ToolTarget target,
+	public OriginEnchant(EnchantKey key, List<EnchantTarget> targets,
 						 List<String> information, String lore, ItemStack menuItem,
 						 int maxLevel, double startCost, double maxCost, double startChance, double maxChance,
 						 ProgressionType chanceType, ProgressionType costType,
 						 EventSubscriber handleEnchant, EnchantmentConfiguration config) {
 		this.key           = key;
-		this.target        = target;
+		this.targets       = targets;
 		this.information   = information;
 		this.lore          = lore;
 		this.menuItem      = menuItem;
@@ -57,8 +54,16 @@ public class OriginEnchant implements Enchant {
 	}
 
 	@Override
-	public ToolTarget getToolTarget() {
-		return target;
+	public List<EnchantTarget> getEnchantTargets() {
+		return targets;
+	}
+
+	@Override
+	public boolean targetsItem(Material type) {
+		for (EnchantTarget target : targets)
+			if(target.appliesToType(type))
+				return true;
+		return false;
 	}
 
 	@Override

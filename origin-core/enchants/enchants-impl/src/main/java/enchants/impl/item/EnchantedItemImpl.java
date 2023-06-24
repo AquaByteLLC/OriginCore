@@ -52,7 +52,7 @@ public class EnchantedItemImpl implements EnchantedItem {
 	@Override
 	public void addEnchant(EnchantKey enchantKey, int level) {
 		final Enchant enchant = getRegistry().getByKey(enchantKey);
-		if(!enchant.getToolTarget().appliesToItem(getItemStack()))
+		if(!enchant.targetsItem(itemStack.getType()))
 			return;
 		writeContainer(pdc -> {
 			if (getFactory().canEnchant(pdc))
