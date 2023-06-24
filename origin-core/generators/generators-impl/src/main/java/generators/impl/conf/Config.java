@@ -1,5 +1,6 @@
 package generators.impl.conf;
 
+import commons.StringUtil;
 import generators.wrapper.Upgrade;
 import me.vadim.util.conf.ConfigurationAccessor;
 import me.vadim.util.conf.ResourceProvider;
@@ -157,7 +158,7 @@ public class Config extends YamlFile {
 		public ItemBuilder format(Material material, Placeholder placeholder) {
 			Placeholder pl = StringPlaceholder.builder()
 											  .set("price_symbol", Double.isNaN(upgradePrice) ? "" : getGenMenuItemPriceSymbol())
-											  .set("upgrade_price", Double.isNaN(upgradePrice) ? getGenMenuItemMaxLevel() : String.valueOf(upgradePrice))
+											  .set("upgrade_price", Double.isNaN(upgradePrice) ? getGenMenuItemMaxLevel() : StringUtil.formatNumber(upgradePrice))
 											  .build();
 
 			return ItemBuilder.create(material)

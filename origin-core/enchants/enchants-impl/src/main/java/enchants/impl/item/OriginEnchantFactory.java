@@ -29,7 +29,7 @@ public class OriginEnchantFactory implements EnchantFactory {
 
 	@Override
 	public EnchantedItem wrapItemStack(ItemStack item) {
-		return new EnchantedItemImpl(item);
+		return item == null ? null : new EnchantedItemImpl(item);
 	}
 
 	@Override
@@ -37,38 +37,7 @@ public class OriginEnchantFactory implements EnchantFactory {
 		return new OriginEnchantBuilder(key);
 	}
 
-	private static final NamespacedKey reqKey = new NamespacedKey("enchants", "_enchantable");
-	private static final String reqValue = "isEnchantable";
 
-	@Override
-	public NamespacedKey getEnchantableKey() {
-		return reqKey;
-	}
 
-	@Override
-	public boolean canEnchant(ItemStack item) {
-		return item.hasItemMeta() && canEnchant(item.getItemMeta().getPersistentDataContainer());
-	}
-
-	@Override
-	@SuppressWarnings("DataFlowIssue")
-	public boolean canEnchant(PersistentDataContainer container) {
-		return container.has(reqKey) && container.get(reqKey, PersistentDataType.STRING).equals(reqValue);
-	}
-
-	@Override
-	public void setCanEnchant(ItemStack item, boolean canEnchant) {
-		if(!item.hasItemMeta())
-			return;
-		item.editMeta(meta -> setCanEnchant(meta.getPersistentDataContainer(), canEnchant));
-	}
-
-	@Override
-	public void setCanEnchant(PersistentDataContainer container, boolean canEnchant) {
-		if(canEnchant)
-			container.set(reqKey, PersistentDataType.STRING, reqValue);
-		else
-			container.remove(reqKey);
-	}
 
 }

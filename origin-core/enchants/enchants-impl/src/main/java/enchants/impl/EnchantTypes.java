@@ -32,11 +32,21 @@ public enum EnchantTypes implements EnchantKey {
 
 			  final EnchantedItem item = new EnchantedItemImpl(playersItem);
 
-			  if (item.activate(key)) {
-				  event.getPlayer().sendMessage(item.getChance(key) + "%");
-				  event.getPlayer().addPotionEffect(PotionEffectType.SPEED.createEffect(10 * 20, 1));
-			  }
-		  }), EnchantTarget.tools());
+			  if (item.activate(key))
+				  event.getPlayer().addPotionEffect(PotionEffectType.SPEED.createEffect(10 * 20, 0));
+		  }), EnchantTarget.tools()),
+	JUMP("Jump",
+		  bukkit(BlockBreakEvent.class, (key, ctx, event) -> {
+			  final ItemStack playersItem = event.getPlayer().getInventory().getItemInMainHand();
+
+			  if (playersItem.getType().isAir()) return;
+
+			  final EnchantedItem item = new EnchantedItemImpl(playersItem);
+
+			  if (item.activate(key))
+				  event.getPlayer().addPotionEffect(PotionEffectType.JUMP.createEffect(10 * 20, 0));
+		  }), EnchantTarget.tools()),
+	;
 
 	private final String          name;
 	private final NamespacedKey   key;

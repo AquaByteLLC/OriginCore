@@ -2,7 +2,7 @@ package enchants.item;
 
 import commons.events.impl.EventSubscriber;
 import enchants.EnchantKey;
-import enchants.config.EnchantmentConfiguration;
+import enchants.conf.EnchantmentConfiguration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

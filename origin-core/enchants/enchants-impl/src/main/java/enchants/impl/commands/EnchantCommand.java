@@ -2,17 +2,19 @@ package enchants.impl.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import enchants.impl.EnchantPlugin;
+import enchants.impl.menu.EnchantMenuImpl;
 import enchants.item.EnchantFactory;
 import enchants.EnchantKey;
 import enchants.EnchantRegistry;
 import enchants.impl.Messages;
-import enchants.impl.item.EnchantedItemImpl;
 import enchants.item.EnchantedItem;
 import enchants.item.Enchant;
 import me.lucko.helper.text3.Text;
 import me.lucko.helper.text3.TextComponent;
 import me.lucko.helper.text3.event.HoverEvent;
 import me.lucko.helper.text3.format.TextColor;
+import me.vadim.util.menu.Menu;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -24,10 +26,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @CommandAlias("enchants")
 public class EnchantCommand extends BaseCommand {
 
-	private final EnchantFactory  factory;
+	private final EnchantPlugin plugin;
+	private final EnchantFactory factory;
 	private final EnchantRegistry registry;
 
-	public EnchantCommand(EnchantFactory factory, EnchantRegistry registry) {
+	public EnchantCommand(EnchantPlugin plugin, EnchantFactory factory, EnchantRegistry registry) {
+		this.plugin   = plugin;
 		this.factory  = factory;
 		this.registry = registry;
 	}
@@ -71,7 +75,12 @@ public class EnchantCommand extends BaseCommand {
 
 	@Subcommand("menu")
 	public void openMenu(Player player) {
-		//Make sure they've got a item in their hand which can be enchanted.
+		EnchantedItem item = arg2item(player);
+		if(item == null) return;
+
+		Menu menu = new EnchantMenuImpl(plugin, item).getMenu();
+		menu.regen();
+		menu.open(player);
 	}
 
 	@Subcommand("test")
@@ -130,14 +139,14 @@ public class EnchantCommand extends BaseCommand {
 	}
 
 	private final EnchantedItem arg2item(Player player) {
-		final ItemStack playerStack = player.getInventory().getItemInMainHand();
+		final EnchantedItem item = factory.wrapItemStack(player.getInventory().getItemInMainHand());
 
-		if (!factory.canEnchant(playerStack)) {
-			Text.sendMessage(player, Messages.DOESNT_HAVE_REQUIRED_KEY);
+		if (!item.isEnchantable()) {
+			Text.sendMessage(player, Messages.NOT_ENCHANTABLE);
 			return null;
 		}
 
-		return factory.wrapItemStack(playerStack);
+		return item;
 	}
 
 }

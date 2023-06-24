@@ -1,6 +1,9 @@
 package enchants.impl.item;
 
+import commons.BukkitUtil;
+import commons.StringUtil;
 import enchants.EnchantAPI;
+import enchants.impl.conf.EnchantPlaceholder;
 import enchants.item.EnchantFactory;
 import enchants.EnchantKey;
 import enchants.EnchantRegistry;
@@ -8,6 +11,7 @@ import enchants.item.Enchant;
 import enchants.item.EnchantedItem;
 import lombok.SneakyThrows;
 import me.lucko.helper.text3.Text;
+import me.vadim.util.conf.wrapper.Placeholder;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -20,6 +24,9 @@ import java.util.function.Consumer;
 
 public class EnchantedItemImpl implements EnchantedItem {
 
+	private static final NamespacedKey reqKey = new NamespacedKey("enchants", "_enchantable");
+	private static final String reqValue = "isEnchantable";
+
 	// static abuse :sillychamp:
 
 	private static EnchantRegistry getRegistry() {
@@ -29,7 +36,7 @@ public class EnchantedItemImpl implements EnchantedItem {
 	private static EnchantFactory getFactory() {
 		return EnchantAPI.get().getInstance(EnchantFactory.class);
 	}
-	
+
 	private final ItemStack itemStack;
 
 	public EnchantedItemImpl(ItemStack itemStack) {
@@ -39,6 +46,25 @@ public class EnchantedItemImpl implements EnchantedItem {
 	@Override
 	public ItemStack getItemStack() {
 		return itemStack;
+	}
+
+	@Override
+	public ItemStack formatMenuItemFor(EnchantKey key) {
+		Enchant enchant = getRegistry().getByKey(key);
+
+		Placeholder pl = EnchantPlaceholder.builder()
+										   .set("maxLevel", StringUtil.formatNumber(enchant.getMaxLevel()))
+										   .set("maxChance", StringUtil.formatNumber(enchant.getMaxChance()))
+										   .set("maxCost", StringUtil.formatNumber(enchant.getMaxCost()))
+										   .set("currentLevel", StringUtil.formatNumber(getLevel(key)))
+										   .set("currentChance", StringUtil.formatNumber(getChance(key)))
+										   .set("currentCost", StringUtil.formatNumber(getCost(key)))
+										   .set("name", key.getName())
+										   .build();
+
+		ItemStack item = enchant.getMenuItem();
+		BukkitUtil.formatItem(pl, item);
+		return item;
 	}
 
 	private PersistentDataContainer readContainer() {
@@ -55,7 +81,7 @@ public class EnchantedItemImpl implements EnchantedItem {
 		if(!enchant.targetsItem(itemStack.getType()))
 			return;
 		writeContainer(pdc -> {
-			if (getFactory().canEnchant(pdc))
+			if (canEnchant(pdc))
 				pdc.set(enchantKey.getNamespacedKey(), PersistentDataType.INTEGER, Math.min(enchant.getMaxLevel(), level));
 		});
 		updateMeta();
@@ -71,7 +97,7 @@ public class EnchantedItemImpl implements EnchantedItem {
 	@Override
 	public void removeAllEnchants() {
 		PersistentDataContainer pdc = readContainer();
-		if (getFactory().canEnchant(pdc)) {
+		if (canEnchant(pdc)) {
 			Set<EnchantKey> keys = getAllEnchants();
 			if (!keys.isEmpty())
 				keys.forEach(this::removeEnchant);
@@ -86,12 +112,12 @@ public class EnchantedItemImpl implements EnchantedItem {
 
 	@Override
 	public void makeEnchantable() {
-		writeContainer(pdc -> getFactory().setCanEnchant(pdc, true));
+		writeContainer(pdc -> setCanEnchant(pdc, true));
 	}
 
 	@Override
 	public boolean isEnchantable() {
-		return getFactory().canEnchant(readContainer());
+		return canEnchant(readContainer());
 	}
 
 	@Override
@@ -105,59 +131,38 @@ public class EnchantedItemImpl implements EnchantedItem {
 		return enchants;
 	}
 
-	@SuppressWarnings("all")
-	@SneakyThrows
-	@Override
-	public double getChance(EnchantKey enchantKey) {
-		if (!hasEnchant(enchantKey)) return 0.0;
-		Enchant holder = getRegistry().getByKey(enchantKey);
-		Enchant.ProgressionType chanceType = holder.getChanceType();
-		final double startChance = holder.getStartChance();
-		final double maxChance = holder.getMaxChance();
+	public static double calc(Enchant holder, Enchant.ProgressionType type, int lvl, double start, double max) {
 		final int maxLvl = holder.getMaxLevel();
-		final int currentLvl = readContainer().get(enchantKey.getNamespacedKey(), PersistentDataType.INTEGER);
 
 		if (maxLvl == 1)
-			return maxChance;
+			return max;
 		else {
-			switch (chanceType) {
+			switch (type) {
 				case EXPONENTIAL -> {
-					return startChance * Math.pow(maxChance / startChance, (double) (currentLvl - 1) / (maxLvl - 1));
+					return start * Math.pow(max / start, (double) (lvl - 1) / (maxLvl - 1));
 				}
 				case LOGARITHMIC -> {
-					return handleLog(startChance, maxChance, currentLvl, maxLvl);
+					return handleLog(start, max, lvl, maxLvl);
 				}
 			}
 			return 0.0;
 		}
 	}
 
-	@SuppressWarnings("all")
+	@SneakyThrows
+	@Override
+	public double getChance(EnchantKey enchantKey) {
+		if (!hasEnchant(enchantKey)) return 0.0;
+		Enchant holder = getRegistry().getByKey(enchantKey);
+		return calc(holder, holder.getChanceType(), getLevel(enchantKey), holder.getStartChance(), holder.getMaxChance());
+	}
+
 	@SneakyThrows
 	@Override
 	public double getCost(EnchantKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return 0.0;
 		Enchant holder = getRegistry().getByKey(enchantKey);
-
-		Enchant.ProgressionType costType = holder.getCostType();
-		final double startCost = holder.getStartCost();
-		final double maxCost = holder.getMaxCost();
-		final int maxLvl = holder.getMaxLevel();
-		final int currentLvl = readContainer().get(enchantKey.getNamespacedKey(), PersistentDataType.INTEGER);
-
-		if (maxLvl == 1)
-			return maxCost;
-		else {
-			switch (costType) {
-				case EXPONENTIAL -> {
-					return startCost * Math.pow(maxCost / startCost, (double) (currentLvl - 1) / (maxLvl - 1));
-				}
-				case LOGARITHMIC -> {
-					return handleLog(startCost, maxCost, currentLvl, maxLvl);
-				}
-			}
-			return 0.0;
-		}
+		return calc(holder, holder.getCostType(), getLevel(enchantKey), holder.getStartCost(), holder.getMaxCost());
 	}
 
 	@SuppressWarnings("all")
@@ -219,11 +224,34 @@ public class EnchantedItemImpl implements EnchantedItem {
 	 * @param max     This will be the maximum level of the players enchant.
 	 * @return The return value will be the calculated chance of the enchantment.
 	 */
-	private double handleLog(double startC, double maxC, int current, int max) {
+	private static double handleLog(double startC, double maxC, int current, int max) {
 		final double logValue = Math.log(current) / Math.log(max);
 		double currentChance = startC + (maxC - startC) * logValue;
 		currentChance = Math.max(startC, currentChance);
 		currentChance = Math.min(maxC, currentChance);
 		return currentChance;
 	}
+
+	public static boolean canEnchant(ItemStack item) {
+		return item.hasItemMeta() && canEnchant(item.getItemMeta().getPersistentDataContainer());
+	}
+
+	@SuppressWarnings("DataFlowIssue")
+	public static boolean canEnchant(PersistentDataContainer container) {
+		return container.has(reqKey) && container.get(reqKey, PersistentDataType.STRING).equals(reqValue);
+	}
+
+	public static void setCanEnchant(ItemStack item, boolean canEnchant) {
+		if(!item.hasItemMeta())
+			return;
+		item.editMeta(meta -> setCanEnchant(meta.getPersistentDataContainer(), canEnchant));
+	}
+
+	public static void setCanEnchant(PersistentDataContainer container, boolean canEnchant) {
+		if(canEnchant)
+			container.set(reqKey, PersistentDataType.STRING, reqValue);
+		else
+			container.remove(reqKey);
+	}
+
 }

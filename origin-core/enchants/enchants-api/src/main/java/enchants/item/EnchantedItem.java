@@ -12,6 +12,8 @@ public interface EnchantedItem {
 
 	ItemStack getItemStack();
 
+	ItemStack formatMenuItemFor(EnchantKey key);
+
 	void addEnchant(EnchantKey enchantKey, int level);
 
 	void removeEnchant(EnchantKey enchantKey);

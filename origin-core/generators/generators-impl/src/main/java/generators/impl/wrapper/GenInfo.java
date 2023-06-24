@@ -23,9 +23,9 @@ public class GenInfo implements Tier {
 		Drop drop = tier.getDrop();
 		return StringPlaceholder.builder()
 								.set("drop_name", StringUtil.convertToUserFriendlyCase(drop.getDropType().name()))
-								.set("drop_price", String.valueOf(drop.getSellPrice()))
-								.set("buy_price", String.valueOf(tier.getBuyPrice()))
-								.set("gen_tier", String.valueOf(tier.getIndex() + 1))
+								.set("drop_price", StringUtil.formatNumber(drop.getSellPrice()))
+								.set("buy_price", StringUtil.formatNumber(tier.getBuyPrice()))
+								.set("gen_tier", StringUtil.formatNumber(tier.getIndex() + 1))
 								.build();
 	}
 

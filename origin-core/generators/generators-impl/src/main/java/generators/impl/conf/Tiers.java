@@ -104,9 +104,9 @@ public class Tiers extends YamlFile {
 
 			Placeholder pl = StringPlaceholder.builder()
 											  .set("drop_name", StringUtil.convertToUserFriendlyCase(drop.name()))
-											  .set("drop_price", String.valueOf(sell))
-											  .set("buy_price", String.valueOf(buy))
-											  .set("gen_tier", String.valueOf(i + 1))
+											  .set("drop_price", StringUtil.formatNumber(sell))
+											  .set("buy_price", StringUtil.formatNumber(buy))
+											  .set("gen_tier", StringUtil.formatNumber(i + 1))
 											  .build();
 
 			last = new GenInfo(--i, buy, block, upgrade, new GenDrop(sell, prov.open(Config.class).getGeneratorDrop().format(drop, pl).build()), prov);

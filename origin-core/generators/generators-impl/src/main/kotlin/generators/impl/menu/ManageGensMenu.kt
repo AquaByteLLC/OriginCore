@@ -66,6 +66,8 @@ class ManageGensMenu(plugin: GensPlugin, private val owner: OfflinePlayer) : Gen
 		next = buttons[NEXT_SLOT]!! to NEXT_SLOT
 		back = buttons[BACK_SLOT]!! to BACK_SLOT
 
+		fill = exclude(*frame())
+
 		val account = accounts.getAccount(owner)
 
 		fun ItemBuilderKt.selfPlug() {

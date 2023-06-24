@@ -13,6 +13,24 @@ import static org.bukkit.ChatColor.COLOR_CHAR;
  */
 public class StringUtil {
 
+	// todo: big numbers
+
+	public static String formatNumber(int num) {
+		return String.format("%d", num);
+	}
+
+	public static String formatNumber(long num) {
+		return String.format("%d", num);
+	}
+
+	public static String formatNumber(float num) {
+		return String.format("%.2f", num);
+	}
+
+	public static String formatNumber(double num) {
+		return String.format("%.2f", num);
+	}
+
 	public static String convertToUserFriendlyCase(String input) {
 		String[]      words  = input.split("_");
 		StringBuilder result = new StringBuilder();

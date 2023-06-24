@@ -1,4 +1,4 @@
-package enchants.config;
+package enchants.conf;
 
 import enchants.item.Enchant;
 import lombok.Getter;
@@ -210,7 +210,6 @@ public class EnchantmentConfiguration {
 				.name(name)
 				.lore(lore)
 				.flag(ItemFlag.HIDE_ENCHANTS)
-				.enchant(Enchantment.ARROW_INFINITE)
 				.build();
 	}
 }

@@ -2,7 +2,7 @@ package enchants.impl.item;
 
 import commons.events.impl.EventSubscriber;
 import enchants.EnchantKey;
-import enchants.config.EnchantmentConfiguration;
+import enchants.conf.EnchantmentConfiguration;
 import enchants.item.Enchant;
 import enchants.item.EnchantTarget;
 import org.bukkit.Material;
@@ -78,7 +78,7 @@ public class OriginEnchant implements Enchant {
 
 	@Override
 	public ItemStack getMenuItem() {
-		return menuItem;
+		return menuItem.clone();
 	}
 
 	@Override

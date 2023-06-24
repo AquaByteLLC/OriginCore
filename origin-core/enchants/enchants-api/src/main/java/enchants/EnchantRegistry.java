@@ -22,4 +22,6 @@ public interface EnchantRegistry {
 
 	@Nullable EnchantKey adaptKey(NamespacedKey key);
 
+	@Nullable EnchantKey keyFromName(String name);
+
 }

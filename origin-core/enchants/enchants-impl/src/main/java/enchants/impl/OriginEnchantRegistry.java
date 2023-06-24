@@ -19,7 +19,8 @@ import java.util.Map;
 public class OriginEnchantRegistry implements EnchantRegistry {
 
 	private final Map<EnchantKey, Enchant> enchants = new HashMap<>();
-	private final Map<NamespacedKey, EnchantKey> adapter = new HashMap<>();
+	private final Map<NamespacedKey, EnchantKey> byKey = new HashMap<>();
+	private final Map<String, EnchantKey> byName = new HashMap<>();
 
 	private final EventRegistry events;
 
@@ -36,14 +37,16 @@ public class OriginEnchantRegistry implements EnchantRegistry {
 	public void register(Enchant enchant) {
 		enchant.getHandleEnchant().bind(events);
 		enchants.put(enchant.getKey(), enchant);
-		adapter.put(enchant.getKey().getNamespacedKey(), enchant.getKey());
+		byKey.put(enchant.getKey().getNamespacedKey(), enchant.getKey());
+		byName.put(enchant.getKey().getName().toLowerCase(), enchant.getKey());
 	}
 
 	@Override
 	public void unregister(Enchant enchant) {
 		enchant.getHandleEnchant().unbind(events);
 		enchants.remove(enchant.getKey());
-		adapter.remove(enchant.getKey().getNamespacedKey());
+		byKey.remove(enchant.getKey().getNamespacedKey());
+		byName.remove(enchant.getKey().getName().toLowerCase());
 	}
 
 	@Override
@@ -56,7 +59,12 @@ public class OriginEnchantRegistry implements EnchantRegistry {
 
 	@Override
 	public @Nullable EnchantKey adaptKey(NamespacedKey key) {
-		return adapter.get(key);
+		return byKey.get(key);
+	}
+
+	@Override
+	public @Nullable EnchantKey keyFromName(String name) {
+		return byName.get(name.toLowerCase());
 	}
 
 }
