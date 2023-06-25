@@ -1,5 +1,12 @@
-package commons.events.api;/**
+package commons.events.api;
+
+import org.bukkit.entity.Player;
+
+/**
  * @author vadim
  */
-public interface PlayerEventContext {
+public interface PlayerEventContext extends EventContext {
+
+	Player getPlayer();
+
 }

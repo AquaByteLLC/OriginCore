@@ -2,12 +2,11 @@ package commons.events.impl;
 
 import commons.ReflectUtil;
 import commons.events.api.EventRegistry;
-import commons.events.api.impl.PlayerEventRegistry;
+import commons.events.api.impl.PluginEventRegistry;
 import commons.events.impl.bukkit.BukkitEventListener;
 import commons.events.impl.packet.PacketEventListener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
@@ -18,14 +17,14 @@ import java.util.Map;
  */
 public class PluginEventWrapper {
 
-	private final Plugin              plugin;
-	private final EventRegistry       events;
-	private final PacketEventListener                        packets;
-	private final Map<Class<? extends Event>, EventListener> bukkit = new HashMap<>();
+	private final Plugin plugin;
+	private final EventRegistry events;
+	private final PacketEventListener packets;
+	private final Map<Class<? extends Event>, BukkitEventListener<?>> bukkit = new HashMap<>();
 
 	public PluginEventWrapper(Plugin plugin) {
 		this.plugin = plugin;
-		this.events = new PlayerEventRegistry();
+		this.events = new PluginEventRegistry();
 		packets     = new PacketEventListener();
 	}
 
@@ -42,15 +41,17 @@ public class PluginEventWrapper {
 		events.addSubscriptionHook(event -> {
 			if (org.bukkit.event.Event.class.isAssignableFrom(event)) {
 				bukkit.computeIfAbsent((Class<? extends Event>) event, e -> {
-					EventListener el = new BukkitEventListener<>(e);
+					BukkitEventListener<?> el = new BukkitEventListener<>(e);
 					el.startListen(plugin, events);
 					return el;
 				});
 				int len = ReflectUtil.getPublicMethodsByReturnType(event, Player.class).length;
 				if (len < 1)
-					throw new IllegalArgumentException("Bukkit event class " + event.getCanonicalName() + " does not involve a player!");
+					ReflectUtil.serr("WARN: Bukkit event class " + event.getCanonicalName() + " does not involve a player!\n" +
+									 "WARN: Functionality of methods expecting PlayerEventContext with this event is undefined.");
 				if (len > 1)
-					ReflectUtil.serr("WARN: Bukkit event class " + event.getCanonicalName() + " involves multiple players! EventContext does not gurantee which player will be selected.");
+					ReflectUtil.serr("WARN: Bukkit event class " + event.getCanonicalName() + " involves multiple players!\n" +
+									 "WARN: Functionality of methods expecting PlayerEventContext with this event is undefined.");
 			}
 		});
 		packets.startListen(plugin, events);

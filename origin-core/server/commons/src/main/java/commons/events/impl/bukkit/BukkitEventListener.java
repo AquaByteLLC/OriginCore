@@ -43,13 +43,15 @@ public class BukkitEventListener<T extends Event> implements EventListener, Even
 	public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
 		if (events != null) {
 			MethodHandle[] getters = ReflectUtil.getPublicMethodsByReturnType(event.getClass(), Player.class);
-			if (getters.length >= 1) {
-				EventContext context = events.publish((Player) getters[0].invoke(event), event);
+			EventContext context;
+			if (getters.length >= 1) // involves a player, let's try to get it
+				context = events.publish((Player) getters[0].invoke(event), event);
+			else // no player involved (methods expecting PlayerEventContext will fail)
+				context = events.publish(event);
 
-				if (event instanceof Cancellable cancellable)
-					if(context.isCancelled()) // todo: document this behavior
-						cancellable.setCancelled(true);
-			}
+			if (event instanceof Cancellable cancellable)
+				if (context.isCancelled()) // todo: document this behavior
+					cancellable.setCancelled(true);
 		}
 	}
 

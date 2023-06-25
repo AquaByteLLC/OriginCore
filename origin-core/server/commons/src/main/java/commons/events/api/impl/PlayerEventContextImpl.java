@@ -1,35 +1,24 @@
 package commons.events.api.impl;
 
 import commons.events.api.EventContext;
+import commons.events.api.PlayerEventContext;
 import org.bukkit.entity.Player;
 
 /**
  * @author vadim
  */
-class PlayerEventContext implements EventContext {
+class PlayerEventContextImpl extends EventContextImpl implements PlayerEventContext {
 
 	private final Player player;
 
-	private boolean cancelled;
-
-	PlayerEventContext(Player player) {
+	PlayerEventContextImpl(Object event, Player player) {
+		super(event);
 		this.player = player;
 	}
 
 	@Override
 	public Player getPlayer() {
 		return player;
-	}
-
-
-	@Override
-	public boolean isCancelled() {
-		return cancelled;
-	}
-
-	@Override
-	public void setCancelled(boolean toCancel) {
-		this.cancelled = toCancel;
 	}
 
 }

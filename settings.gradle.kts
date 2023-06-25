@@ -9,6 +9,7 @@ setupOriginModule(
             Pair("blocks", listOf("blocks-api")),
             Pair("enchants", listOf("enchants-api", "enchants-impl")),
             Pair("generators", listOf("generators-api", "generators-impl")),
+            Pair("enderchests", listOf("chests-api", "chests-impl")),
             Pair("server", listOf("commons"))
               ));
 

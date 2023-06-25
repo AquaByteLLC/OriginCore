@@ -91,6 +91,7 @@ class EnchantMenuImpl(plugin: EnchantPlugin, private val item: EnchantedItem) : 
 		back = buttons[BACK_SLOT]!! to BACK_SLOT
 
 		fill = exclude(*frame())
+		item.itemStack.itemMeta.persistentDataContainer
 
 		frameWith(blank())
 

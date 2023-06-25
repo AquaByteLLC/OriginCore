@@ -13,10 +13,12 @@ public interface EventRegistry {
 
 	void subscribeAll(Object listener);
 
-	<T> void subscribeOne(Object listener, Subscriber<T> subscriber, Class<T> eventClass);
+	<C extends EventContext, E> void subscribeOne(Object listener, Subscriber<C, E> subscriber, Class<E> eventClass);
 
 	void unsubscribe(Object listener);
 
-	<T> EventContext publish(Player player, T event);
+	<T> EventContext publish(T event);
+
+	<T> PlayerEventContext publish(Player player, T event);
 
 }

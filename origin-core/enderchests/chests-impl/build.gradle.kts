@@ -2,8 +2,8 @@ plugins {
     kotlin("jvm") version "1.6.20-RC"
 }
 
-group = "enchants.impl"
-sharedProjectData.main_cls = "$group.EnchantPlugin"
+group = "enderchests.impl"
+sharedProjectData.main_cls = "$group.EnderChestsPlugin"
 
 setupShadowJar()
 copyToPluginsFolder()
@@ -16,13 +16,12 @@ dependencies {
     compileOnly(Dependencies._SPIGOT)
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
-    compileOnly(Dependencies.GUICE)
     compileOnly(Dependencies.LFC_SHARED)
     compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(Dependencies.ITEMS)
     compileOnly(Dependencies.MENUS)
     compileOnly(project(":commons"))
-    implementation(project(":enchants-api"))
+    implementation(project(":chests-api"))
 }
 
 tasks {

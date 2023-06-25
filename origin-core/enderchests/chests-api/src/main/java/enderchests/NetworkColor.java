@@ -5,7 +5,7 @@ import org.bukkit.ChatColor;
 /**
  * @author vadim
  */
-public enum ChestNetwork {
+public enum NetworkColor {
 
 	RED(ChatColor.RED),
 	DARK_RED(ChatColor.DARK_RED),
@@ -26,7 +26,7 @@ public enum ChestNetwork {
 
 	public final ChatColor chatColor;
 
-	ChestNetwork(ChatColor chatColor) {
+	NetworkColor(ChatColor chatColor) {
 		this.chatColor = chatColor;
 	}
 

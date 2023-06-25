@@ -4,8 +4,8 @@ package commons.events.api;
  * @author vadim
  */
 @FunctionalInterface
-public interface Subscriber<T> {
+public interface Subscriber<C extends EventContext,E> {
 
-	void process(EventContext context, T event) throws NoSuchFieldException, IllegalAccessException;
+	void process(C context, E event) throws Exception;
 
 }

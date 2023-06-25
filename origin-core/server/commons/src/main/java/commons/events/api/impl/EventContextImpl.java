@@ -6,25 +6,29 @@ import org.bukkit.entity.Player;
 /**
  * @author vadim
  */
-class PlayerEventContextImpl implements EventContext {
+class EventContextImpl implements EventContext {
 
-	private final Player player;
+	private Object event;
+
+	EventContextImpl(Object event) {
+		this.event = event;
+	}
+
+	@Override
+	public Object getEvent() {
+		return event;
+	}
+
+	@Override
+	public void mutate(Object event) {
+		this.event = event;
+	}
 
 	private boolean cancelled;
 
-	PlayerEventContextImpl(Player player) {
-		this.player = player;
-	}
-
-	@Override
-	public Player getPlayer() {
-		return player;
-	}
-
-
 	@Override
 	public boolean isCancelled() {
-		return cancelled;
+		return cancelled || event == null;
 	}
 
 	@Override

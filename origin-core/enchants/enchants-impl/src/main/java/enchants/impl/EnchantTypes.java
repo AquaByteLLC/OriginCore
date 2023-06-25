@@ -1,16 +1,14 @@
 package enchants.impl;
 
-import commons.events.api.EventContext;
+import commons.events.api.PlayerEventContext;
 import commons.events.impl.EventSubscriber;
-import commons.events.impl.bukkit.BukkitEventSubscriber;
-import commons.events.impl.packet.PacketEventSubscriber;
+import commons.events.impl.impl.PlayerEventSubscriber;
 import enchants.EnchantKey;
 import enchants.EnchantRegistry;
 import enchants.impl.item.EnchantedItemImpl;
 import enchants.item.EnchantFactory;
 import enchants.item.EnchantedItem;
 import enchants.item.EnchantTarget;
-import net.minecraft.network.protocol.Packet;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
@@ -25,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public enum EnchantTypes implements EnchantKey {
 
 	SPEED("Speed",
-		  bukkit(BlockBreakEvent.class, (key, ctx, event) -> {
+		  subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
 			  final ItemStack playersItem = event.getPlayer().getInventory().getItemInMainHand();
 
 			  if (playersItem.getType().isAir()) return;
@@ -36,7 +34,7 @@ public enum EnchantTypes implements EnchantKey {
 				  event.getPlayer().addPotionEffect(PotionEffectType.SPEED.createEffect(10 * 20, 0));
 		  }), EnchantTarget.tools()),
 	JUMP("Jump",
-		  bukkit(BlockBreakEvent.class, (key, ctx, event) -> {
+		 subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
 			  final ItemStack playersItem = event.getPlayer().getInventory().getItemInMainHand();
 
 			  if (playersItem.getType().isAir()) return;
@@ -78,19 +76,14 @@ public enum EnchantTypes implements EnchantKey {
 
 	private static int v = 0;
 
-	private static <T extends Event> EventSubscriber bukkit(Class<T> clazz, SubscriberKeyConsumer<T> cons) {
+	private static <T extends Event> EventSubscriber subscribe(Class<T> clazz, Consumer3<T> cons) {
 		final int vf = v++;
-		return new BukkitEventSubscriber<>(clazz, (ctx, event) -> cons.consume(values()[vf], ctx, event));
-	}
-
-	private static <T extends Packet<?>> EventSubscriber packet(Class<T> clazz, SubscriberKeyConsumer<T> cons) {
-		final int vf = v++;
-		return new PacketEventSubscriber<>(clazz, (ctx, event) -> cons.consume(values()[vf], ctx, event));
+		return new PlayerEventSubscriber<>(clazz, (ctx, event) -> cons.consume(values()[vf], ctx, event));
 	}
 
 	@FunctionalInterface
-	private interface SubscriberKeyConsumer<T> {
-		void consume(EnchantKey key, EventContext context, T event);
+	private interface Consumer3<T> {
+		void consume(EnchantKey key, PlayerEventContext context, T event);
 	}
 
 	public static @Nullable EnchantKey fromName(String name) {

@@ -75,7 +75,7 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 	}
 
 	@Subscribe
-	void onRtClick(EventContext ctx, PlayerInteractEvent event) {
+	void onRtClick(PlayerInteractEvent event) {
 		if(event.getHand() != EquipmentSlot.HAND) return;
 
 		switch (event.getAction()) {
@@ -90,7 +90,7 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 
 		Menu menu = new EnchantMenuImpl(this, item).getMenu();
 		menu.regen();
-		menu.open(ctx.getPlayer());
+		menu.open(event.getPlayer());
 	}
 
 	public GeneralConfig getGeneralConfig() {

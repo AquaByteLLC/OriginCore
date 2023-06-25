@@ -65,8 +65,8 @@ public class GenHandler {
 	}
 
 	@Subscribe
-	void onCreateGen(EventContext context, BlockPlaceEvent event) {
-		Player     player   = context.getPlayer();
+	void onCreateGen(BlockPlaceEvent event) {
+		Player     player   = event.getPlayer();
 		GenAccount account  = provider.getAccount(player);
 		Location   location = event.getBlock().getLocation();
 
@@ -100,8 +100,8 @@ public class GenHandler {
 	}
 
 	@Subscribe
-	void onDeleteGen(EventContext context, BlockBreakEvent event) {
-		Player     player   = context.getPlayer();
+	void onDeleteGen(BlockBreakEvent event) {
+		Player     player   = event.getPlayer();
 		Location   location = event.getBlock().getLocation();
 
 		Generator generator = reg.getGenAt(location);
@@ -113,12 +113,12 @@ public class GenHandler {
 	}
 
 	@Subscribe
-	void onUpgradeGen(EventContext context, PlayerInteractEvent event) {
+	void onUpgradeGen(PlayerInteractEvent event) {
 		if(event.getHand() != EquipmentSlot.HAND) return;
 		if(event.isBlockInHand()) return;
 		if(!event.getPlayer().isSneaking()) return;
 
-		Player     player  = context.getPlayer();
+		Player     player  = event.getPlayer();
 		Block      block   = event.getClickedBlock();
 		if (block == null) return;
 
@@ -133,7 +133,7 @@ public class GenHandler {
 
 	@Subscribe
 	@SuppressWarnings("DataFlowIssue")
-	void onPickupItem(EventContext context, PlayerAttemptPickupItemEvent event) {
+	void onPickupItem(PlayerAttemptPickupItemEvent event) {
 		UUID      player = event.getPlayer().getUniqueId();
 		ItemStack item   = event.getItem().getItemStack();
 

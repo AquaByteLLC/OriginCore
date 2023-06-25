@@ -10,10 +10,10 @@ copyToPluginsFolder()
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)
-    compileOnly(Dependencies.ACF)
     annotationProcessor(Dependencies.LOMBOK)
     compileOnly(Dependencies.PAPER)
     compileOnly(Dependencies._SPIGOT)
+    compileOnly(Dependencies.ACF)
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
     compileOnly(Dependencies.GUICE)

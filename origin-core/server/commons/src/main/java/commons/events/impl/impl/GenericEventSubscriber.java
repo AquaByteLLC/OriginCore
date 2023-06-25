@@ -1,22 +1,21 @@
-package commons.events.impl.bukkit;
+package commons.events.impl.impl;
 
 import commons.events.api.EventContext;
+import commons.events.api.EventRegistry;
 import commons.events.api.PlayerEventContext;
 import commons.events.api.Subscriber;
-import commons.events.api.EventRegistry;
 import commons.events.impl.EventSubscriber;
 import org.bukkit.event.Event;
 
 /**
  * @author vadim
  */
-@Deprecated(forRemoval = true)
-public class BukkitEventSubscriber<T extends Event> implements EventSubscriber {
+public class GenericEventSubscriber<T> implements EventSubscriber {
 
-	private final Subscriber<PlayerEventContext, T> subscriber;
-	private final Class<T>      clazz;
+	private final Subscriber<? extends EventContext, T> subscriber;
+	private final Class<T> clazz;
 
-	public BukkitEventSubscriber(Class<T> clazz, Subscriber<PlayerEventContext, T> subscriber) {
+	public GenericEventSubscriber(Class<T> clazz, Subscriber<? extends EventContext, T> subscriber) {
 		this.clazz      = clazz;
 		this.subscriber = subscriber;
 	}
