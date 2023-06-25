@@ -1,10 +1,13 @@
 package commons.events.api.impl;
 
+import commons.ReflectUtil;
 import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
+import lombok.SneakyThrows;
 import org.bukkit.entity.Player;
 import commons.events.api.Subscribe;
 import commons.events.api.Subscriber;
+import org.bukkit.event.EventException;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
@@ -82,6 +85,7 @@ public class PlayerEventRegistry implements EventRegistry {
 
 	@Override
 	@SuppressWarnings("rawtypes,unchecked")
+	@SneakyThrows
 	public <T> EventContext publish(Player player, T event) {
 		Class<?>     clazz   = event.getClass();
 		EventContext context = new PlayerEventContext(player);
@@ -91,7 +95,12 @@ public class PlayerEventRegistry implements EventRegistry {
 			subs.removeIf(sub -> sub.listener.refersTo(null));
 			for (Subscription sub : subs)
 				for (Subscriber subscriber : sub.callbacks.get(clazz))
-					subscriber.process(context, event);
+					try {
+						subscriber.process(context, event);
+					} catch (Exception e) {
+						ReflectUtil.serr("problem processing event " + event.getClass().getCanonicalName() + " in class " + sub.listener.get().getClass().getCanonicalName());
+						throw new EventException(e);
+					}
 		}
 
 		return context;
