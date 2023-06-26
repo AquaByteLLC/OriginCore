@@ -1,12 +1,12 @@
 package enderchests.block;
 
-import java.awt.*;
+import org.bukkit.ChatColor;
 
 /**
  * @author vadim
  */
 public interface BlockHighlight extends BlockLike {
 
-	Color getHighlightColor();
+	ChatColor getHighlightColor();
 
 }

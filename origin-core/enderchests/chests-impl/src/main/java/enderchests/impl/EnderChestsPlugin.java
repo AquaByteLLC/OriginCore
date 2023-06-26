@@ -4,10 +4,10 @@ import co.aikar.commands.PaperCommandManager;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import enderchests.ChestRegistry;
-import enderchests.block.FakeBlockFactory;
+import enderchests.block.BlockFactory;
 import enderchests.IllusionRegistry;
-import enderchests.impl.block.PacketBasedFakeBlockFactory;
-import enderchests.impl.cmd.FakeBlockCommand;
+import enderchests.impl.block.BlockFactoryImpl;
+import enderchests.impl.cmd.IllusionCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -18,8 +18,8 @@ public class EnderChestsPlugin extends JavaPlugin {
 	private PaperCommandManager commands;
 	private ChestRegistry     chestRegistry;
 	private EnderChestHandler chestHandler;
-	private IllusionRegistry  blockRegistry;
-	private FakeBlockFactory  blockFactory;
+	private IllusionRegistry blockRegistry;
+	private BlockFactory     blockFactory;
 
 	public ChestRegistry getChestRegistry() {
 		return chestRegistry;
@@ -29,7 +29,7 @@ public class EnderChestsPlugin extends JavaPlugin {
 		return blockRegistry;
 	}
 
-	public FakeBlockFactory getBlockFactory() {
+	public BlockFactory getBlockFactory() {
 		return blockFactory;
 	}
 
@@ -44,10 +44,10 @@ public class EnderChestsPlugin extends JavaPlugin {
 		chestHandler  = new EnderChestHandler(chestRegistry);
 
 		blockRegistry = new BlockIllusionRegistry();
-		blockFactory  = new PacketBasedFakeBlockFactory();
+		blockFactory  = new BlockFactoryImpl();
 
 		commands = new PaperCommandManager(this);
-		commands.registerCommand(new FakeBlockCommand(blockRegistry, blockFactory));
+		commands.registerCommand(new IllusionCommand(blockRegistry, blockFactory));
 
 		EventRegistry events = CommonsPlugin.commons().getEventRegistry();
 		events.subscribeAll(chestHandler);
