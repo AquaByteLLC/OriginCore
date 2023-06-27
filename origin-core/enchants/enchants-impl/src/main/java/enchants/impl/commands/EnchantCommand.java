@@ -2,14 +2,14 @@ package enchants.impl.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import enchants.impl.EnchantPlugin;
-import enchants.impl.menu.EnchantMenuImpl;
-import enchants.item.EnchantFactory;
 import enchants.EnchantKey;
 import enchants.EnchantRegistry;
+import enchants.impl.EnchantPlugin;
 import enchants.impl.Messages;
-import enchants.item.EnchantedItem;
+import enchants.impl.menu.EnchantMenuImpl;
 import enchants.item.Enchant;
+import enchants.item.EnchantFactory;
+import enchants.item.EnchantedItem;
 import me.lucko.helper.text3.Text;
 import me.lucko.helper.text3.TextComponent;
 import me.lucko.helper.text3.event.HoverEvent;
@@ -17,7 +17,6 @@ import me.lucko.helper.text3.format.TextColor;
 import me.vadim.util.menu.Menu;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +47,7 @@ public class EnchantCommand extends BaseCommand {
 				enchantInformation.forEach($ -> {
 					count.getAndIncrement();
 					if (count.get() == enchantInformation.size()) text.append(Text.colorize($));
-				    else text.append(Text.colorize($) + "\n");
+					else text.append(Text.colorize($) + "\n");
 				});
 			}))).build();
 

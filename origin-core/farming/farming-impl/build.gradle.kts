@@ -21,8 +21,9 @@ dependencies {
     compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(Dependencies.ITEMS)
     compileOnly(Dependencies.MENUS)
+    compileOnly(Dependencies.WORLD_GUARD)
     compileOnly(project(":commons"))
-    implementation(project(":farming-api"))
+    implementation(project(":blocks-api"))
 }
 
 tasks {

@@ -6,7 +6,7 @@ setupOriginModule(
             Pair("mining", listOf("mining-api", "mining-impl")),
             Pair("farming", listOf("farming-api", "farming-impl")),
             Pair("fishing", listOf("fishing-api", "fishing-impl")),
-            Pair("blocks", listOf("blocks-api")),
+            Pair("blocks", listOf("blocks-api", "blocks-impl")),
             Pair("enchants", listOf("enchants-api", "enchants-impl")),
             Pair("generators", listOf("generators-api", "generators-impl")),
             Pair("enderchests", listOf("chests-api", "chests-impl")),

@@ -54,9 +54,7 @@ public class BlockIllusionRegistry implements enderchests.IllusionRegistry {
 	@Override
 	public void register(BlockHighlight highlight) {
 		highlights.put(highlight.getBlockLocation(), highlight);
-
 		FallingBlockHighlight impl = ((FallingBlockHighlight) highlight);
-
 		FallingBlock block = impl.spawn();
 		block.getPersistentDataContainer().set(fbk, PersistentDataType.STRING, fbv);
 		falling.put(highlight, block.getUniqueId());

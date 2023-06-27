@@ -21,8 +21,11 @@ dependencies {
     compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(Dependencies.ITEMS)
     compileOnly(Dependencies.MENUS)
+    compileOnly(Dependencies.WORLD_GUARD)
     compileOnly(project(":commons"))
+    compileOnly(project(":enchants-api"))
     compileOnly(project(":blocks-api"))
+    compileOnly(project(":blocks-impl"))
     implementation(project(":mining-api"))
 }
 

@@ -18,5 +18,4 @@ public interface ChestRegistry {
 	@NotNull LinkedChest createChest(ChestNetwork network, Location location);
 
 	void deleteChest(LinkedChest chest);
-
 }
