@@ -1,19 +1,20 @@
-package blocks.impl.aspect;
+package blocks.block.aspects;
 
 import lombok.Getter;
 
-public enum AspectEnum {
+public enum AspectType {
 
 	OVERLAYABLE("overlayable"),
 	LOCATABLE("locatable"),
 	EFFECTABLE("effectable"),
 	HARDENABLE("hardenable"),
 	REGENABLE("regenable"),
-	FAKE_BLOCK("fake_block"),
+	PROJECTABLE("projectable"),
 	DROPABLE("drop");
 
 	@Getter private final String name;
-	AspectEnum(String name){this.name = name;}
+
+	AspectType(String name) { this.name = name; }
 
 
 }

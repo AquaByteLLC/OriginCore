@@ -20,7 +20,7 @@ public record OriginRegion(String regionID, String allowedBlock, World world) {
 		private final OriginRegion region;
 		private final String block;
 		@Getter private final ProtectedRegion wgRegion;
-		private static final RegionRegistry registry = BlocksAPI.getRegionRegistry();
+		private static final RegionRegistry registry = BlocksAPI.getInstance().getRegionRegistry();
 
 		public RegionInstance(OriginRegion region, String block) {
 			this.region = region;

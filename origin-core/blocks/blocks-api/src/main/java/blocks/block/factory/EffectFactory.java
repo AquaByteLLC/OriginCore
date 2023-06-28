@@ -1,7 +1,7 @@
 package blocks.block.factory;
 
-import blocks.block.builder.OriginEffectBuilder;
+import blocks.block.builder.EffectHolder;
 
 public interface EffectFactory {
-	OriginEffectBuilder newEffect();
+	EffectHolder newEffect();
 }

@@ -1,82 +1,68 @@
 package blocks.impl.aspect.overlay;
 
 import blocks.BlocksAPI;
-import blocks.block.aspects.location.Locatable;
+import blocks.block.aspects.AspectType;
+import blocks.block.aspects.BlockAspect;
+import blocks.block.aspects.overlay.ClickCallback;
 import blocks.block.aspects.overlay.Overlayable;
-import blocks.block.aspects.overlay.registry.OverlayLocationRegistry;
-import blocks.block.builder.OriginBlockBuilder;
-import me.lucko.helper.text3.format.TextColor;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import blocks.block.builder.AspectHolder;
+import blocks.block.illusions.BlockOverlay;
+import blocks.impl.aspect.BaseAspect;
+import org.bukkit.ChatColor;
+import org.bukkit.block.data.BlockData;
 
-import java.util.function.Consumer;
+public class Overlay extends BaseAspect implements Overlayable {
 
-public class Overlay implements Overlayable {
+	private BlockData overlayData;
+	private ChatColor color = ChatColor.GREEN;
+	private ClickCallback callback;
 
-	private final OriginBlockBuilder builder;
-	private Location location;
-	private TextColor color = TextColor.GREEN;
-	private Consumer<Player> player;
-	private final OverlayLocationRegistry locationRegistry;
-
-	public Overlay(OriginBlockBuilder builder) {
-		this.builder = builder;
-		this.locationRegistry = BlocksAPI.getOverlayLocationRegistry();
+	public Overlay(AspectHolder editor) {
+		super(editor, AspectType.OVERLAYABLE);
 	}
 
 	@Override
-	public OriginBlockBuilder getBuilder() {
-		return this.builder;
-	}
-
-
-
-	@Override
-	public Overlayable setOverlayColor(TextColor color) {
+	public void setHighlightColor(ChatColor color) {
 		this.color = color;
-		return this;
 	}
 
 	@Override
-	public TextColor getOverlayColor() {
+	public ChatColor getHighlightColor() {
 		return this.color;
 	}
 
 	@Override
-	public Consumer<Player> getPlayerConsumer() {
-		return this.player;
+	public void setOverlayData(BlockData overlayData) {
+		this.overlayData = overlayData;
 	}
 
 	@Override
-	public Overlayable setPlayerConsumer(Consumer<Player> playerConsumer) {
-		this.player = playerConsumer;
-		return this;
+	public BlockData getOverlayData() {
+		return overlayData;
+	}
+
+//	@Override
+//	public BlockOverlay toOverlay() {
+//		return new FallingBlockOverlay();
+//	}
+
+	@Override
+	public ClickCallback getClickCallback() {
+		return this.callback;
 	}
 
 	@Override
-	public OverlayLocationRegistry getRegistry() {
-		return this.locationRegistry;
+	public void setClickCallback(ClickCallback callback) {
+		this.callback = callback;
 	}
 
 	@Override
-	public Location getBlockLocation() {
-		return this.location;
-	}
-
-	@Override
-	public Locatable setBlockLocation(Location location) {
-		this.location = location;
-		return this;
-	}
-
-	@Override
-	public void registerLocation() {
-		getRegistry().getOverlays().put(getBlockLocation(), this);
-	}
-
-	@Override
-	public void unregisterLocation() {
-		getRegistry().getOverlays().remove(getBlockLocation());
+	public BlockAspect copy(AspectHolder newHolder) {
+		Overlay overlay = new Overlay(newHolder);
+		overlay.overlayData = overlayData.clone();
+		overlay.callback = callback;
+		overlay.color = color;
+		return overlay;
 	}
 
 }

@@ -8,12 +8,9 @@ import generators.impl.conf.Config
 import generators.impl.data.GenAccount
 import me.vadim.util.conf.ConfigurationProvider
 import me.vadim.util.item.createItem
-import me.vadim.util.menu.MenuList
+import me.vadim.util.menu.*
 import me.vadim.util.menu.builder.MenuBuilder
-import me.vadim.util.menu.button
 import me.vadim.util.menu.button.Button
-import me.vadim.util.menu.frameWith
-import me.vadim.util.menu.menu
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemFlag

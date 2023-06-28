@@ -8,8 +8,13 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public interface OverlayLocationRegistry {
-	void createOverlay(Overlayable overlayable, Location loc);
-	void deleteOverlay(Overlayable overlayable, Location loc);
+
+	void createOverlay(Overlayable overlay, Location loc);
+
+	void deleteOverlay(Overlayable overlay, Location loc);
+
 	@NotNull HashMap<Location, Overlayable> getOverlays();
+
 	@NotNull HashMap<Overlayable, UUID> getFalling();
+
 }

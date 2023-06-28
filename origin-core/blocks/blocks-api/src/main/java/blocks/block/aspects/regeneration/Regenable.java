@@ -1,13 +1,17 @@
 package blocks.block.aspects.regeneration;
 
-import blocks.block.aspects.GeneralAspect;
-import blocks.block.aspects.illusions.FakeBlock;
+import blocks.block.aspects.BlockAspect;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
+import blocks.block.illusions.FakeBlock;
 
-public interface Regenable extends GeneralAspect {
-	Regenable setRegenTime(double regenTime);
-	Regenable setFakeBlock(FakeBlock fakeBlock);
+public interface Regenable extends BlockAspect {
+
 	double getRegenTime();
+
+	void setRegenTime(double regenTime);
+
 	FakeBlock getFakeBlock();
-	RegenerationRegistry getRegistry();
+
+	void setFakeBlock(FakeBlock fakeBlock);
+
 }

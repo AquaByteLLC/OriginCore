@@ -1,17 +1,17 @@
 package blocks.impl.registry;
 
-import blocks.block.aspects.illusions.FakeBlock;
-import blocks.block.aspects.illusions.registry.IllusionRegistry;
-import blocks.block.aspects.location.BlockLocatable;
-import blocks.block.aspects.location.Locatable;
+import blocks.block.aspects.projection.Projectable;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
-import blocks.impl.aspect.AspectEnum;
+import blocks.block.builder.AspectHolder;
+import blocks.block.illusions.*;
+import blocks.block.aspects.AspectType;
 import blocks.impl.handler.BlocksConfig;
+import com.sun.jdi.Locatable;
 import me.lucko.helper.Schedulers;
-import me.lucko.helper.text3.format.TextColor;
 import me.vadim.util.conf.LiteConfig;
 import net.minecraft.core.BlockPosition;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
@@ -21,65 +21,89 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import java.util.HashMap;
 
 public class RegenerationRegistryImpl implements RegenerationRegistry {
 
 	private final HashMap<BlockPosition, Regenable> regenableHashMap;
 	private final IllusionRegistry illusionRegistry;
+	private final IllusionFactory illusionFactory;
 	private final BlocksConfig config;
 	private final JavaPlugin plugin;
 
-	public RegenerationRegistryImpl(JavaPlugin plugin, LiteConfig lfc, IllusionRegistry illusionRegistry) {
+	public RegenerationRegistryImpl(JavaPlugin plugin, LiteConfig lfc, IllusionsAPI illusions) {
 		this.regenableHashMap = new HashMap<>();
-		this.illusionRegistry = illusionRegistry;
+		this.illusionRegistry = illusions.registry();
+		this.illusionFactory = illusions.factory();
 		this.config = lfc.open(BlocksConfig.class);
 		this.plugin = plugin;
 	}
 
 	@Override
 	public void createRegen(Regenable block, Block original, Player player, long end) {
-		final BlockLocatable locatable = block.getFakeBlock().getLocatable();
-		final BlockPosition position = new BlockPosition(locatable.getBlockLocation().getBlockX(), locatable.getBlockLocation().getBlockY(), locatable.getBlockLocation().getBlockZ());
+/*
+		Location location = null; // = block.getLocation();
 
-		final YamlConfiguration configuration = YamlConfiguration.loadConfiguration(config.file);
-		final Material regenMaterial = Material.matchMaterial(String.valueOf(configuration.getString("regenMaterial")));
+		FakeBlock fake;
+
+		AspectHolder originBlock;
+
+		Projectable projectable = (Projectable) originBlock.getAspects().get(AspectType.PROJECTABLE);
+
+		illusionFactory.newFakeBlock(null, projectable.getProjectedBlockData());
+
+		BlockOverlay overlay = null; // = illusionFactory.newXOverlay(...);
+		fake = illusionFactory.newOverlayedBlock(location, overlay);
+
+		BlockData fakeData = null; // = ...;
+		fake = illusionFactory.newFakeBlock(location, fakeData);
+
+		//using it
+		illusionRegistry.register(fake);
+
+		//save somewhere
+
+
+		//done with it
+		illusionRegistry.unregister(fake);*/
+		Location location = block.getFakeBlock().getBlockLocation();
+		final BlockPosition position = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
 		regenableHashMap.put(position, block);
-		block.getBuilder().createAspect(AspectEnum.OVERLAYABLE.getName(), block.getBuilder().getFactory().newOverlayable().setOverlayColor(TextColor.GREEN).setPlayerConsumer(player1 -> player1.sendMessage("test")));
 		illusionRegistry.register(block.getFakeBlock());
+		player.sendBlockChange(location, block.getFakeBlock().getProjectedBlockData());
 
-		player.sendBlockChange(locatable.getBlockLocation(), block.getFakeBlock().getProjectedBlockData());
-
-		while (System.currentTimeMillis() >= end) {
-			if (getRegenerations().containsKey(position)) {
-
+		Schedulers.bukkit().runTaskTimer(plugin, bukkitTask -> {
+			if (System.currentTimeMillis() >= end) {
 				BlockData blockData = original.getBlockData();
 				if (blockData instanceof Ageable ageable) {
 					Schedulers.bukkit().runTaskTimer(plugin, runnable -> {
 						if (!(ageable.getAge() == ageable.getMaximumAge())) {
 							ageable.setAge(ageable.getAge() + 1);
-							FakeBlock newFakeBlock = illusionRegistry.getBlockAt(locatable.getBlockLocation()).setProjectedBlockData(blockData).setLocatable(locatable);
+							Projectable projectable = (Projectable) block.getEditor().getAspects().get(AspectType.PROJECTABLE);
+							projectable.setProjectedBlockData(ageable);
+							FakeBlock newFakeBlock = projectable.toFakeBlock(location);
 							illusionRegistry.unregister(block.getFakeBlock());
 							illusionRegistry.register(newFakeBlock);
-							player.sendBlockChange(locatable.getBlockLocation(), newFakeBlock.getProjectedBlockData());
+							player.sendBlockChange(location, newFakeBlock.getProjectedBlockData());
 						} else {
 							runnable.cancel();
 						}
 					}, 10, 10);
 				}
+				deleteRegen(block);
+				player.sendBlockChange(location, original.getBlockData());
+				illusionRegistry.unregister(block.getFakeBlock());
+				bukkitTask.cancel();
 			}
-		}
-
-		deleteRegen(block);
-		player.sendBlockChange(locatable.getBlockLocation(), original.getBlockData());
-		illusionRegistry.unregister(block.getFakeBlock());
+		}, 0, 5);
 	}
 
 	@Override
 	public void deleteRegen(Regenable block) {
-		Locatable locatable = block.getFakeBlock().getLocatable();
-		BlockPosition position = new BlockPosition(locatable.getBlockLocation().getBlockX(), locatable.getBlockLocation().getBlockY(), locatable.getBlockLocation().getBlockZ());
+		Location location = block.getFakeBlock().getBlockLocation();
+		final BlockPosition position = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 		regenableHashMap.remove(position);
 	}
 

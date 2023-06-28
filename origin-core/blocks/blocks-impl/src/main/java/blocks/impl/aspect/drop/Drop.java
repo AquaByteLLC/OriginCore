@@ -1,25 +1,22 @@
 package blocks.impl.aspect.drop;
 
+import blocks.block.aspects.AspectType;
+import blocks.block.aspects.BlockAspect;
 import blocks.block.aspects.drop.Dropable;
-import blocks.block.builder.OriginBlockBuilder;
+import blocks.block.builder.AspectHolder;
+import blocks.impl.aspect.BaseAspect;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Drop implements Dropable {
+public class Drop extends BaseAspect implements Dropable {
 
-	private final OriginBlockBuilder builder;
 	private final List<ItemStack> droppedItems;
 
-	public Drop(OriginBlockBuilder builder) {
-		this.builder = builder;
+	public Drop(AspectHolder editor) {
+		super(editor, AspectType.DROPABLE);
 		droppedItems = new ArrayList<>();
-	}
-
-	@Override
-	public OriginBlockBuilder getBuilder() {
-		return this.builder;
 	}
 
 	@Override
@@ -38,4 +35,12 @@ public class Drop implements Dropable {
 		droppedItems.remove(itemStack);
 		return this;
 	}
+
+	@Override
+	public BlockAspect copy(AspectHolder newHolder) {
+		Drop drop = new Drop(newHolder);
+		drop.droppedItems.addAll(droppedItems.stream().map(ItemStack::clone).toList());
+		return drop;
+	}
+
 }

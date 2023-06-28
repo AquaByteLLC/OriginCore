@@ -4,12 +4,11 @@ import blocks.BlocksAPI;
 import blocks.block.aspects.drop.Dropable;
 import blocks.block.aspects.effect.Effectable;
 import blocks.block.aspects.harden.Hardenable;
-import blocks.block.aspects.illusions.FakeBlock;
+import blocks.block.aspects.projection.Projectable;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
-import blocks.block.builder.OriginEffectBuilder;
-import blocks.impl.BlocksPlugin;
-import blocks.impl.aspect.AspectEnum;
+import blocks.block.builder.EffectHolder;
+import blocks.block.aspects.AspectType;
 import blocks.impl.aspect.effect.type.OriginEffect;
 import blocks.impl.aspect.effect.type.OriginParticle;
 import blocks.impl.builder.OriginBlock;
@@ -35,7 +34,6 @@ import mining.event.MiningBreakEvent;
 import mining.impl.commands.RegionCommands;
 import mining.impl.conf.GeneralConfig;
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
@@ -48,7 +46,7 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 
 	private static Injector injector;
 	private EventRegistry eventRegistry;
-	private BlocksPlugin blocksPlugin;
+	private BlocksAPI blocksAPI;
 	private MiningAPI miningAPI;
 	private LiteConfig lfc;
 
@@ -60,8 +58,8 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 		lfc.register(BlocksConfig.class, BlocksConfig::new);
 		lfc.reload();
 		this.miningAPI = new MiningAPI(this);
-		this.blocksPlugin = new BlocksPlugin(this, lfc, eventRegistry);
-		injector = Guice.createInjector(new MiningModule(this, lfc, blocksPlugin, miningAPI));
+		this.blocksAPI = BlocksAPI.getInstance();
+		injector       = Guice.createInjector(new MiningModule(this, lfc, blocksAPI, miningAPI));
 		MiningBreakEvent.init(eventRegistry);
 		setup();
 	}
@@ -69,7 +67,7 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 	@Override
 	protected void disable() {
 		lfc.open(BlocksConfig.class).save();
-		RegenerationRegistry.cancelRegenerations(blocksPlugin.getRegenerationRegistry().getRegenerations());
+		RegenerationRegistry.cancelRegenerations(blocksAPI.getRegenerationRegistry().getRegenerations());
 	}
 
 	public GeneralConfig getGeneralConfig() {
@@ -89,26 +87,27 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 
 	private void setup() {
 		PaperCommandManager commands = new PaperCommandManager(this);
-		commands.registerCommand(new RegionCommands(blocksPlugin.getBlockRegistry()));
+		commands.registerCommand(new RegionCommands(blocksAPI.getBlockRegistry()));
 		BlockHandler.init(conf -> {
 			for (String blockKey : conf.getConfigurationSection("Blocks").getKeys(false)) {
 				String mainPath = "Blocks." + blockKey + ".";
-				String blockName = conf.getString(mainPath + "blockName");
-				int customModelData = conf.getInt(mainPath + "modelData");
-				double hardnessMultiplier = conf.getDouble(mainPath + "hardnessMultiplier");
-				double regenTime = conf.getDouble(mainPath + "regenTime");
-				boolean hasParticles = conf.getBoolean(mainPath + "hasParticle");
-				boolean hasEffect = conf.getBoolean(mainPath + "hasEffect");
+
+				String  blockName          = conf.getString(mainPath + "blockName");
+				int     customModelData    = conf.getInt(mainPath + "modelData");
+				double  hardnessMultiplier = conf.getDouble(mainPath + "hardnessMultiplier");
+				double  regenTime          = conf.getDouble(mainPath + "regenTime");
+				boolean hasParticles       = conf.getBoolean(mainPath + "hasParticle");
+				boolean hasEffect          = conf.getBoolean(mainPath + "hasEffect");
 
 				OriginBlock originBlock = new BlockFactoryImpl().newBlock()
 						.setName(blockName)
 						.setModelData(customModelData);
 
-				Dropable drop = originBlock.getFactory().newDropable();
-				Effectable effectable = originBlock.getFactory().newEffectable();
-				Hardenable hardenable = originBlock.getFactory().newHardenable();
-				Regenable regenable = originBlock.getFactory().newRegenable();
-				FakeBlock fakeBlock = originBlock.getFactory().newFakeBlock();
+				Dropable    drop        = originBlock.getFactory().newDropable();
+				Effectable  effectable  = originBlock.getFactory().newEffectable();
+				Hardenable  hardenable  = originBlock.getFactory().newHardenable();
+				Regenable   regenable   = originBlock.getFactory().newRegenable();
+				Projectable projectable = originBlock.getFactory().newProjectable();
 
 				hardenable.setHardnessMultiplier(hardnessMultiplier);
 				regenable.setRegenTime(regenTime);
@@ -120,8 +119,8 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 					OriginParticle originParticles = new OriginParticle(amount);
 					originParticles.setType(Particle.valueOf(particleType));
 
-					OriginEffectBuilder particleEffect = new EffectFactoryImpl().newEffect()
-							.setEffectType(originParticles);
+					EffectHolder particleEffect = new EffectFactoryImpl().newEffect();
+					particleEffect.setEffectType(originParticles);
 
 					effectable.addEffect(particleEffect);
 				}
@@ -133,10 +132,10 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 
 					OriginEffect originEffect = new OriginEffect(data, radius);
 
-					originEffect.setType(Effect.valueOf(effectType));
+					originEffect.setType(org.bukkit.Effect.valueOf(effectType));
 
-					OriginEffectBuilder effect = new EffectFactoryImpl().newEffect()
-							.setEffectType(originEffect);
+					EffectHolder effect = new EffectFactoryImpl().newEffect();
+					effect.setEffectType(originEffect);
 
 					effectable.addEffect(effect);
 				}
@@ -161,18 +160,17 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 					drop.addDrop(builder.build());
 				}
 
-				fakeBlock.setProjectedBlockData(Material.matchMaterial(conf.getString("regenMaterial")).createBlockData());
-				regenable.setFakeBlock(fakeBlock);
+				projectable.setProjectedBlockData(Material.matchMaterial(conf.getString("regenMaterial")).createBlockData());
 
 				originBlock
-						.createAspect(AspectEnum.EFFECTABLE.getName(), effectable)
-						.createAspect(AspectEnum.HARDENABLE.getName(), hardenable)
-						.createAspect(AspectEnum.REGENABLE.getName(), regenable)
-						.createAspect(AspectEnum.FAKE_BLOCK.getName(), fakeBlock)
-						.createAspect(AspectEnum.DROPABLE.getName(), drop);
+						.createAspect(effectable)
+						.createAspect(hardenable)
+						.createAspect(regenable)
+						.createAspect(projectable)
+						.createAspect(drop);
 
 				if (blockName == null) return;
-				BlocksAPI.getBlockRegistry().createBlock(originBlock);
+				blocksAPI.getBlockRegistry().createBlock(originBlock);
 			}
 		});
 		MiningAPI.map(new BukkitBossBarFactory(Bukkit.getServer()).newBossBar().color(BossBarColor.PINK).style(BossBarStyle.SOLID));
@@ -181,20 +179,20 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 	protected static class MiningModule extends AbstractModule {
 		private final JavaPlugin plugin;
 		private final LiteConfig lfc;
-		private final BlocksPlugin blockPlugin;
+		private final BlocksAPI blocksAPI;
 		private final MiningAPI miningApi;
 
-		MiningModule(JavaPlugin plugin, LiteConfig lfc, BlocksPlugin blockPlugin, MiningAPI api) {
-			this.plugin = plugin;
-			this.lfc = lfc;
-			this.blockPlugin = blockPlugin;
+		MiningModule(JavaPlugin plugin, LiteConfig lfc, BlocksAPI blocksAPI, MiningAPI api) {
+			this.plugin    = plugin;
+			this.lfc       = lfc;
+			this.blocksAPI = blocksAPI;
 			this.miningApi = api;
 		}
 
 		protected void configure() {
 			this.bind(JavaPlugin.class).toInstance(plugin);
 			this.bind(LiteConfig.class).toInstance(lfc);
-			this.bind(BlocksPlugin.class).toInstance(blockPlugin);
+			this.bind(BlocksAPI.class).toInstance(blocksAPI);
 			this.bind(MiningAPI.class).toInstance(miningApi);
 		}
 	}

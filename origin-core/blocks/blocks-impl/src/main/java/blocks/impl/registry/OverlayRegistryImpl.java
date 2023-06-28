@@ -21,12 +21,12 @@ public class OverlayRegistryImpl implements OverlayLocationRegistry {
 	}
 
 	@Override
-	public void createOverlay(Overlayable overlayable, Location loc) {
-		overlayMap.put(loc, overlayable);
+	public void createOverlay(Overlayable overlay, Location loc) {
+		overlayMap.put(loc, overlay);
 	}
 
 	@Override
-	public void deleteOverlay(Overlayable overlayable, Location loc) {
+	public void deleteOverlay(Overlayable overlay, Location loc) {
 		overlayMap.remove(loc);
 	}
 

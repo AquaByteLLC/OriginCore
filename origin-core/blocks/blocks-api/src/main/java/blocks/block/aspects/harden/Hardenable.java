@@ -1,8 +1,11 @@
 package blocks.block.aspects.harden;
 
-import blocks.block.aspects.GeneralAspect;
+import blocks.block.aspects.BlockAspect;
 
-public interface Hardenable extends GeneralAspect {
-	Hardenable setHardnessMultiplier(double hardnessMultiplier);
+public interface Hardenable extends BlockAspect {
+
+	void setHardnessMultiplier(double hardnessMultiplier);
+
 	double getHardnessMultiplier();
+
 }

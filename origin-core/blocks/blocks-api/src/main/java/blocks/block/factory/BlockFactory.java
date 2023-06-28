@@ -1,7 +1,7 @@
 package blocks.block.factory;
 
-import blocks.block.builder.OriginBlockBuilder;
+import blocks.block.builder.AspectHolder;
 
 public interface BlockFactory {
-	OriginBlockBuilder newBlock();
+	AspectHolder newBlock();
 }

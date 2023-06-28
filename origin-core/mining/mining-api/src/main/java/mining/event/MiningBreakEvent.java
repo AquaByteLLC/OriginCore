@@ -6,7 +6,7 @@ import blocks.block.aspects.effect.Effectable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.impl.anim.entity.BlockEntity;
-import blocks.impl.aspect.AspectEnum;
+import blocks.block.aspects.AspectType;
 import blocks.impl.builder.OriginBlock;
 import blocks.impl.event.OriginBreakEvent;
 import commons.events.api.EventRegistry;
@@ -32,8 +32,8 @@ import java.util.Objects;
 
 public class MiningBreakEvent {
 
-	private static final ProgressRegistry progressRegistry = BlocksAPI.getProgressRegistry();
-	private static final RegenerationRegistry regenRegistry = BlocksAPI.getRegenerationRegistry();
+	private static final ProgressRegistry progressRegistry = BlocksAPI.getInstance().getProgressRegistry();
+	private static final RegenerationRegistry regenRegistry = BlocksAPI.getInstance().getRegenerationRegistry();
 	private static PlayerEventSubscriber<PacketPlayInBlockDig> packetEventSubscriber;
 	private static GenericEventSubscriber<OriginBreakEvent> bukkitEventSubscriber;
 
@@ -79,8 +79,8 @@ public class MiningBreakEvent {
 
 			if (originBlock == null) return;
 
-			Effectable effectable = (Effectable) originBlock.getAspects().get(AspectEnum.EFFECTABLE.getName());
-			Dropable dropable = (Dropable) originBlock.getAspects().get(AspectEnum.DROPABLE.getName());
+			Effectable effectable = (Effectable) originBlock.getAspects().get(AspectType.EFFECTABLE);
+			Dropable dropable = (Dropable) originBlock.getAspects().get(AspectType.DROPABLE);
 			if (effectable != null) {
 				effectable.getEffects().forEach(effect -> effect.getEffectType().handleEffect(player, block.getLocation(), true));
 			}

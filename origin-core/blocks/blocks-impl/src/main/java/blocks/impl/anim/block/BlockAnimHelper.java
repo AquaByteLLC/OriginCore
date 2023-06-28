@@ -3,15 +3,17 @@ package blocks.impl.anim.block;
 import blocks.BlocksAPI;
 import blocks.block.BlockRegistry;
 import blocks.block.aspects.harden.Hardenable;
-import blocks.block.aspects.illusions.FakeBlock;
-import blocks.block.aspects.location.BlockLocatable;
+import blocks.block.aspects.projection.Projectable;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
-import blocks.block.builder.OriginBlockBuilder;
+import blocks.block.builder.AspectHolder;
+import blocks.block.builder.FixedAspectHolder;
+import blocks.block.illusions.FakeBlock;
+import blocks.block.illusions.IllusionFactory;
+import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
-import blocks.impl.aspect.AspectEnum;
-import blocks.impl.aspect.location.BlockLocation;
+import blocks.block.aspects.AspectType;
 import blocks.impl.event.OriginBreakEvent;
 import commons.events.impl.packet.PacketEventListener;
 import lombok.Getter;
@@ -22,6 +24,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimation;
 import net.minecraft.server.level.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -35,15 +38,17 @@ public class BlockAnimHelper {
 
 	private final ProgressRegistry registry;
 	private final BlockRegistry blockRegistry;
+	private final IllusionsAPI illusions;
 	private final RegenerationRegistry regenerationRegistry;
 	@Getter private final SpeedAttribute breakSpeed;
 	private final BossBar bossBar;
 
 	public BlockAnimHelper(BossBar bossBar) {
-		this.registry = BlocksAPI.getProgressRegistry();
-		this.blockRegistry = BlocksAPI.getBlockRegistry();
-		this.breakSpeed = BlocksAPI.getSpeedAttribute();
-		this.regenerationRegistry = BlocksAPI.getRegenerationRegistry();
+		this.registry = BlocksAPI.getInstance().getProgressRegistry();
+		this.blockRegistry = BlocksAPI.getInstance().getBlockRegistry();
+		this.breakSpeed = BlocksAPI.getInstance().getSpeedAttribute();
+		this.regenerationRegistry = BlocksAPI.getInstance().getRegenerationRegistry();
+		this.illusions = BlocksAPI.getInstance().getIllusions();
 		this.bossBar = bossBar;
 	}
 
@@ -76,28 +81,29 @@ public class BlockAnimHelper {
 				BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
 				if (BlocksAPI.getBlock(block.getLocation()) == null) return;
 
-				OriginBlockBuilder originBlock = BlocksAPI.getBlock(block.getLocation());
+				FixedAspectHolder originBlock = BlocksAPI.getBlock(block.getLocation());
 
 				if (originBlock == null) return;
 
-				if ((player.getLocation().getZ() + 12.0 >= block.getZ()) || (player.getLocation().getX() + 12.0 >= block.getX()) || player.getLocation().getZ() + 12.0 >= block.getZ()) {
+				if ((player.getLocation().getZ() + 12.0 >= block.getZ()) || (player.getLocation().getX() + 12.0 >= block.getX()) || player.getLocation().getZ() + 12.0 >= block.getZ())
 					cleanup(blockPosition, block, player, blockProgress);
-				}
 
-				Hardenable hardenable = (Hardenable) originBlock.getAspects().get(AspectEnum.HARDENABLE.getName());
-				FakeBlock fakeBlock = (FakeBlock) originBlock.getAspects().get(AspectEnum.FAKE_BLOCK.getName());
+				Hardenable hardenable = (Hardenable) originBlock.getAspects().get(AspectType.HARDENABLE);
+				Projectable projectable = (Projectable) originBlock.getAspects().get(AspectType.PROJECTABLE);
 
 				if (hardenable == null) return;
 				if (hardenable.getHardnessMultiplier() <= 0) return;
 
-				if (fakeBlock == null) return;
-				if (fakeBlock.getProjectedBlockData() == null) return;
+				if (projectable == null) return;
+				if (projectable.getProjectedBlockData() == null) return;
 
 				double hardnessMultiplier = 1d / (hardenable.getHardnessMultiplier() / 100d);
 
 				if (registry.getBlockBreak(blockPosition)) {
 					EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
+					//todo: convert to VarHandle, please
+					//todo: this will kill performance
 					final Field currentDigTickField = entityPlayer.d.getClass().getDeclaredField("i");
 					final Field lastDigTickField = entityPlayer.d.getClass().getDeclaredField("g");
 					currentDigTickField.setAccessible(true);
@@ -139,17 +145,12 @@ public class BlockAnimHelper {
 						continue;
 					}
 
-					fakeBlock.setLocatable((BlockLocatable) new BlockLocation(originBlock).setBlock(block).setBlockLocation(block.getLocation()));
-					System.out.println(fakeBlock.getLocatable().getBlockLocation());
-					if (fakeBlock.getLocatable() == null) return;
-					originBlock.createAspect(AspectEnum.FAKE_BLOCK.getName(), fakeBlock);
-
-					Regenable regenable = (Regenable) originBlock.getAspects().get(AspectEnum.REGENABLE.getName());
+					FakeBlock fake = projectable.toFakeBlock(originBlock.getBlockLocation());
+					Regenable regenable = (Regenable) originBlock.getAspects().get(AspectType.REGENABLE);
 					if (regenable == null) return;
 					if (regenable.getFakeBlock() == null) return;
 					if (regenable.getRegenTime() <= 0) return;
-
-					regenable.setFakeBlock(fakeBlock);
+					regenable.setFakeBlock(fake);
 
 					long endTime = (long) (System.currentTimeMillis() + regenable.getRegenTime() * 1000);
 					regenerationRegistry.createRegen(regenable, block, player, endTime);
@@ -161,7 +162,6 @@ public class BlockAnimHelper {
 			}
 		}
 		updatePacket();
-
 	}
 
 	private void cleanup(BlockPosition blockPosition, Block block, Player player, double progress) {

@@ -1,9 +1,9 @@
 package blocks.impl.builder;
 
-import blocks.block.builder.OriginEffectBuilder;
+import blocks.block.builder.EffectHolder;
 import blocks.block.effects.EffectType;
 
-public class BukkitEffect implements OriginEffectBuilder {
+public class BukkitEffect implements EffectHolder {
 	private EffectType<?> effectType;
 
 	public BukkitEffect(EffectType<?> effectType) {
@@ -16,8 +16,8 @@ public class BukkitEffect implements OriginEffectBuilder {
 	}
 
 	@Override
-	public OriginEffectBuilder setEffectType(EffectType<?> type) {
+	public void setEffectType(EffectType<?> type) {
 		this.effectType = type;
-		return this;
 	}
+
 }

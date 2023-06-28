@@ -1,10 +1,8 @@
-package blocks.impl.registry;
+package blocks.impl.illusions;
 
-import blocks.block.aspects.illusions.FakeBlock;
-import blocks.block.aspects.illusions.registry.IllusionRegistry;
-import blocks.block.aspects.overlay.Overlayable;
-import blocks.block.aspects.overlay.registry.OverlayLocationRegistry;
-import blocks.impl.aspect.AspectEnum;
+import blocks.block.aspects.overlay.ClickCallback;
+import blocks.block.illusions.FakeBlock;
+import blocks.block.illusions.IllusionRegistry;
 import commons.events.api.EventRegistry;
 import commons.events.api.PlayerEventContext;
 import commons.events.api.Subscribe;
@@ -18,22 +16,25 @@ import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.UUID;
 
-public class IllusionRegistryImpl implements IllusionRegistry {
-	private final OverlayLocationRegistry overlays;
-	private final HashMap<Location, FakeBlock> blockMap;
+public class BlockIllusionRegistry implements IllusionRegistry {
+
+	private final HashMap<Location, FakeBlock> blocks = new HashMap<>();
+	private final HashMap<FakeBlock, UUID> falling = new HashMap<>();
 	private static final VarHandle PacketPlayOutBlockChange_b = unreflect(PacketPlayOutBlockChange.class, "b");
 	private static final VarHandle PacketPlayOutMultiBlockChange_b = unreflect(PacketPlayOutMultiBlockChange.class, "b");
 	private static final VarHandle PacketPlayOutMultiBlockChange_c = unreflect(PacketPlayOutMultiBlockChange.class, "c");
@@ -42,53 +43,36 @@ public class IllusionRegistryImpl implements IllusionRegistry {
 	private static final NamespacedKey fbk = new NamespacedKey("blocks", "block.overlay");
 	private static final String fbv = "overlayed";
 
-	public IllusionRegistryImpl(EventRegistry registry, OverlayLocationRegistry locationRegistry) {
-		blockMap = new HashMap<>();
-		this.overlays = locationRegistry;
+	public BlockIllusionRegistry(EventRegistry registry) {
 		registry.subscribeAll(this);
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void register(FakeBlock block) {
-		getFakeBlocks().put(block.getLocatable().getBlockLocation(), block);
-		if (block.getBuilder().getAspects().containsKey(AspectEnum.OVERLAYABLE.getName())) {
-			block.getOverlay().registerLocation();
-			FallingBlock fallingBlock = block.spawn();
+		blocks.put(block.getBlockLocation(), block);
+		if (block.hasOverlay()) {
+			FallingBlock fallingBlock = block.getOverlay().spawnNew();
 			fallingBlock.getPersistentDataContainer().set(fbk, PersistentDataType.STRING, fbv);
-			getOverlayRegistry().getFalling().put(block.getOverlay(), fallingBlock.getUniqueId());
+			falling.put(block, fallingBlock.getUniqueId());
 		}
 	}
 
-
 	@Override
 	public void unregister(FakeBlock block) {
-		getFakeBlocks().remove(block.getLocatable().getBlockLocation());
-		if (block.getBuilder().getAspects().containsKey(AspectEnum.OVERLAYABLE.getName())) {
-			block.getOverlay().registerLocation();
-			FallingBlock fallingBlock = block.spawn();
-			fallingBlock.getPersistentDataContainer().remove(fbk);
-			getOverlayRegistry().getFalling().remove(block.getOverlay());
+		blocks.remove(block.getBlockLocation());
+		UUID fuid = falling.remove(block);
+		if (fuid != null) {
+			Entity entity = block.getBlock().getWorld().getEntity(fuid);
+
+			if (entity instanceof FallingBlock fb)
+				fb.remove();
 		}
 	}
 
 	@Override
 	public @Nullable FakeBlock getBlockAt(Location location) {
-		return getFakeBlocks().get(location.getBlock().getLocation());
-	}
-
-	@Override
-	public @Nullable Overlayable getOverlayAt(Location location) {
-		return getOverlayRegistry().getOverlays().get(location.getBlock().getLocation());
-	}
-
-	@Override
-	public @NotNull HashMap<Location, FakeBlock> getFakeBlocks() {
-		return this.blockMap;
-	}
-
-	@Override
-	public OverlayLocationRegistry getOverlayRegistry() {
-		return this.overlays;
+		return blocks.get(location.getBlock().getLocation());
 	}
 
 	private static VarHandle unreflect(Class<?> clazz, String name) {
@@ -102,11 +86,10 @@ public class IllusionRegistryImpl implements IllusionRegistry {
 		}
 	}
 
-
 	@Subscribe
 	void sendBlockChange(PlayerEventContext context, PacketPlayOutBlockChange packet) {
-	//	Location  location = CraftLocation.toBukkit(packet.c(), context.getPlayer().getWorld());
-		Vector vector = CraftVector.toBukkit(packet.c().b());
+//		Location  location = CraftLocation.toBukkit(packet.c(), context.getPlayer().getWorld());
+		Vector vector = CraftVector.toBukkit(packet.c().b()); // whatever
 		Location location = vector.toLocation(context.getPlayer().getWorld());
 		FakeBlock block    = getBlockAt(location);
 		if (block == null) return;
@@ -143,14 +126,31 @@ public class IllusionRegistryImpl implements IllusionRegistry {
 		}
 	}
 
-	public void clickHighlight(PlayerEventContext context, PlayerInteractAtEntityEvent event) {
+	@Subscribe
+	public void left(EntityDamageByEntityEvent event) {
+		Entity damager = event.getDamager();
+		if(!(damager instanceof Player player)) return;
+		processClick(player, event.getEntity(), ClickCallback.Interaction.LEFT_CLICK);
+	}
+
+	@Subscribe
+	public void right(PlayerInteractAtEntityEvent event) {
+		Player player = event.getPlayer();
 		if(event.getHand() != EquipmentSlot.HAND) return;
-		Entity entity = event.getRightClicked();
+
+		processClick(player, event.getRightClicked(), ClickCallback.Interaction.RIGHT_CLICK);
+	}
+
+	private void processClick(Player player, Entity entity, ClickCallback.Interaction interaction) {
 		if (!(entity instanceof FallingBlock fb)) return;
+
 		PersistentDataContainer pdc = fb.getPersistentDataContainer();
 		if (!(pdc.has(fbk) && fbv.equals(pdc.get(fbk, PersistentDataType.STRING)))) return;
-		Overlayable overlay = getOverlayAt(entity.getLocation());
-		if (overlay == null) return;
-		overlay.getPlayerConsumer().accept(event.getPlayer());
+
+		FakeBlock fake = getBlockAt(entity.getLocation());
+		if (fake == null) return;
+		if(!fake.hasOverlay()) return;
+		fake.getOverlay().getCallback().onClick(player, interaction);
 	}
+
 }

@@ -1,24 +1,36 @@
 package blocks.impl.builder;
 
-import blocks.block.aspects.GeneralAspect;
-import blocks.block.builder.OriginBlockBuilder;
+import blocks.block.aspects.AspectType;
+import blocks.block.aspects.BlockAspect;
+import blocks.block.builder.AspectHolder;
+import blocks.block.builder.FixedAspectHolder;
 import blocks.block.factory.AspectFactory;
 import blocks.impl.factory.AspectFactoryImpl;
+import blocks.impl.illusions.BlockAdapter;
+import commons.events.impl.EventSubscriber;
+import commons.events.impl.impl.GenericEventSubscriber;
 import commons.events.impl.impl.PlayerEventSubscriber;
+import org.bukkit.Location;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class OriginBlock implements OriginBlockBuilder {
+public class OriginBlock extends BlockAdapter implements FixedAspectHolder {
 	private String blockName;
 	private int modelData;
-	private Map<String, GeneralAspect> aspects;
+	private final Map<AspectType, BlockAspect> aspects = new HashMap<>();
 	private final AspectFactory aspectFactory;
-	private PlayerEventSubscriber<?> eventSubscriber;
+	private final List<EventSubscriber> eventSubscribers = new ArrayList<>();
 
 	public OriginBlock() {
-		this.aspects = new HashMap<>();
+		this(null);
+	}
+
+	private OriginBlock(Location location) {
+		super(location);
 		this.aspectFactory = new AspectFactoryImpl(this);
 	}
 
@@ -50,19 +62,35 @@ public class OriginBlock implements OriginBlockBuilder {
 	}
 
 	@Override
-	public OriginBlockBuilder createAspect(String name, GeneralAspect aspect) {
-		getAspects().put(name, aspect);
+	public FixedAspectHolder createAspect(BlockAspect aspect) {
+		getAspects().put(aspect.getAspectType(), aspect);
 		return this;
 	}
 
 	@Override
-	public Map<String, GeneralAspect> getAspects() {
+	public Map<AspectType, BlockAspect> getAspects() {
 		return this.aspects;
 	}
 
 	@Override
-	public <T> OriginBlockBuilder handle(Class<T> eventClazz, Consumer<T> eventConsumer) {
-		eventSubscriber = new PlayerEventSubscriber<>(eventClazz, ((context, event) -> eventConsumer.accept(event)));
+	public <T> FixedAspectHolder handle(Class<T> eventClazz, Consumer<T> eventConsumer) {
+		if(true) throw new UnsupportedOperationException("this operation is not implemented. none of the eventSubscribers are ever binded");
+		eventSubscribers.add(new PlayerEventSubscriber<>(eventClazz, ((context, event) -> eventConsumer.accept(event))));
 		return this;
 	}
+
+	@Override
+	public FixedAspectHolder asLocationBased(Location location) {
+		OriginBlock copy = new OriginBlock(location);
+
+		copy.modelData = modelData;
+		copy.eventSubscribers.addAll(eventSubscribers);
+		copy.blockName = blockName;
+
+		for (Map.Entry<AspectType, BlockAspect> entry : aspects.entrySet())
+			copy.aspects.put(entry.getKey(), entry.getValue().copy(copy));
+
+		return copy;
+	}
+
 }

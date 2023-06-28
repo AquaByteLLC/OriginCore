@@ -1,39 +1,30 @@
 package blocks.impl.aspect.regen;
 
 import blocks.BlocksAPI;
-import blocks.block.aspects.illusions.FakeBlock;
+import blocks.block.aspects.AspectType;
+import blocks.block.aspects.BlockAspect;
+import blocks.block.illusions.FakeBlock;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
-import blocks.block.builder.OriginBlockBuilder;
+import blocks.block.builder.AspectHolder;
+import blocks.impl.aspect.BaseAspect;
 
-public class Regeneration implements Regenable {
-	private final OriginBlockBuilder builder;
+public class Regeneration extends BaseAspect implements Regenable {
 	private double regenTime;
 	private FakeBlock fakeBlock;
-	private final RegenerationRegistry regenerationRegistry;
 
-	public Regeneration(OriginBlockBuilder builder) {
-		this.builder = builder;
-		this.regenTime = 0.0;
-		this.fakeBlock = null;
-		this.regenerationRegistry = BlocksAPI.getRegenerationRegistry();
+	public Regeneration(AspectHolder editor) {
+		super(editor, AspectType.REGENABLE);
 	}
 
 	@Override
-	public OriginBlockBuilder getBuilder() {
-		return this.builder;
-	}
-
-	@Override
-	public Regenable setRegenTime(double regenTime) {
+	public void setRegenTime(double regenTime) {
 		this.regenTime = regenTime;
-		return this;
 	}
 
 	@Override
-	public Regenable setFakeBlock(FakeBlock fakeBlock) {
+	public void setFakeBlock(FakeBlock fakeBlock) {
 		this.fakeBlock = fakeBlock;
-		return this;
 	}
 
 	@Override
@@ -47,7 +38,10 @@ public class Regeneration implements Regenable {
 	}
 
 	@Override
-	public RegenerationRegistry getRegistry() {
-		return this.regenerationRegistry;
+	public BlockAspect copy(AspectHolder newHolder) {
+		Regeneration regeneration = new Regeneration(newHolder);
+		regeneration.regenTime = regenTime;
+		return regeneration;
 	}
+
 }

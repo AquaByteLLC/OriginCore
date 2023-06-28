@@ -2,8 +2,10 @@ package blocks.block.builder;
 
 import blocks.block.effects.EffectType;
 
-public interface OriginEffectBuilder {
+public interface EffectHolder {
+
 	EffectType<?> getEffectType();
 
-	OriginEffectBuilder setEffectType(EffectType<?> type);
+	void setEffectType(EffectType<?> type);
+
 }

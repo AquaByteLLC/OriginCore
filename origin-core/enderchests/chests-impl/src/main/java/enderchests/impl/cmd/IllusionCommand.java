@@ -4,27 +4,21 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
 import commons.BukkitUtil;
-import enderchests.block.BlockHighlight;
+import enderchests.block.BlockOverlay;
 import enderchests.block.FakeBlock;
 import enderchests.block.BlockFactory;
 import enderchests.IllusionRegistry;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockAction;
-import net.minecraft.world.level.World;
-import net.minecraft.world.level.block.entity.TileEntityChest;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftLocation;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Shulker;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
-import org.bukkit.util.Vector;
 
 /**
  * @author vadim
@@ -42,6 +36,11 @@ public class IllusionCommand extends BaseCommand {
 
 	@Subcommand("fakeblock set")
 	void set(Player sender, Material material) {
+		set(sender, material, BlockFace.EAST);
+	}
+
+	@Subcommand("fakeblock set")
+	void set(Player sender, Material material, BlockFace face) {
 		if(!material.isBlock()) {
 			sender.sendMessage("not a block bruh");
 			return;
@@ -52,7 +51,12 @@ public class IllusionCommand extends BaseCommand {
 			sender.sendMessage("look at a block ._.");
 			return;
 		}
-		FakeBlock fake = factory.newFakeBlock(block.getLocation(), material.createBlockData());
+		BlockData data = material.createBlockData();
+
+		if(data instanceof Directional directional)
+			directional.setFacing(face);
+
+		FakeBlock fake = factory.newFakeBlock(block.getLocation(), data);
 
 		registry.register(fake);
 		sender.sendBlockChange(fake.getBlockLocation(), fake.getProjectedBlockData());
@@ -78,6 +82,7 @@ public class IllusionCommand extends BaseCommand {
 		sender.sendMessage("done");
 	}
 
+
 	@Subcommand("highlight")
 	void highlight(Player sender, ChatColor color) {
 		Block block = sender.getTargetBlockExact(10);
@@ -87,9 +92,31 @@ public class IllusionCommand extends BaseCommand {
 		}
 
 		Location       location = block.getLocation();
-		BlockHighlight highlight = factory.newBlockHighlight(location, color, (player) -> {
+		BlockOverlay highlight = factory.newOverlay(location, Material.GLASS.createBlockData(), color, (player) -> {
 			player.sendMessage("clicked!");
-		// 1, 1
+			// 1, 1
+
+			PacketPlayOutBlockAction action = new PacketPlayOutBlockAction(CraftLocation.toBlockPosition(location),
+																		   ((CraftBlockData) Material.ENDER_CHEST.createBlockData()).getState().b(),
+																		   1, 1);
+
+			BukkitUtil.sendPacket(player, action);
+		});
+		registry.register(highlight);
+	}
+
+	@Subcommand("highlight")
+	void highlight(Player sender, Material material) {
+		Block block = sender.getTargetBlockExact(10);
+		if(block == null) {
+			sender.sendMessage("look at a block ._.");
+			return;
+		}
+
+		Location       location = block.getLocation();
+		BlockOverlay highlight = factory.newOverlay(location, material.createBlockData(), null, (player) -> {
+			player.sendMessage("clicked!");
+			// 1, 1
 
 			PacketPlayOutBlockAction action = new PacketPlayOutBlockAction(CraftLocation.toBlockPosition(location),
 																		   ((CraftBlockData) Material.ENDER_CHEST.createBlockData()).getState().b(),
@@ -108,7 +135,7 @@ public class IllusionCommand extends BaseCommand {
 			return;
 		}
 
-		BlockHighlight highlight = registry.getHighlightAt(block.getLocation());
+		BlockOverlay highlight = registry.getHighlightAt(block.getLocation());
 		if(highlight == null) {
 			sender.sendMessage("buh");
 			return;
