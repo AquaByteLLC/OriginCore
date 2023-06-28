@@ -5,7 +5,6 @@ import blocks.block.aspects.BlockAspect;
 import blocks.block.factory.AspectFactory;
 import org.bukkit.Location;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 

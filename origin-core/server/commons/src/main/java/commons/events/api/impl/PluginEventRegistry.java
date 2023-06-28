@@ -1,6 +1,6 @@
 package commons.events.api.impl;
 
-import commons.ReflectUtil;
+import commons.util.ReflectUtil;
 import commons.events.api.*;
 import lombok.SneakyThrows;
 import org.bukkit.entity.Player;

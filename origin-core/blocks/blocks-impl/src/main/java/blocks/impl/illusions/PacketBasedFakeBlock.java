@@ -27,7 +27,7 @@ public class PacketBasedFakeBlock extends BlockAdapter implements FakeBlock {
 
 	public PacketBasedFakeBlock(Location location, BlockData fakeData, BlockOverlay overlay) {
 		super(location);
-		this.fakeData = fakeData.clone();
+		this.fakeData = fakeData == null ? null : fakeData.clone();
 		this.overlay  = overlay;
 	}
 

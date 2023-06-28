@@ -1,6 +1,6 @@
 package blocks.impl.illusions;
 
-import blocks.block.aspects.overlay.ClickCallback;
+import blocks.block.util.ClickCallback;
 import blocks.block.illusions.BlockOverlay;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -52,7 +52,7 @@ public class FallingBlockOverlay extends BlockAdapter implements BlockOverlay {
 	public FallingBlock spawnNew() {
 		Location location = getBlockLocation();
 		location.add(.5, 0, .5);
-		FallingBlock block = getBlock().getWorld().spawnFallingBlock(location, Material.GLASS.createBlockData());
+		FallingBlock block = getBlock().getWorld().spawnFallingBlock(location, data);
 		block.setVelocity(new Vector(0, 0, 0));
 		block.setSilent(true);
 		block.setInvulnerable(true);

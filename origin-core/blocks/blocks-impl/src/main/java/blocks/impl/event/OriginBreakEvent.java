@@ -9,7 +9,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public class OriginBreakEvent extends Event implements Cancellable {
+public class OriginBreakEvent extends Event {
 	private final Block block;
 	private final Player player;
 	private final EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
@@ -22,15 +22,16 @@ public class OriginBreakEvent extends Event implements Cancellable {
 
 	private static final HandlerList HANDLERS_LIST = new HandlerList();
 
-	@Override
-	public boolean isCancelled() {
-		return isCancelled;
-	}
-
-	@Override
-	public void setCancelled(boolean cancel) {
-		this.isCancelled = cancel;
-	}
+	// these were not actually implemented
+//	@Override
+//	public boolean isCancelled() {
+//		return isCancelled;
+//	}
+//
+//	@Override
+//	public void setCancelled(boolean cancel) {
+//		this.isCancelled = cancel;
+//	}
 
 	public Player getPlayer() {
 		return player;

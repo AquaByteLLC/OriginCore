@@ -1,7 +1,7 @@
 package blocks.block.illusions;
 
 import blocks.block.aspects.location.BlockLike;
-import blocks.block.aspects.overlay.ClickCallback;
+import blocks.block.util.ClickCallback;
 import org.bukkit.ChatColor;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.FallingBlock;

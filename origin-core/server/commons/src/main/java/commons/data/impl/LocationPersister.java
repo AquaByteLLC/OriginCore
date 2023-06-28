@@ -3,9 +3,8 @@ package commons.data.impl;
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.field.types.BaseDataType;
-import com.j256.ormlite.field.types.LongType;
 import com.j256.ormlite.support.DatabaseResults;
-import commons.PackUtil;
+import commons.util.PackUtil;
 import org.bukkit.Location;
 
 import java.sql.SQLException;

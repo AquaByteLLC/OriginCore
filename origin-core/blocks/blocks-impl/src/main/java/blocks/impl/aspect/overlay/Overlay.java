@@ -1,12 +1,10 @@
 package blocks.impl.aspect.overlay;
 
-import blocks.BlocksAPI;
 import blocks.block.aspects.AspectType;
 import blocks.block.aspects.BlockAspect;
-import blocks.block.aspects.overlay.ClickCallback;
+import blocks.block.util.ClickCallback;
 import blocks.block.aspects.overlay.Overlayable;
 import blocks.block.builder.AspectHolder;
-import blocks.block.illusions.BlockOverlay;
 import blocks.impl.aspect.BaseAspect;
 import org.bukkit.ChatColor;
 import org.bukkit.block.data.BlockData;

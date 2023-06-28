@@ -81,7 +81,7 @@ public class OriginBlock extends BlockAdapter implements FixedAspectHolder {
 
 	@Override
 	public FixedAspectHolder asLocationBased(Location location) {
-		OriginBlock copy = new OriginBlock(location);
+		OriginBlock copy = new OriginBlock(location.getBlock().getLocation());
 
 		copy.modelData = modelData;
 		copy.eventSubscribers.addAll(eventSubscribers);

@@ -1,6 +1,6 @@
 package blocks.impl.illusions;
 
-import blocks.block.aspects.overlay.ClickCallback;
+import blocks.block.util.PlayerInteraction;
 import blocks.block.illusions.FakeBlock;
 import blocks.block.illusions.IllusionRegistry;
 import commons.events.api.EventRegistry;
@@ -48,10 +48,10 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public void register(FakeBlock block) {
 		blocks.put(block.getBlockLocation(), block);
 		if (block.hasOverlay()) {
+			unoverlay(block);
 			FallingBlock fallingBlock = block.getOverlay().spawnNew();
 			fallingBlock.getPersistentDataContainer().set(fbk, PersistentDataType.STRING, fbv);
 			falling.put(block, fallingBlock.getUniqueId());
@@ -61,6 +61,10 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 	@Override
 	public void unregister(FakeBlock block) {
 		blocks.remove(block.getBlockLocation());
+		unoverlay(block);
+	}
+
+	private void unoverlay(FakeBlock block) {
 		UUID fuid = falling.remove(block);
 		if (fuid != null) {
 			Entity entity = block.getBlock().getWorld().getEntity(fuid);
@@ -73,6 +77,11 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 	@Override
 	public @Nullable FakeBlock getBlockAt(Location location) {
 		return blocks.get(location.getBlock().getLocation());
+	}
+
+	@Override
+	public boolean isOverlayEntity(FallingBlock block) {
+		return block != null && block.getPersistentDataContainer().has(fbk) && fbv.equals(block.getPersistentDataContainer().get(fbk, PersistentDataType.STRING));
 	}
 
 	private static VarHandle unreflect(Class<?> clazz, String name) {
@@ -130,7 +139,7 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 	public void left(EntityDamageByEntityEvent event) {
 		Entity damager = event.getDamager();
 		if(!(damager instanceof Player player)) return;
-		processClick(player, event.getEntity(), ClickCallback.Interaction.LEFT_CLICK);
+		processClick(player, event.getEntity(), PlayerInteraction.LEFT_CLICK);
 	}
 
 	@Subscribe
@@ -138,10 +147,10 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 		Player player = event.getPlayer();
 		if(event.getHand() != EquipmentSlot.HAND) return;
 
-		processClick(player, event.getRightClicked(), ClickCallback.Interaction.RIGHT_CLICK);
+		processClick(player, event.getRightClicked(), PlayerInteraction.RIGHT_CLICK);
 	}
 
-	private void processClick(Player player, Entity entity, ClickCallback.Interaction interaction) {
+	private void processClick(Player player, Entity entity, PlayerInteraction interaction) {
 		if (!(entity instanceof FallingBlock fb)) return;
 
 		PersistentDataContainer pdc = fb.getPersistentDataContainer();

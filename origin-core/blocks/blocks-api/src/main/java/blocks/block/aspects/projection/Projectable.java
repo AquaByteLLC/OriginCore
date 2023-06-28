@@ -1,13 +1,11 @@
 package blocks.block.aspects.projection;
 
 import blocks.block.aspects.BlockAspect;
-import blocks.block.aspects.overlay.ClickCallback;
 import blocks.block.illusions.FakeBlock;
+import blocks.block.util.ClickCallback;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
-
-import java.util.Locale;
 
 /**
  * Represents a fake block data projected to the client, regardless of what the actual block is on the server.

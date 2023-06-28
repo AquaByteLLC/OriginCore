@@ -4,6 +4,7 @@ import blocks.block.BlockRegistry;
 import blocks.block.aspects.location.registry.BlockLocationRegistry;
 import blocks.block.aspects.overlay.registry.OverlayLocationRegistry;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
+import blocks.block.builder.AspectHolder;
 import blocks.block.builder.FixedAspectHolder;
 import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
@@ -20,6 +21,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 public final class BlocksAPI {
 
@@ -82,15 +84,19 @@ public final class BlocksAPI {
 		return blockRegistry;
 	}
 
-	public static FixedAspectHolder getBlock(Location location) {
+	public static @Nullable FixedAspectHolder getBlock(Location location) {
+		FixedAspectHolder fah = instance.locationRegistry.getBlockAt(location);
+		if(fah != null) return fah;
+
 		RegionManager wgCurrWorldRM = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(location.getWorld()));
 		if (wgCurrWorldRM == null) return null;
 		ApplicableRegionSet arSet = wgCurrWorldRM.getApplicableRegions(BukkitAdapter.asBlockVector(location));
 		if (arSet.size() > 0) {
 			for (ProtectedRegion region : arSet) {
-				if (getInstance().regionRegistry.getRegions().containsKey(region.getId())) {
-					OriginRegion oRegion = getInstance().regionRegistry.getRegions().get(region.getId()).getRegion();
-					return getInstance().blockRegistry.getBlocks().get(oRegion.allowedBlock()).asLocationBased(location);
+				if (instance.regionRegistry.getRegions().containsKey(region.getId())) {
+					OriginRegion oRegion = instance.regionRegistry.getRegions().get(region.getId()).getRegion();
+					AspectHolder editor = instance.blockRegistry.getBlocks().get(oRegion.allowedBlock());
+					return instance.locationRegistry.createBlock(editor, location);
 				}
 			}
 		}
@@ -103,7 +109,7 @@ public final class BlocksAPI {
 		ApplicableRegionSet arSet = wgCurrWorldRM.getApplicableRegions(BukkitAdapter.asBlockVector(loc));
 		if (arSet.size() > 0) {
 			for (ProtectedRegion region : arSet) {
-				if (getInstance().regionRegistry.getRegions().containsKey(region.getId())) {
+				if (instance.regionRegistry.getRegions().containsKey(region.getId())) {
 					return true;
 				}
 			}

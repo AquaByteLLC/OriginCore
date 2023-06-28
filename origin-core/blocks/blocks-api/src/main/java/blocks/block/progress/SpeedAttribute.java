@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.function.Consumer;
 
 public interface SpeedAttribute {
+
 	String KEY_NAME = "CUSTOM_BREAK_SPEED";
 
 	static NamespacedKey getKey() {
@@ -17,7 +18,11 @@ public interface SpeedAttribute {
 	}
 
 	void setSpeed(ItemStack stack, float speed);
+
 	float getSpeed(ItemStack stack);
+
 	PersistentDataContainer readContainer(ItemStack stack);
+
 	void writeContainer(ItemStack stack, Consumer<PersistentDataContainer> pdc);
+
 }

@@ -1,4 +1,4 @@
-package commons;
+package commons.util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

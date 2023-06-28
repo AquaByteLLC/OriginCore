@@ -1,17 +1,19 @@
 package blocks.block.aspects.location.registry;
 
 import blocks.block.builder.AspectHolder;
+import blocks.block.builder.FixedAspectHolder;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.HashMap;
+import org.jetbrains.annotations.Nullable;
 
 public interface BlockLocationRegistry {
 
-	void createBlock(AspectHolder editor, Location block);
+	@Nullable FixedAspectHolder getBlockAt(Location location);
 
-	void deleteBlock(AspectHolder editor, Location block);
+	@NotNull FixedAspectHolder createBlock(AspectHolder editor, Location block);
 
-	@NotNull HashMap<Location, AspectHolder> getBlocks();
+	void deleteBlock(FixedAspectHolder editor);
+
+	void deleteBlock(Location location);
 
 }

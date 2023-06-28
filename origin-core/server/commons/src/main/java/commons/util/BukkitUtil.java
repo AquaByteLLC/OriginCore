@@ -1,4 +1,4 @@
-package commons;
+package commons.util;
 
 import me.lucko.helper.text3.Text;
 import me.vadim.util.conf.wrapper.Placeholder;

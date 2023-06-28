@@ -3,7 +3,7 @@ package blocks.impl.aspect.projection;
 import blocks.BlocksAPI;
 import blocks.block.aspects.AspectType;
 import blocks.block.aspects.BlockAspect;
-import blocks.block.aspects.overlay.ClickCallback;
+import blocks.block.util.ClickCallback;
 import blocks.block.aspects.projection.Projectable;
 import blocks.block.builder.AspectHolder;
 import blocks.block.illusions.FakeBlock;

@@ -3,6 +3,7 @@ package commons.events.impl.packet;
 import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
 import commons.events.impl.EventListener;
+import commons.util.ReflectUtil;
 import io.netty.channel.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -91,16 +92,26 @@ public final class PacketEventListener implements EventListener, Listener {
 
 		@Override
 		public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-			EventContext context = events.publish(player, msg);
-			if (events == null || !context.isCancelled())
-				super.write(ctx, context.getEvent(), promise);
+			try {
+				EventContext context = events.publish(player, msg);
+				if (events == null || !context.isCancelled())
+					super.write(ctx, context.getEvent(), promise);
+			} catch (Exception e) {
+				ReflectUtil.serr("SEVERE: exception in netty thread");
+				ReflectUtil.serr(e);
+			}
 		}
 
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-			EventContext context = events.publish(player, msg);
-			if (events == null || !context.isCancelled())
-				super.channelRead(ctx, context.getEvent());
+			try {
+				EventContext context = events.publish(player, msg);
+				if (events == null || !context.isCancelled())
+					super.channelRead(ctx, context.getEvent());
+			} catch (Exception e) {
+				ReflectUtil.serr("SEVERE: exception in netty thread");
+				ReflectUtil.serr(e);
+			}
 		}
 	}
 

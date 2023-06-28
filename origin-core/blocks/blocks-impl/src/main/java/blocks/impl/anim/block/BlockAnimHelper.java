@@ -79,12 +79,11 @@ public class BlockAnimHelper {
 				if (block == null) return;
 
 				BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
-				if (BlocksAPI.getBlock(block.getLocation()) == null) return;
-
 				FixedAspectHolder originBlock = BlocksAPI.getBlock(block.getLocation());
-
 				if (originBlock == null) return;
 
+//				¿ was this supposed to be a distance check ?
+//				->   player.getLocation().distanceSquared(block.getLocation()) >= 12*12
 				if ((player.getLocation().getZ() + 12.0 >= block.getZ()) || (player.getLocation().getX() + 12.0 >= block.getX()) || player.getLocation().getZ() + 12.0 >= block.getZ())
 					cleanup(blockPosition, block, player, blockProgress);
 
@@ -132,10 +131,10 @@ public class BlockAnimHelper {
 					}
 
 					if (player.getGameMode() != GameMode.CREATIVE) {
-						registry.getBlockProgress().put(blockPosition, doubleProgress + oldProgress);
+						blockProgress = doubleProgress + oldProgress;
+						registry.getBlockProgress().put(blockPosition, blockProgress);
 					}
 
-					blockProgress = registry.getBlockProgress().get(blockPosition);
 					final double bossBarProgress = blockProgress / 100;
 
 					if (blockProgress < 100 && blockProgress > -1) {
@@ -148,7 +147,6 @@ public class BlockAnimHelper {
 					FakeBlock fake = projectable.toFakeBlock(originBlock.getBlockLocation());
 					Regenable regenable = (Regenable) originBlock.getAspects().get(AspectType.REGENABLE);
 					if (regenable == null) return;
-					if (regenable.getFakeBlock() == null) return;
 					if (regenable.getRegenTime() <= 0) return;
 					regenable.setFakeBlock(fake);
 

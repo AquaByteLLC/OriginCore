@@ -1,7 +1,7 @@
 package blocks.block.aspects.overlay;
 
 import blocks.block.aspects.BlockAspect;
-import blocks.block.illusions.BlockOverlay;
+import blocks.block.util.ClickCallback;
 import org.bukkit.ChatColor;
 import org.bukkit.block.data.BlockData;
 

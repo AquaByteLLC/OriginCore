@@ -1,6 +1,6 @@
 package commons.events.impl;
 
-import commons.ReflectUtil;
+import commons.util.ReflectUtil;
 import commons.events.api.EventRegistry;
 import commons.events.api.impl.PluginEventRegistry;
 import commons.events.impl.bukkit.BukkitEventListener;

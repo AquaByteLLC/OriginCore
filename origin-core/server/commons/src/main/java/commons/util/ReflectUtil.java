@@ -1,4 +1,4 @@
-package commons;
+package commons.util;
 
 import lombok.SneakyThrows;
 
@@ -41,6 +41,12 @@ public class ReflectUtil {
 			for (char c : string.toCharArray())
 				System.err.print(c);
 			System.err.println();
+		}
+	}
+
+	public static void serr(Throwable throwable) {
+		synchronized (System.err) {
+			throwable.printStackTrace(System.err);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package commons.events.api;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventException;
 
 import java.util.function.Consumer;
 
@@ -19,6 +20,6 @@ public interface EventRegistry {
 
 	<T> EventContext publish(T event);
 
-	<T> PlayerEventContext publish(Player player, T event);
+	<T> PlayerEventContext publish(Player player, T event) throws EventException;
 
 }
