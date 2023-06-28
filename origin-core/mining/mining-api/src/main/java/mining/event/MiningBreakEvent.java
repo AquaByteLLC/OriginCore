@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class MiningBreakEvent {
 
 	private static final ProgressRegistry progressRegistry = BlocksAPI.getInstance().getProgressRegistry();

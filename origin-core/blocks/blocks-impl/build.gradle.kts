@@ -30,8 +30,6 @@ dependencies {
     implementation(project(":blocks-api"))
 }
 
-
-
 tasks {
     compileKotlin {
         kotlinOptions {

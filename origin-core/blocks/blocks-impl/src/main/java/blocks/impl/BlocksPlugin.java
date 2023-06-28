@@ -2,7 +2,6 @@ package blocks.impl;
 
 import blocks.BlocksAPI;
 import blocks.block.BlockRegistry;
-import blocks.block.illusions.IllusionRegistry;
 import blocks.block.aspects.location.registry.BlockLocationRegistry;
 import blocks.block.aspects.overlay.registry.OverlayLocationRegistry;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
@@ -11,7 +10,6 @@ import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.block.regions.registry.RegionRegistry;
 import blocks.impl.anim.item.BreakSpeed;
-import blocks.impl.handler.BlockHandler;
 import blocks.impl.illusions.BlockIllusionRegistry;
 import blocks.impl.illusions.IllusionFactoryImpl;
 import blocks.impl.illusions.Illusions;
@@ -22,12 +20,8 @@ import com.google.inject.Injector;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import lombok.Getter;
-import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.function.Consumer;
 
 @Getter
 public class BlocksPlugin extends JavaPlugin implements ResourceProvider {
@@ -44,7 +38,6 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider {
 		return injector;
 	}
 
-	private LiteConfig lfc;
 	private RegenerationRegistry regenerationRegistry;
 	private IllusionsAPI illusions;
 	private BlockRegistry blockRegistry;
@@ -56,24 +49,18 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider {
 
 	@Override
 	public void onEnable() {
-		this.lfc = new LiteConfig(this);
-
 		EventRegistry events = CommonsPlugin.commons().getEventRegistry();
 
 		this.blockRegistry = new BlockRegistryImpl();
 		this.overlayLocationRegistry = new OverlayRegistryImpl();
 		this.illusions = new Illusions(new IllusionFactoryImpl(), new BlockIllusionRegistry(events));
-		this.regenerationRegistry = new RegenerationRegistryImpl(this, lfc, illusions);
+		this.regenerationRegistry = new RegenerationRegistryImpl(this, illusions);
 		this.blockLocationRegistry = new LocationRegistryImpl();
 		this.progressRegistry = new ProgressRegistryImpl();
 		this.speedAttribute = new BreakSpeed();
 		this.regionRegistry = new RegionRegistryImpl();
 
-		injector = Guice.createInjector(new BlockModule(new BlocksAPI(this, lfc, blockLocationRegistry, illusions, regenerationRegistry, blockRegistry, overlayLocationRegistry, progressRegistry, speedAttribute, regionRegistry)));
-	}
-
-	public static void createHandler(Consumer<YamlConfiguration> configurationConsumer) {
-		BlockHandler.init(configurationConsumer);
+		injector = Guice.createInjector(new BlockModule(new BlocksAPI(this, blockLocationRegistry, illusions, regenerationRegistry, blockRegistry, overlayLocationRegistry, progressRegistry, speedAttribute, regionRegistry)));
 	}
 
 	static class BlockModule extends AbstractModule {

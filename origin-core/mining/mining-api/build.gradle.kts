@@ -11,9 +11,8 @@ dependencies {
     compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(Dependencies.GUICE)
     compileOnly(project(":commons"))
-    implementation(project(":blocks-impl"))
-    implementation(project(":blocks-api"))
+    compileOnly(project(":blocks-api"))
+    compileOnly(project(":blocks-impl"))
     compileOnly(Dependencies.WORLD_GUARD)
     compileOnly(Dependencies._SPIGOT)
-
 }

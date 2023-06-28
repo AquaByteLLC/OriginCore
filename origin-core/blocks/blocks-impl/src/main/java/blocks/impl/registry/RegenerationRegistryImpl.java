@@ -3,25 +3,18 @@ package blocks.impl.registry;
 import blocks.block.aspects.projection.Projectable;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
-import blocks.block.builder.AspectHolder;
 import blocks.block.illusions.*;
 import blocks.block.aspects.AspectType;
-import blocks.impl.handler.BlocksConfig;
-import com.sun.jdi.Locatable;
 import me.lucko.helper.Schedulers;
-import me.vadim.util.conf.LiteConfig;
 import net.minecraft.core.BlockPosition;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import java.util.HashMap;
 
 public class RegenerationRegistryImpl implements RegenerationRegistry {
@@ -29,14 +22,12 @@ public class RegenerationRegistryImpl implements RegenerationRegistry {
 	private final HashMap<BlockPosition, Regenable> regenableHashMap;
 	private final IllusionRegistry illusionRegistry;
 	private final IllusionFactory illusionFactory;
-	private final BlocksConfig config;
 	private final JavaPlugin plugin;
 
-	public RegenerationRegistryImpl(JavaPlugin plugin, LiteConfig lfc, IllusionsAPI illusions) {
+	public RegenerationRegistryImpl(JavaPlugin plugin, IllusionsAPI illusions) {
 		this.regenableHashMap = new HashMap<>();
 		this.illusionRegistry = illusions.registry();
 		this.illusionFactory = illusions.factory();
-		this.config = lfc.open(BlocksConfig.class);
 		this.plugin = plugin;
 	}
 

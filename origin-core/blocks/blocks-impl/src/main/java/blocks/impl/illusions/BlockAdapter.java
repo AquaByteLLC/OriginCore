@@ -11,17 +11,17 @@ public abstract class BlockAdapter implements BlockLike {
 
 	private final Location location;
 	public BlockAdapter(Location location) {
-		this.location = location.getBlock().getLocation();
+		this.location = location == null ? null : location.getBlock().getLocation();
 	}
 
 	@Override
 	public Block getBlock() {
-		return location.getBlock();
+		return location == null ? null : location.getBlock();
 	}
 
 	@Override
 	public Location getBlockLocation() {
-		return location.clone();
+		return location == null ? null : location.clone();
 	}
 
 }
