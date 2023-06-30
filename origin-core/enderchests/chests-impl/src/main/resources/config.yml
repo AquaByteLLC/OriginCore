@@ -1,0 +1,37 @@
+enchantHeader:
+  - "&c&lEnchants"
+  - " "
+
+menu:
+  title: "Manage Enchants for %name%"
+  button:
+    next:
+      type: ARROW
+      name: "Next page"
+      lore:
+        - "Click me!"
+    back:
+      type: ARROW
+      name: "Previous page"
+      lore:
+        - "Click me!"
+    done:
+      type: BARRIER
+      name: "Done"
+      lore:
+        - "Goes back to last menu,"
+        - "or closes the current menu."
+    upgrade:
+      name: "+%levels% Enchant Levels"
+      lore:
+        - "Upgrade Enchant %name%"
+        - "Price: %netCost%"
+        - "Activate: %newChance%"
+        - "new level: %newLevel%"
+        - "%maxLevel%"
+        - "%maxChance%"
+        - "%maxCost%"
+        - "%currentLevel%"
+        - "%currentChance%"
+        - "%currentCost%"
+        - "click to purchase"

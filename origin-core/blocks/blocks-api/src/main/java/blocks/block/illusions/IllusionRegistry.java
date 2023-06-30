@@ -2,6 +2,7 @@ package blocks.block.illusions;
 
 import org.bukkit.Location;
 import org.bukkit.entity.FallingBlock;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 public interface IllusionRegistry {
@@ -12,10 +13,7 @@ public interface IllusionRegistry {
 
 	@Nullable FakeBlock getBlockAt(Location location);
 
-	/**
-	 * @deprecated Not for API use.
-	 */
-	@Deprecated
+	@ApiStatus.Internal
 	boolean isOverlayEntity(FallingBlock block);
 
 }

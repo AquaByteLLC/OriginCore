@@ -2,7 +2,9 @@ package blocks.impl.anim.entity;
 
 import com.mojang.datafixers.util.Pair;
 import commons.entity.EntityHelper;
-import commons.events.impl.packet.PacketEventListener;
+import commons.events.impl.impl.PacketEventListener;
+import commons.util.reflect.FieldAccess;
+import commons.util.reflect.Reflection;
 import net.minecraft.network.protocol.game.PacketPlayOutEntity;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment;
@@ -17,9 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
-import java.lang.reflect.Field;
+
 import java.util.List;
 
 public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
@@ -34,20 +34,7 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 	private double difY = 0;
 	private double difZ = 0;
 
-	private static final VarHandle aM;
-
-	static {
-		Field field;
-		VarHandle handle;
-		try {
-			field = Entity.class.getDeclaredField("am");
-			field.setAccessible(true);
-			handle = MethodHandles.privateLookupIn(Entity.class, MethodHandles.lookup()).unreflectVarHandle(field);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-		aM = handle;
-	}
+	private static final FieldAccess<DataWatcher> am = Reflection.unreflectFieldAccess(Entity.class, "am");
 
 	public BlockEntity(Player owner, World world, Block block, ItemStack item) {
 		super(
@@ -69,7 +56,7 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 			System.out.println("5");
 			this.spawnEntity(this.owner);
 
-			DataWatcher watcher = ((DataWatcher) aM.get((getEntity()).getBukkitEntity().getHandle()));
+			DataWatcher watcher = am.get((getEntity()).getBukkitEntity().getHandle());
 			final PacketPlayOutEntityEquipment packetPlayOutEntityEquipment = new PacketPlayOutEntityEquipment(this.getEntity().getBukkitEntity().getEntityId(),
 					List.of(Pair.of(EnumItemSlot.f, CraftItemStack.asNMSCopy(this.item))));
 			final PacketPlayOutEntityMetadata packetPlayOutEntityMetadata = new PacketPlayOutEntityMetadata(

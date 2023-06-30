@@ -2,33 +2,34 @@ package commons.events.api.impl;
 
 import commons.events.api.EventContext;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author vadim
  */
-class EventContextImpl implements EventContext {
+class PlayerEventContext implements EventContext {
 
-	private Object event;
+	private final @Nullable Player player;
 
-	EventContextImpl(Object event) {
-		this.event = event;
+	PlayerEventContext(@Nullable Player player) {
+		this.player = player;
 	}
 
 	@Override
-	public Object getEvent() {
-		return event;
+	public Player getPlayer() {
+		return player;
 	}
 
 	@Override
-	public void mutate(Object event) {
-		this.event = event;
+	public boolean hasPlayer() {
+		return player != null;
 	}
 
 	private boolean cancelled;
 
 	@Override
 	public boolean isCancelled() {
-		return cancelled || event == null;
+		return cancelled;
 	}
 
 	@Override

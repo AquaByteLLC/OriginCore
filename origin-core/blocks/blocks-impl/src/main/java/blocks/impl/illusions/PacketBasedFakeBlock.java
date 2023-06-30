@@ -33,6 +33,7 @@ public class PacketBasedFakeBlock extends BlockAdapter implements FakeBlock {
 
 	@Override
 	public BlockData getProjectedBlockData() {
+		if(!hasProjection()) throw new UnsupportedOperationException("no projection set");
 		return fakeData.clone();
 	}
 

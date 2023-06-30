@@ -3,7 +3,7 @@ package commons.entity;
 import com.google.common.collect.ConcurrentHashMultiset;
 import commons.CommonsPlugin;
 import commons.entity.interfaces.Tickable;
-import commons.events.impl.packet.PacketEventListener;
+import commons.events.impl.impl.PacketEventListener;
 import me.lucko.helper.Schedulers;
 import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity;
 import net.minecraft.world.entity.Entity;

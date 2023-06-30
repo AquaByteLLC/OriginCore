@@ -1,21 +1,17 @@
 package commons.events.impl.impl;
 
-import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
-import commons.events.api.PlayerEventContext;
 import commons.events.api.Subscriber;
-import commons.events.impl.EventSubscriber;
-import org.bukkit.event.Event;
 
 /**
  * @author vadim
  */
-public class GenericEventSubscriber<T> implements EventSubscriber {
+public class DetachedSubscriber<T> implements commons.events.impl.EventSubscriber {
 
-	private final Subscriber<? extends EventContext, T> subscriber;
+	private final Subscriber<T> subscriber;
 	private final Class<T> clazz;
 
-	public GenericEventSubscriber(Class<T> clazz, Subscriber<? extends EventContext, T> subscriber) {
+	public DetachedSubscriber(Class<T> clazz, Subscriber<T> subscriber) {
 		this.clazz      = clazz;
 		this.subscriber = subscriber;
 	}

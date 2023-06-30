@@ -5,12 +5,12 @@ import blocks.block.util.ClickCallback;
 import org.bukkit.ChatColor;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.FallingBlock;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @author vadim
  */
-@SuppressWarnings("DeprecatedIsStillUsed")
 public interface BlockOverlay extends BlockLike {
 
 	@Nullable ChatColor getHighlightColor();
@@ -21,10 +21,7 @@ public interface BlockOverlay extends BlockLike {
 
 	ClickCallback getCallback();
 
-	/**
-	 * @deprecated Not for API use.
-	 */
-	@Deprecated
+	@ApiStatus.Internal
 	FallingBlock spawnNew();
 
 }

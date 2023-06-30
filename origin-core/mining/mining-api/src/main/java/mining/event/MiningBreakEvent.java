@@ -1,18 +1,19 @@
 package mining.event;
 
 import blocks.BlocksAPI;
+import blocks.block.aspects.AspectType;
 import blocks.block.aspects.drop.Dropable;
 import blocks.block.aspects.effect.Effectable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.impl.anim.entity.BlockEntity;
-import blocks.block.aspects.AspectType;
 import blocks.impl.builder.OriginBlock;
 import blocks.impl.event.OriginBreakEvent;
 import commons.events.api.EventRegistry;
-import commons.events.impl.impl.GenericEventSubscriber;
-import commons.events.impl.impl.PlayerEventSubscriber;
-import commons.events.impl.packet.PacketEventListener;
+import commons.events.impl.impl.DetachedSubscriber;
+import commons.events.impl.impl.PacketEventListener;
+import commons.util.reflect.FieldAccess;
+import commons.util.reflect.Reflection;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.protocol.game.PacketPlayInBlockDig;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityEffect;
@@ -25,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,35 +35,35 @@ public class MiningBreakEvent {
 
 	private static final ProgressRegistry progressRegistry = BlocksAPI.getInstance().getProgressRegistry();
 	private static final RegenerationRegistry regenRegistry = BlocksAPI.getInstance().getRegenerationRegistry();
-	private static PlayerEventSubscriber<PacketPlayInBlockDig> packetEventSubscriber;
-	private static GenericEventSubscriber<OriginBreakEvent> bukkitEventSubscriber;
+	private static DetachedSubscriber<PacketPlayInBlockDig> packetEventSubscriber;
+	private static DetachedSubscriber<OriginBreakEvent> bukkitEventSubscriber;
+
+	private static final FieldAccess<PacketPlayInBlockDig.EnumPlayerDigType> enumPlayerDigTypeInDig = Reflection.unreflectFieldAccess(PacketPlayInBlockDig.class, "c");
+	private static final FieldAccess<BlockPosition> blockPositionDigIn = Reflection.unreflectFieldAccess(PacketPlayInBlockDig.class, "a");
 
 	public static void init(EventRegistry registry) {
-		packetEventSubscriber = new PlayerEventSubscriber<>(PacketPlayInBlockDig.class, ((context, event) -> {
+		packetEventSubscriber = new DetachedSubscriber<>(PacketPlayInBlockDig.class, ((context, event) -> {
 			if (context.getPlayer().getTargetBlockExact(5) == null) return;
 			if (BlocksAPI.inRegion(context.getPlayer().getTargetBlockExact(5).getLocation())) {
-				Field enumPlayerDigTypeInDig = PacketPlayInBlockDig.class.getDeclaredField("c");
-				Field blockPositionDigIn = PacketPlayInBlockDig.class.getDeclaredField("a");
-				enumPlayerDigTypeInDig.setAccessible(true);
-				blockPositionDigIn.setAccessible(true);
-
-				BlockPosition blockPos = (BlockPosition) blockPositionDigIn.get(event);
+				BlockPosition blockPos = blockPositionDigIn.get(event);
 
 				if (regenRegistry.getRegenerations().containsKey(blockPos)) return;
 
 				PacketPlayOutEntityEffect entityEffect = new PacketPlayOutEntityEffect(context.getPlayer().getEntityId(), new MobEffect(Objects.requireNonNull(MobEffectList.a(PotionEffectType.SLOW_DIGGING.getId())), Integer.MAX_VALUE, 255, true, false));
 				PacketEventListener.sendPacket(context.getPlayer(), entityEffect);
 				progressRegistry.getBlocksBreaking().remove(blockPos);
-				if (enumPlayerDigTypeInDig.get(event) == PacketPlayInBlockDig.EnumPlayerDigType.a) {
+
+				PacketPlayInBlockDig.EnumPlayerDigType digType = enumPlayerDigTypeInDig.get(event);
+				if (digType == PacketPlayInBlockDig.EnumPlayerDigType.a) {
 					progressRegistry.getBlocksBreaking().put(blockPos, true);
-				} else if (enumPlayerDigTypeInDig.get(event) == PacketPlayInBlockDig.EnumPlayerDigType.c || enumPlayerDigTypeInDig.get(event) == PacketPlayInBlockDig.EnumPlayerDigType.b) {
+				} else if (digType == PacketPlayInBlockDig.EnumPlayerDigType.c || digType == PacketPlayInBlockDig.EnumPlayerDigType.b) {
 					progressRegistry.getBlocksBreaking().remove(blockPos);
 					progressRegistry.copyOldData(blockPos);
 				}
 			}
 		}));
 
-		bukkitEventSubscriber = new GenericEventSubscriber<>(OriginBreakEvent.class, (context, event) -> {
+		bukkitEventSubscriber = new DetachedSubscriber<>(OriginBreakEvent.class, (context, event) -> {
 			Player player = event.getPlayer();
 			Block block = event.getBlock();
 

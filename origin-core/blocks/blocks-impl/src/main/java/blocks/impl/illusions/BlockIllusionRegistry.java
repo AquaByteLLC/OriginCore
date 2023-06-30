@@ -1,12 +1,15 @@
 package blocks.impl.illusions;
 
-import blocks.block.util.PlayerInteraction;
 import blocks.block.illusions.FakeBlock;
 import blocks.block.illusions.IllusionRegistry;
+import blocks.block.util.PlayerInteraction;
+import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
-import commons.events.api.PlayerEventContext;
 import commons.events.api.Subscribe;
+import commons.util.reflect.FieldAccess;
+import commons.util.reflect.Reflection;
 import net.minecraft.core.SectionPosition;
+import net.minecraft.network.protocol.game.PacketPlayInUseEntity;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockChange;
 import net.minecraft.network.protocol.game.PacketPlayOutMultiBlockChange;
 import net.minecraft.world.level.block.state.IBlockData;
@@ -17,7 +20,6 @@ import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -25,9 +27,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -35,10 +34,10 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 
 	private final HashMap<Location, FakeBlock> blocks = new HashMap<>();
 	private final HashMap<FakeBlock, UUID> falling = new HashMap<>();
-	private static final VarHandle PacketPlayOutBlockChange_b = unreflect(PacketPlayOutBlockChange.class, "b");
-	private static final VarHandle PacketPlayOutMultiBlockChange_b = unreflect(PacketPlayOutMultiBlockChange.class, "b");
-	private static final VarHandle PacketPlayOutMultiBlockChange_c = unreflect(PacketPlayOutMultiBlockChange.class, "c");
-	private static final VarHandle PacketPlayOutMultiBlockChange_d = unreflect(PacketPlayOutMultiBlockChange.class, "d");
+	private static final FieldAccess<IBlockData> PacketPlayOutBlockChange_b = Reflection.unreflectFieldAccess(PacketPlayOutBlockChange.class, "b");
+	private static final FieldAccess<SectionPosition> PacketPlayOutMultiBlockChange_b = Reflection.unreflectFieldAccess(PacketPlayOutMultiBlockChange.class, "b");
+	private static final FieldAccess<short[]> PacketPlayOutMultiBlockChange_c = Reflection.unreflectFieldAccess(PacketPlayOutMultiBlockChange.class, "c");
+	private static final FieldAccess<IBlockData[]> PacketPlayOutMultiBlockChange_d = Reflection.unreflectFieldAccess(PacketPlayOutMultiBlockChange.class, "d");
 
 	private static final NamespacedKey fbk = new NamespacedKey("blocks", "block.overlay");
 	private static final String fbv = "overlayed";
@@ -84,34 +83,24 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 		return block != null && block.getPersistentDataContainer().has(fbk) && fbv.equals(block.getPersistentDataContainer().get(fbk, PersistentDataType.STRING));
 	}
 
-	private static VarHandle unreflect(Class<?> clazz, String name) {
-		Field field;
-		try {
-			field = clazz.getDeclaredField(name);
-			field.setAccessible(true);
-			return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflectVarHandle(field);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@Subscribe
-	void sendBlockChange(PlayerEventContext context, PacketPlayOutBlockChange packet) {
+	void sendBlockChange(EventContext context, PacketPlayOutBlockChange packet) {
 //		Location  location = CraftLocation.toBukkit(packet.c(), context.getPlayer().getWorld());
-		Vector vector = CraftVector.toBukkit(packet.c().b()); // whatever
-		Location location = vector.toLocation(context.getPlayer().getWorld());
+		Vector    vector   = CraftVector.toBukkit(packet.c().b()); // whatever
+		Location  location = vector.toLocation(context.getPlayer().getWorld());
 		FakeBlock block    = getBlockAt(location);
 		if (block == null) return;
+		if (!block.hasProjection()) return;
 
-		context.mutate(new PacketPlayOutBlockChange(packet.c(), ((CraftBlockData) block.getProjectedBlockData()).getState()));
+		PacketPlayOutBlockChange_b.set(packet, ((CraftBlockData) block.getProjectedBlockData()).getState());
 	}
 
 	@Subscribe
 	@SuppressWarnings("PointlessBitwiseExpression")
-	void sendMultiBlockChange(PlayerEventContext context, PacketPlayOutMultiBlockChange packet) {
-		SectionPosition pos  = (SectionPosition) PacketPlayOutMultiBlockChange_b.get(packet);
-		short[]         rel  = (short[]) PacketPlayOutMultiBlockChange_c.get(packet);
-		IBlockData[]    data = (IBlockData[]) PacketPlayOutMultiBlockChange_d.get(packet);
+	void sendMultiBlockChange(EventContext context, PacketPlayOutMultiBlockChange packet) {
+		SectionPosition pos  = PacketPlayOutMultiBlockChange_b.get(packet);
+		short[]         rel  = PacketPlayOutMultiBlockChange_c.get(packet);
+		IBlockData[]    data = PacketPlayOutMultiBlockChange_d.get(packet);
 
 		int cx = pos.u() << 4;
 		int cz = pos.w() << 4;
@@ -130,22 +119,28 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 
 			FakeBlock block = getBlockAt(new Location(context.getPlayer().getWorld(), x, y, z));
 			if (block == null) continue;
+			if (!block.hasProjection()) continue;
 
 			data[i] = ((CraftBlockData) block.getProjectedBlockData()).getState();
 		}
 	}
 
 	@Subscribe
-	public void left(EntityDamageByEntityEvent event) {
-		Entity damager = event.getDamager();
-		if(!(damager instanceof Player player)) return;
-		processClick(player, event.getEntity(), PlayerInteraction.LEFT_CLICK);
+	public void left(EventContext context, PacketPlayInUseEntity event) {
+		System.out.println(event.a());
+//		Player player = event.getPlayer();
+//		if(event.getHand() != EquipmentSlot.HAND) return;
+//
+//		Entity clicked = player.getTargetEntity(5);
+//		if(clicked == null) return;
+//
+//		processClick(player, clicked, PlayerInteraction.LEFT_CLICK);
 	}
 
 	@Subscribe
-	public void right(PlayerInteractAtEntityEvent event) {
+	public void right(EventContext context, PlayerInteractAtEntityEvent event) {
 		Player player = event.getPlayer();
-		if(event.getHand() != EquipmentSlot.HAND) return;
+		if (event.getHand() != EquipmentSlot.HAND) return;
 
 		processClick(player, event.getRightClicked(), PlayerInteraction.RIGHT_CLICK);
 	}
@@ -158,7 +153,7 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 
 		FakeBlock fake = getBlockAt(entity.getLocation());
 		if (fake == null) return;
-		if(!fake.hasOverlay()) return;
+		if (!fake.hasOverlay()) return;
 		fake.getOverlay().getCallback().onClick(player, interaction);
 	}
 

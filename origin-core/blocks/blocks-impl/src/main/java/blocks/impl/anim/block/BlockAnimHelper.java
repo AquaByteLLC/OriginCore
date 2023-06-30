@@ -2,36 +2,35 @@ package blocks.impl.anim.block;
 
 import blocks.BlocksAPI;
 import blocks.block.BlockRegistry;
+import blocks.block.aspects.AspectType;
 import blocks.block.aspects.harden.Hardenable;
 import blocks.block.aspects.projection.Projectable;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
-import blocks.block.builder.AspectHolder;
 import blocks.block.builder.FixedAspectHolder;
 import blocks.block.illusions.FakeBlock;
-import blocks.block.illusions.IllusionFactory;
 import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
-import blocks.block.aspects.AspectType;
 import blocks.impl.event.OriginBreakEvent;
-import commons.events.impl.packet.PacketEventListener;
+import commons.events.impl.impl.PacketEventListener;
+import commons.util.reflect.FieldAccess;
+import commons.util.reflect.Reflection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.lucko.helper.bossbar.BossBar;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimation;
 import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.PlayerInteractManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 
-import java.lang.reflect.Field;
 import java.util.Random;
 
 public class BlockAnimHelper {
@@ -69,6 +68,9 @@ public class BlockAnimHelper {
 		}
 	}
 
+	private static final FieldAccess<Integer> currentDigTickField = Reflection.unreflectFieldAccess(PlayerInteractManager.class, "i");
+	private static final FieldAccess<Integer> lastDigTickField = Reflection.unreflectFieldAccess(PlayerInteractManager.class, "g");
+
 	@SneakyThrows
 	public void progression() {
 		for (Player player : Bukkit.getOnlinePlayers()) {
@@ -101,15 +103,8 @@ public class BlockAnimHelper {
 				if (registry.getBlockBreak(blockPosition)) {
 					EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
-					//todo: convert to VarHandle, please
-					//todo: this will kill performance
-					final Field currentDigTickField = entityPlayer.d.getClass().getDeclaredField("i");
-					final Field lastDigTickField = entityPlayer.d.getClass().getDeclaredField("g");
-					currentDigTickField.setAccessible(true);
-					lastDigTickField.setAccessible(true);
-
-					final int currentDigTick = currentDigTickField.getInt(entityPlayer.d);
-					final int lastDigTick = lastDigTickField.getInt(entityPlayer.d);
+					final int currentDigTick = currentDigTickField.get(entityPlayer.d);
+					final int lastDigTick = lastDigTickField.get(entityPlayer.d);
 
 					final int newDigTick = currentDigTick - lastDigTick;
 

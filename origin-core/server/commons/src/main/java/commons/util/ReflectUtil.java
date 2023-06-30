@@ -4,6 +4,8 @@ import lombok.SneakyThrows;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +57,21 @@ public class ReflectUtil {
 			for (char c : string.toCharArray())
 				System.out.print(c);
 			System.out.println();
+		}
+	}
+
+	/**
+	 * @deprecated incorrect usage of {@link VarHandle}
+	 */
+	@Deprecated
+	public static VarHandle unreflect(Class<?> clazz, String name) {
+		Field field;
+		try {
+			field = clazz.getDeclaredField(name);
+			field.setAccessible(true);
+			return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflectVarHandle(field);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

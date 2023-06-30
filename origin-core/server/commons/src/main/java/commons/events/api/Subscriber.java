@@ -1,11 +1,12 @@
 package commons.events.api;
 
 /**
+ * Represents a callable event subscription.
  * @author vadim
  */
 @FunctionalInterface
-public interface Subscriber<C extends EventContext,E> {
+public interface Subscriber<T> {
 
-	void process(C context, E event) throws Exception;
+	void process(EventContext context, T event) throws Exception;
 
 }

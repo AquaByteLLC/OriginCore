@@ -11,11 +11,11 @@ import java.lang.reflect.Method;
 
 /**
  * This class <b>only</b> supports method signatures matching:
- * <p>{@code void onEvent(EventContext context, Event event)}
- * <p>{@code void onEvent(Event event)}
+ * <li><p>{@code void onEvent(EventContext context, Event event)}</li>
+ * <li><p>{@code void onEvent(Event event)}</li>
  * @author vadim
  */
-class MethodSubscriber implements Subscriber<EventContext, Object> {
+class MethodSubscriber implements Subscriber<Object> {
 
 	private final WeakReference<Object> listener;
 	private final MethodHandle handle;

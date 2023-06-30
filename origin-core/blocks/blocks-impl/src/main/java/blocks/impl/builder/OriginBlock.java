@@ -2,14 +2,12 @@ package blocks.impl.builder;
 
 import blocks.block.aspects.AspectType;
 import blocks.block.aspects.BlockAspect;
-import blocks.block.builder.AspectHolder;
 import blocks.block.builder.FixedAspectHolder;
 import blocks.block.factory.AspectFactory;
 import blocks.impl.factory.AspectFactoryImpl;
 import blocks.impl.illusions.BlockAdapter;
 import commons.events.impl.EventSubscriber;
-import commons.events.impl.impl.GenericEventSubscriber;
-import commons.events.impl.impl.PlayerEventSubscriber;
+import commons.events.impl.impl.DetachedSubscriber;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
@@ -75,7 +73,7 @@ public class OriginBlock extends BlockAdapter implements FixedAspectHolder {
 	@Override
 	public <T> FixedAspectHolder handle(Class<T> eventClazz, Consumer<T> eventConsumer) {
 		if(true) throw new UnsupportedOperationException("this operation is not implemented. none of the eventSubscribers are ever binded");
-		eventSubscribers.add(new PlayerEventSubscriber<>(eventClazz, ((context, event) -> eventConsumer.accept(event))));
+		eventSubscribers.add(new DetachedSubscriber<>(eventClazz, ((context, event) -> eventConsumer.accept(event))));
 		return this;
 	}
 

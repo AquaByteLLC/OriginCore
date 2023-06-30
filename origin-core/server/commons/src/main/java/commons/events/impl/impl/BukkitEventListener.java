@@ -1,4 +1,4 @@
-package commons.events.impl.bukkit;
+package commons.events.impl.impl;
 
 import commons.util.ReflectUtil;
 import commons.events.api.EventContext;
@@ -46,7 +46,7 @@ public class BukkitEventListener<T extends Event> implements EventListener, Even
 			EventContext context;
 			if (getters.length >= 1) // involves a player, let's try to get it
 				context = events.publish((Player) getters[0].invoke(event), event);
-			else // no player involved (methods expecting PlayerEventContext will fail)
+			else // no player detected, EventContext will have null player
 				context = events.publish(event);
 
 			if (event instanceof Cancellable cancellable)
