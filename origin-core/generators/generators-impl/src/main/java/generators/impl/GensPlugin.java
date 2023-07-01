@@ -1,15 +1,10 @@
 package generators.impl;
 
 import co.aikar.commands.PaperCommandManager;
-import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.j256.ormlite.field.DataPersisterManager;
 import commons.CommonsPlugin;
 import commons.data.AccountStorage;
-import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
-import commons.events.api.Subscribe;
-import commons.events.impl.EventSubscriber;
-import commons.events.impl.bukkit.BukkitEventSubscriber;
 import generators.GeneratorRegistry;
 import generators.impl.conf.Tiers;
 import generators.impl.cmd.GenCommand;
@@ -22,13 +17,7 @@ import generators.impl.data.TierPersister;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
-import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.lang.ref.Reference;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author vadim

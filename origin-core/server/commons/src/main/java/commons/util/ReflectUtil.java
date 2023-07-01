@@ -19,7 +19,9 @@ public class ReflectUtil {
 
 	private static final Map<Class<?>, Map<Class<?>, List<MethodHandle>>> publicMethodsByReturnType = new HashMap<>();
 
-	// this method caches the method handle for faster subsequent lookups
+	/**
+	 * this method caches the method handles for faster subsequent lookups
+ 	 */
 	@SneakyThrows
 	public static MethodHandle[] getPublicMethodsByReturnType(Class<?> clazz, Class<?> returnType) {
 		Map<Class<?>, List<MethodHandle>> byReturnType = publicMethodsByReturnType.computeIfAbsent(clazz, x -> new HashMap<>());
@@ -32,6 +34,8 @@ public class ReflectUtil {
 			for (Method method : clazz.getMethods())
 				if (returnType.isAssignableFrom(method.getReturnType()))
 					handles.add(lookup.unreflect(method));
+
+			byReturnType.put(clazz, handles);
 		} else
 			handles = byReturnType.get(returnType);
 
@@ -62,15 +66,27 @@ public class ReflectUtil {
 
 	/**
 	 * @deprecated incorrect usage of {@link VarHandle}
+	 * @see commons.util.reflect.FieldAccess
 	 */
 	@Deprecated
-	public static VarHandle unreflect(Class<?> clazz, String name) {
+	public static VarHandle unreflectVarHandle(Class<?> clazz, String name) {
 		Field field;
 		try {
 			field = clazz.getDeclaredField(name);
 			field.setAccessible(true);
 			return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflectVarHandle(field);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static MethodHandle unreflectMethodHandle(Class<?> clazz, String name) {
+		Method method;
+		try {
+			method = clazz.getDeclaredMethod(name);
+			method.setAccessible(true);
+			return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflect(method);
+		} catch (NoSuchMethodException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}

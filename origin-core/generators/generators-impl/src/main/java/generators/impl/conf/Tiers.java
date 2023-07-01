@@ -1,7 +1,6 @@
 package generators.impl.conf;
 
-import commons.ReflectUtil;
-import commons.StringUtil;
+import commons.util.StringUtil;
 import generators.impl.wrapper.GenDrop;
 import generators.impl.wrapper.GenInfo;
 import generators.impl.wrapper.TierUp;
@@ -12,9 +11,7 @@ import me.vadim.util.conf.bukkit.YamlFile;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.Material;
-import org.bukkit.configuration.InvalidConfigurationException;
 
-import javax.swing.plaf.basic.BasicButtonUI;
 import java.util.*;
 
 /**

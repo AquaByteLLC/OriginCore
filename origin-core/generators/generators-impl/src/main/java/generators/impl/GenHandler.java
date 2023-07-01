@@ -1,7 +1,6 @@
 package generators.impl;
 
 import commons.data.AccountProvider;
-import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import generators.impl.conf.Config;
@@ -32,10 +31,10 @@ import java.util.UUID;
  */
 public class GenHandler {
 
-	private final ConfigurationProvider       conf;
+	private final ConfigurationProvider conf;
 	private final AccountProvider<GenAccount> provider;
-	private final GenRegistry                 reg;
-	private final Task                        drops;
+	private final GenRegistry reg;
+	private final Task drops;
 
 	public GenHandler(ConfigurationProvider conf, EventRegistry events, GenRegistry registry, AccountProvider<GenAccount> provider) {
 		this.conf     = conf;
@@ -75,7 +74,7 @@ public class GenHandler {
 			return;
 		}
 
-		if(!PDCUtil.isGen(event.getItemInHand()))
+		if (!PDCUtil.isGen(event.getItemInHand()))
 			return;
 
 		Tier tier = conf.open(Tiers.class).findTier(event.getItemInHand().getType());
@@ -101,8 +100,8 @@ public class GenHandler {
 
 	@Subscribe
 	void onDeleteGen(BlockBreakEvent event) {
-		Player     player   = event.getPlayer();
-		Location   location = event.getBlock().getLocation();
+		Player   player   = event.getPlayer();
+		Location location = event.getBlock().getLocation();
 
 		Generator generator = reg.getGenAt(location);
 		if (generator == null) return;
@@ -114,19 +113,19 @@ public class GenHandler {
 
 	@Subscribe
 	void onUpgradeGen(PlayerInteractEvent event) {
-		if(event.getHand() != EquipmentSlot.HAND) return;
-		if(event.isBlockInHand()) return;
-		if(!event.getPlayer().isSneaking()) return;
+		if (event.getHand() != EquipmentSlot.HAND) return;
+		if (event.isBlockInHand()) return;
+		if (!event.getPlayer().isSneaking()) return;
 
-		Player     player  = event.getPlayer();
-		Block      block   = event.getClickedBlock();
+		Player player = event.getPlayer();
+		Block  block  = event.getClickedBlock();
 		if (block == null) return;
 
 		Location  location  = block.getLocation();
 		Generator generator = reg.getGenAt(location);
 		if (generator == null) return;
 
-		if(!generator.isOwnedBy(player)) return; // do not allow upgrading other's gens
+		if (!generator.isOwnedBy(player)) return; // do not allow upgrading other's gens
 
 		generator.upgrade(reg);
 	}

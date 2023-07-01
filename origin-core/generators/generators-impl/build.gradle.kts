@@ -1,10 +1,7 @@
-plugins {
-    kotlin("jvm") version "1.6.20-RC"
-}
-
 group = "generators.impl"
 sharedProjectData.main_cls = "$group.GensPlugin"
 
+setupKotlin()
 setupShadowJar()
 copyToPluginsFolder()
 
@@ -26,21 +23,4 @@ dependencies {
     compileOnly(Dependencies.ORMLITE_JDBC)
     compileOnly(project(":commons"))
     implementation(project(":generators-api"))
-}
-
-
-
-tasks {
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = "17"
-        }
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
-    }
-
-    compileJava {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
-    }
 }

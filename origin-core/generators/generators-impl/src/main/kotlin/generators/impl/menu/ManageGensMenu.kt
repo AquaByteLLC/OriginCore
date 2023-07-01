@@ -1,12 +1,11 @@
 package generators.impl.menu
 
-import commons.StringUtil
+import commons.util.StringUtil
 import generators.impl.GensPlugin
 import generators.impl.wrapper.GenInfo
 import generators.wrapper.Generator
 import generators.wrapper.result.UpgradeResult
 import me.vadim.util.conf.wrapper.Placeholder
-import me.vadim.util.conf.wrapper.impl.StringPlaceholder
 import me.vadim.util.item.ItemBuilderKt
 import me.vadim.util.item.mutateItem
 import me.vadim.util.menu.*

@@ -1,6 +1,6 @@
 package generators.impl.conf;
 
-import commons.StringUtil;
+import commons.util.StringUtil;
 import generators.wrapper.Upgrade;
 import me.vadim.util.conf.ConfigurationAccessor;
 import me.vadim.util.conf.ResourceProvider;
@@ -13,7 +13,6 @@ import me.vadim.util.item.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

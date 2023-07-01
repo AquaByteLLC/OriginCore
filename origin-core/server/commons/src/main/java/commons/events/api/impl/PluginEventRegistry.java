@@ -1,13 +1,7 @@
 package commons.events.api.impl;
 
-import commons.events.api.EventContext;
-import commons.events.api.EventRegistry;
-import commons.events.api.Subscribe;
-import commons.events.api.Subscriber;
+import commons.events.api.*;
 import commons.util.ReflectUtil;
-import lombok.SneakyThrows;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventException;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
@@ -55,19 +49,17 @@ public class PluginEventRegistry implements EventRegistry {
 			methodsByEventType.computeIfAbsent(params[params.length == 1 ? 0 : 1], x -> new ArrayList<>()).add(method);
 		}
 
-		WeakReference<Object> reference = new WeakReference<>(listener);
-
 		// streams api is not fucking with this map
 		Map<Class<?>, List<Subscriber<?>>> callbacks = new HashMap<>();
 		for (Map.Entry<Class<?>, List<Method>> entry : methodsByEventType.entrySet()) {
 			List<Subscriber<?>> funcs = new ArrayList<>();
 			for (Method method : entry.getValue())
-				funcs.add(new MethodSubscriber(reference, method));
+				funcs.add(new MethodSubscriber(listener, method));
 			callbacks.put(entry.getKey(), funcs);
 		}
 
 		Subscription subscription = new Subscription();
-		subscription.listener  = reference;
+		subscription.listener  = new WeakReference<>(listener);
 		subscription.events    = Collections.unmodifiableSet(methodsByEventType.keySet());
 		subscription.callbacks = callbacks;
 
@@ -98,18 +90,8 @@ public class PluginEventRegistry implements EventRegistry {
 	}
 
 	@Override
-	public <T> EventContext publish(T event) {
-		return publish(null, event);
-	}
-
-	@Override
-	public <T> EventContext publish(Player player, T event) {
-		return fire(new PlayerEventContext(player), event);
-	}
-
 	@SuppressWarnings("rawtypes,unchecked")
-	@SneakyThrows
-	private <T> EventContext fire(EventContext context, T event) {
+	public <T> void publish(EventContext context, T event) throws EventExecutionException {
 		Class<?>           clazz = event.getClass();
 		List<Subscription> subs  = subscriptions.get(clazz);
 		if (subs != null) {
@@ -119,11 +101,17 @@ public class PluginEventRegistry implements EventRegistry {
 					try {
 						subscriber.process(context, event);
 					} catch (Exception e) {
-						ReflectUtil.serr("problem processing event " + event.getClass().getCanonicalName() + " in class " + sub.listener.get().getClass().getCanonicalName());
-						throw new EventException(e);
+						Object listener = sub.listener.get();
+						ReflectUtil.serr("problem processing event " + event.getClass().getCanonicalName() +
+										 " in class " + (listener == null ? "<garbage collected>" : listener.getClass().getCanonicalName()));
+						throw new EventExecutionException(e);
 					}
 		}
-		return context;
+	}
+
+	@Override
+	public ContextBuilder prepareContext() {
+		return new EventContextBuilder();
 	}
 
 	private void invokeSubscriptionHooks(Subscription subscription) {

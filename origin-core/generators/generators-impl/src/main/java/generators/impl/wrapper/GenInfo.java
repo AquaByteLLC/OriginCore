@@ -1,6 +1,6 @@
 package generators.impl.wrapper;
 
-import commons.StringUtil;
+import commons.util.StringUtil;
 import generators.impl.conf.Config;
 import generators.wrapper.Drop;
 import generators.wrapper.Generator;

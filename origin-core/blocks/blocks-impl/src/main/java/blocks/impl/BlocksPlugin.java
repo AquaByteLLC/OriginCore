@@ -53,7 +53,7 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider {
 
 		this.blockRegistry = new BlockRegistryImpl();
 		this.overlayLocationRegistry = new OverlayRegistryImpl();
-		this.illusions = new Illusions(new IllusionFactoryImpl(), new BlockIllusionRegistry(events));
+		this.illusions = new Illusions(new IllusionFactoryImpl(), new BlockIllusionRegistry(this, events));
 		this.regenerationRegistry = new RegenerationRegistryImpl(this, illusions);
 		this.blockLocationRegistry = new LocationRegistryImpl();
 		this.progressRegistry = new ProgressRegistryImpl();

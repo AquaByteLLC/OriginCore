@@ -75,7 +75,9 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 	}
 
 	@Subscribe
-	void onRtClick(PlayerInteractEvent event) {
+	void onRtClick(EventContext context, PlayerInteractEvent event) {
+		event.setCancelled(false);
+		context.setCancelled(false);
 		if(event.getHand() != EquipmentSlot.HAND) return;
 
 		switch (event.getAction()) {

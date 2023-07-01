@@ -1,8 +1,8 @@
 package enchants.impl;
 
-import commons.events.api.PlayerEventContext;
+import commons.events.api.EventContext;
 import commons.events.impl.EventSubscriber;
-import commons.events.impl.impl.PlayerEventSubscriber;
+import commons.events.impl.impl.DetachedSubscriber;
 import enchants.EnchantKey;
 import enchants.EnchantRegistry;
 import enchants.impl.item.EnchantedItemImpl;
@@ -78,12 +78,12 @@ public enum EnchantTypes implements EnchantKey {
 
 	private static <T extends Event> EventSubscriber subscribe(Class<T> clazz, Consumer3<T> cons) {
 		final int vf = v++;
-		return new PlayerEventSubscriber<>(clazz, (ctx, event) -> cons.consume(values()[vf], ctx, event));
+		return new DetachedSubscriber<>(clazz, (ctx, event) -> cons.consume(values()[vf], ctx, event));
 	}
 
 	@FunctionalInterface
 	private interface Consumer3<T> {
-		void consume(EnchantKey key, PlayerEventContext context, T event);
+		void consume(EnchantKey key, EventContext context, T event);
 	}
 
 	public static @Nullable EnchantKey fromName(String name) {

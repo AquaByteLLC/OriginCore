@@ -1,13 +1,12 @@
 package generators.impl.wrapper;
 
-import commons.PackUtil;
+import commons.util.PackUtil;
 import generators.wrapper.Drop;
 import generators.wrapper.Generator;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 

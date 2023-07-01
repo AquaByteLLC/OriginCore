@@ -1,7 +1,7 @@
 package enchants.impl.item;
 
-import commons.BukkitUtil;
-import commons.StringUtil;
+import commons.util.BukkitUtil;
+import commons.util.StringUtil;
 import enchants.EnchantAPI;
 import enchants.impl.conf.EnchantPlaceholder;
 import enchants.item.EnchantFactory;

@@ -2,17 +2,13 @@ package generators.impl.wrapper;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import commons.StringUtil;
 import commons.impl.PlayerOwned;
 import generators.GeneratorRegistry;
-import generators.wrapper.Drop;
 import generators.wrapper.Generator;
 import generators.wrapper.Tier;
 import generators.wrapper.Upgrade;
 import generators.wrapper.result.DestroyResult;
 import generators.wrapper.result.UpgradeResult;
-import me.vadim.util.conf.wrapper.Placeholder;
-import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -93,7 +89,8 @@ public class Gen extends PlayerOwned implements Generator {
 		registry.deleteGen(this);
 		location.getBlock().setType(Material.AIR);
 
-		by.getInventory().addItem(asItem());
+		if(by.getGameMode() != GameMode.CREATIVE)
+			by.getInventory().addItem(asItem());
 		by.sendMessage("broke " + (isOwnedBy(by) ? "ur" : getOfflineOwner().getName() + "'s") + " gen :o");
 		return DestroyResult.SUCCESS;
 	}

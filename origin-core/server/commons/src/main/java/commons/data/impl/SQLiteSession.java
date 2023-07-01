@@ -1,8 +1,6 @@
 package commons.data.impl;
 
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.support.ConnectionSource;
-import me.vadim.util.conf.ResourceProvider;
 
 import java.io.File;
 import java.sql.SQLException;

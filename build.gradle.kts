@@ -7,7 +7,6 @@ plugins {
 }
 
 subprojects {
-
     apply {
         plugin<JavaPlugin>()
     }

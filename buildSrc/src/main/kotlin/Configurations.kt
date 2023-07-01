@@ -3,11 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocatio
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
-import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.invoke
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
+import org.gradle.kotlin.dsl.*
 import org.gradle.language.jvm.tasks.ProcessResources
 
 fun Project.setupShadowJar(mini: Boolean = true) {
@@ -48,6 +44,7 @@ fun Project.setupShadowJar(mini: Boolean = true) {
     }
 }
 
+@Suppress("UnstableApiUsage")
 fun Project.copyToPluginsFolder() {
     tasks {
         register("serverCopy", Copy::class) {
@@ -69,6 +66,20 @@ fun Project.copyToPluginsFolder() {
             }
         }
 	}
+}
+
+fun Project.setupKotlin() {
+    apply {
+        plugin("kotlin")
+    }
+
+    tasks {
+        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
 }
 
 private fun ShadowJar.relocate(group: Any, vararg dependencies: String) {

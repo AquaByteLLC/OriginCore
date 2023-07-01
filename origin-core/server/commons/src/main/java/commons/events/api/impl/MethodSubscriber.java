@@ -11,8 +11,11 @@ import java.lang.reflect.Method;
 
 /**
  * This class <b>only</b> supports method signatures matching:
+ * <ul>
  * <li><p>{@code void onEvent(EventContext context, Event event)}</li>
  * <li><p>{@code void onEvent(Event event)}</li>
+ * </ul>
+ * Behaviour for methods not matching the aforementioned signatures is <b>undefined</b>.
  * @author vadim
  */
 class MethodSubscriber implements Subscriber<Object> {
@@ -21,11 +24,15 @@ class MethodSubscriber implements Subscriber<Object> {
 	private final MethodHandle handle;
 	private final boolean needsContext;
 
+	/**
+	 * This constructor does <i>no verification</i> of the provided method's signature.
+	 * <p><b>It is up to the caller to verify the method parameters.</b>
+	 */
 	@SneakyThrows
-	MethodSubscriber(WeakReference<Object> listener, Method method) {
-		this.listener = listener;
-		this.handle = MethodHandles.lookup().unreflect(method);
-		this.needsContext = method.getParameterCount() == 2; // it is up to the caller to verify the method parameters
+	MethodSubscriber(Object listener, Method method) {
+		this.listener = new WeakReference<>(listener);
+		this.handle = MethodHandles.privateLookupIn(listener.getClass(), MethodHandles.lookup()).unreflect(method);
+		this.needsContext = method.getParameterCount() == 2;
 	}
 
 	@Override

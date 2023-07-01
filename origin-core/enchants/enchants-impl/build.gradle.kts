@@ -1,10 +1,7 @@
-plugins {
-    kotlin("jvm") version "1.6.20-RC"
-}
-
 group = "enchants.impl"
 sharedProjectData.main_cls = "$group.EnchantPlugin"
 
+setupKotlin()
 setupShadowJar()
 copyToPluginsFolder()
 
@@ -12,7 +9,7 @@ dependencies {
     compileOnly(Dependencies.LOMBOK)
     annotationProcessor(Dependencies.LOMBOK)
     compileOnly(Dependencies.PAPER)
-    compileOnly(Dependencies._SPIGOT)
+    compileOnly(Dependencies.SPIGOT)
     compileOnly(Dependencies.ACF)
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
@@ -23,19 +20,4 @@ dependencies {
     compileOnly(Dependencies.MENUS)
     compileOnly(project(":commons"))
     implementation(project(":enchants-api"))
-}
-
-tasks {
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = "17"
-        }
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
-    }
-
-    compileJava {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
-    }
 }

@@ -9,4 +9,5 @@ dependencies {
     compileOnly(Dependencies.LFC_SHARED)
     compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(project(":commons"))
+    compileOnly(project(":blocks-api"))
 }

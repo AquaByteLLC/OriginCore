@@ -4,7 +4,6 @@ import com.j256.ormlite.dao.Dao;
 import commons.data.ORMLiteAccountStorage;
 import commons.data.SessionProvider;
 import enderchests.ChestRegistry;
-import generators.GeneratorRegistry;
 import me.vadim.util.conf.ConfigurationProvider;
 
 import java.sql.SQLException;
@@ -13,11 +12,11 @@ import java.util.UUID;
 /**
  * @author vadim
  */
-public class EnderChestStorage extends ORMLiteAccountStorage<EnderChestAccount> {
+public class EChestAccountStorage extends ORMLiteAccountStorage<EnderChestAccount> {
 
 	private final ChestRegistry registry;
 
-	public EnderChestStorage(ChstRegistry registry, ConfigurationProvider conf, SessionProvider provider) {
+	public EChestAccountStorage(ChestRegistry registry, ConfigurationProvider conf, SessionProvider provider) {
 		super(uuid -> new EnderChestAccount(uuid, registry, conf), provider, EnderChestAccount.class);
 		this.registry = registry;
 	}

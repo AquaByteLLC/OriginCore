@@ -4,15 +4,11 @@ import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.field.types.BaseDataType;
 import com.j256.ormlite.support.DatabaseResults;
-import commons.PackUtil;
-import generators.impl.GensPlugin;
 import generators.impl.conf.Tiers;
 import generators.wrapper.Tier;
 import me.vadim.util.conf.ConfigurationProvider;
-import org.bukkit.Location;
 
 import java.sql.SQLException;
-import java.util.zip.DataFormatException;
 
 /**
  * @author vadim

@@ -1,11 +1,18 @@
-package enderchests.impl.block;
+package enderchests.impl;
 
 import commons.impl.PlayerOwned;
+import commons.util.StringUtil;
 import enderchests.ChestNetwork;
-import enderchests.block.LinkedChest;
+import enderchests.LinkedChest;
 import enderchests.NetworkColor;
-import enderchests.impl.block.LinkedEnderChest;
+import enderchests.impl.conf.Config;
+import me.vadim.util.conf.ConfigurationProvider;
+import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +24,22 @@ import java.util.UUID;
 public class EnderChestNetwork extends PlayerOwned implements ChestNetwork {
 
 	private final NetworkColor color;
+	private final Inventory inventory;
 	private final List<LinkedChest> chests = new ArrayList<>();
 
-	public EnderChestNetwork(UUID uuid, NetworkColor color) {
+	public EnderChestNetwork(UUID uuid, NetworkColor color, ConfigurationProvider conf) {
 		super(uuid);
 		this.color = color;
+		this.inventory = Bukkit.createInventory(null, Config.CHEST_SIZE,
+												StringUtil.colorize(conf.open(Config.class)
+													.getChestMenuTitle().format(StringPlaceholder.of("color",
+																									 color.chatColor.toString() +
+																									 StringUtil.convertToUserFriendlyCase(color.name()) +
+																									 "&r"))));
 	}
 
-	public LinkedChest newChest(Location location) {
-		LinkedChest chest = new LinkedEnderChest(location, this);
+	public LinkedChest newChest(Location location, BlockFace face) {
+		LinkedChest chest = new LinkedEnderChest(location, face, this);
 		chests.add(chest);
 		return chest;
 	}
@@ -37,6 +51,11 @@ public class EnderChestNetwork extends PlayerOwned implements ChestNetwork {
 	@Override
 	public NetworkColor getColor() {
 		return color;
+	}
+
+	@Override
+	public Inventory getInventory() {
+		return inventory;
 	}
 
 	@Override

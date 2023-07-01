@@ -1,9 +1,6 @@
-enchantHeader:
-  - "&c&lEnchants"
-  - " "
-
+linked_inventory:
+  title: "{color} &8&nEnder Chest"
 menu:
-  title: "Manage Enchants for %name%"
   button:
     next:
       type: ARROW
@@ -21,17 +18,3 @@ menu:
       lore:
         - "Goes back to last menu,"
         - "or closes the current menu."
-    upgrade:
-      name: "+%levels% Enchant Levels"
-      lore:
-        - "Upgrade Enchant %name%"
-        - "Price: %netCost%"
-        - "Activate: %newChance%"
-        - "new level: %newLevel%"
-        - "%maxLevel%"
-        - "%maxChance%"
-        - "%maxCost%"
-        - "%currentLevel%"
-        - "%currentChance%"
-        - "%currentCost%"
-        - "click to purchase"

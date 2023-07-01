@@ -2,11 +2,10 @@ package generators.impl.cmd;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import commons.StringUtil;
+import commons.util.StringUtil;
 import commons.data.AccountProvider;
 import commons.data.AccountStorage;
 import generators.GeneratorRegistry;
-import generators.impl.GenRegistry;
 import generators.impl.GensPlugin;
 import generators.impl.conf.Tiers;
 import generators.impl.data.GenAccount;
@@ -19,7 +18,6 @@ import me.vadim.util.menu.Menu;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 /**
  * @author vadim

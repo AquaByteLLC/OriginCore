@@ -2,14 +2,15 @@ package commons.events.impl.impl;
 
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscriber;
+import commons.events.impl.EventSubscriber;
 
 /**
  * @author vadim
  */
-public class DetachedSubscriber<T> implements commons.events.impl.EventSubscriber {
+public class DetachedSubscriber<T> implements EventSubscriber {
 
-	private final Subscriber<T> subscriber;
 	private final Class<T> clazz;
+	private final Subscriber<T> subscriber;
 
 	public DetachedSubscriber(Class<T> clazz, Subscriber<T> subscriber) {
 		this.clazz      = clazz;

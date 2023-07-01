@@ -1,10 +1,10 @@
 package commons.events.impl;
 
-import commons.util.ReflectUtil;
 import commons.events.api.EventRegistry;
 import commons.events.api.impl.PluginEventRegistry;
 import commons.events.impl.impl.BukkitEventListener;
 import commons.events.impl.impl.PacketEventListener;
+import commons.util.ReflectUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
@@ -46,12 +46,9 @@ public class PluginEventWrapper {
 					return el;
 				});
 				int len = ReflectUtil.getPublicMethodsByReturnType(event, Player.class).length;
-				if (len < 1)
-					ReflectUtil.serr("WARN: Bukkit event class " + event.getCanonicalName() + " does not involve a player!\n" +
-									 "WARN: Functionality of methods expecting PlayerEventContext with this event is undefined.");
 				if (len > 1)
 					ReflectUtil.serr("WARN: Bukkit event class " + event.getCanonicalName() + " involves multiple players!\n" +
-									 "WARN: Functionality of methods expecting PlayerEventContext with this event is undefined.");
+									 "WARN: Functionality of methods using EventContext#getPlayer() with this event is undefined.");
 			}
 		});
 		packets.startListen(plugin, events);

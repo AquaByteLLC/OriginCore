@@ -14,5 +14,5 @@ dependencies {
     compileOnly(project(":blocks-api"))
     compileOnly(project(":blocks-impl"))
     compileOnly(Dependencies.WORLD_GUARD)
-    compileOnly(Dependencies._SPIGOT)
+    compileOnly(Dependencies.SPIGOT)
 }

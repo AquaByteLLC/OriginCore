@@ -1,12 +1,13 @@
-package generators.impl.data;
+package enderchests.impl.data;
 
 
-import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import commons.data.AbstractAccount;
-import generators.GeneratorRegistry;
-import generators.impl.conf.Config;
+import enderchests.ChestRegistry;
+import enderchests.NetworkColor;
+import enderchests.impl.LinkedEnderChest;
 import me.vadim.util.conf.ConfigurationProvider;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -14,30 +15,26 @@ import java.util.UUID;
  * @author vadim
  */
 @DatabaseTable
-public class GenAccount extends AbstractAccount {
+public class EnderChestAccount extends AbstractAccount {
 
-	GeneratorRegistry registry;
+	ChestRegistry registry;
 
-	private GenAccount() { // ORMLite
+	private EnderChestAccount() { // ORMLite
 		super(null);
 	}
 
-	GenAccount(UUID uuid, GeneratorRegistry registry, ConfigurationProvider conf) {
+	EnderChestAccount(UUID uuid, ChestRegistry registry, ConfigurationProvider conf) {
 		super(uuid);
 
 		this.registry = registry;
-		slotLimit = conf.open(Config.class).getDefaultMaxSlots();
 	}
 
-	@DatabaseField
-	public int slotLimit;
+	public NetworkColor temp = NetworkColor.AQUA;
 
-	public int getSlotsUsed() { return registry.countGenerators(getOwnerUUID()); }
+	public LinkedEnderChest currentLinkedInventory;
 
-	public boolean isAtSlotLimit() { return getSlotsUsed() >= slotLimit; }
-
-	public boolean canBulkUpgrade(){
-		return getOfflineOwner().getPlayer().hasPermission("gens.bulk");
+	public boolean isViewingLinkedInventory(){
+		return currentLinkedInventory != null;
 	}
 
 }

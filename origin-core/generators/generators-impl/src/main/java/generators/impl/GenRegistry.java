@@ -1,21 +1,16 @@
 package generators.impl;
 
-import commons.PackUtil;
+import commons.util.PackUtil;
 import generators.GeneratorRegistry;
 import generators.wrapper.Generator;
-import generators.wrapper.Tier;
-import generators.wrapper.Upgrade;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.objects.ObjectLists;
 import me.vadim.util.conf.ConfigurationProvider;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

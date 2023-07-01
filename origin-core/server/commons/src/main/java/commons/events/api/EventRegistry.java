@@ -1,7 +1,5 @@
 package commons.events.api;
 
-import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Consumer;
@@ -48,27 +46,23 @@ public interface EventRegistry {
 
 	/**
 	 * Unsubscribe all subscribers registered with the {@code listener}.
-	 * Unsubscribed listeners will no longer receive {@linkplain #publish(Object) published} {@linkplain #publish(Player, Object) events}.
+	 * Unsubscribed listeners will no longer receive {@linkplain #publish(EventContext, Object) published} events.
 	 * @param listener the listener object in question
 	 */
 	void unsubscribe(Object listener);
 
 	/**
 	 * Publishes an event, firing all registered subscribers.
+	 * @param context the {@link EventContext} to be processed by the subscribers
 	 * @param event the event to be fired
-	 * @return the resulting {@link EventContext}, as processed by the subscribers
 	 * @param <T> the event's type
 	 * @throws EventExecutionException if any exception occurs during the firing of any of the subscribers
 	 */
-	<T> EventContext publish(T event) throws EventExecutionException;
+	<T> void publish(EventContext context, T event) throws EventExecutionException;
 
 	/**
-	 * Publishes a {@linkplain EventContext#getPlayer() player event}, firing all registered subscribers.
-	 * @param event the event to be fired
-	 * @return the resulting {@link EventContext}, as processed by the subscribers
-	 * @param <T> the event's type
-	 * @throws EventExecutionException if any exception occurs during the firing of any of the subscribers
+	 * @return a new {@link ContextBuilder} with which to construct an {@link EventContext} to be passed to {@link #publish(EventContext, Object)}
 	 */
-	<T> EventContext publish(Player player, T event) throws EventExecutionException;
+	ContextBuilder prepareContext();
 
 }

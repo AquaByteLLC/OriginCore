@@ -1,7 +1,7 @@
 package enderchests;
 
 import commons.Owned;
-import enderchests.block.LinkedChest;
+import org.bukkit.inventory.Inventory;
 
 /**
  * @author vadim
@@ -9,6 +9,8 @@ import enderchests.block.LinkedChest;
 public interface ChestNetwork extends Owned {
 
 	NetworkColor getColor();
+
+	Inventory getInventory();
 
 	LinkedChest[] getChests();
 
