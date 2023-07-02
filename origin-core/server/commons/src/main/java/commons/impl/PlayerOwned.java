@@ -22,15 +22,23 @@ public abstract class PlayerOwned implements Owned {
 	}
 
 	@Override
-	public OfflinePlayer getOfflineOwner() { return Bukkit.getOfflinePlayer(uuid); }
+	public OfflinePlayer getOfflineOwner() {
+		return Bukkit.getOfflinePlayer(uuid);
+	}
 
 	@Override
-	public UUID getOwnerUUID() { return uuid; }
+	public UUID getOwnerUUID() {
+		return uuid;
+	}
 
 	@Override
-	public boolean isOwnedBy(OfflinePlayer test) { return isOwnedBy(test == null ? null : test.getUniqueId()); }
+	public boolean isOwnedBy(OfflinePlayer test) {
+		return isOwnedBy(test == null ? null : test.getUniqueId());
+	}
 
 	@Override
-	public boolean isOwnedBy(UUID test) { return uuid.equals(test); }
+	public boolean isOwnedBy(UUID test) {
+		return uuid.equals(test);
+	}
 
 }

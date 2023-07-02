@@ -17,7 +17,6 @@ import commons.impl.account.PlayerDefaultAccount;
 import commons.impl.account.PlayerDefaultAccountStorage;
 import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
-import me.vadim.util.menu.Menus;
 import me.vadim.util.menu.MenusKt;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -32,10 +31,11 @@ import java.util.concurrent.Executors;
 public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	private static CommonsPlugin instance;
-	@Getter private final EntityRegistry entityRegistry = new EntityRegistry();
+	@Getter
+	private final EntityRegistry entityRegistry = new EntityRegistry();
 
 	public static CommonsPlugin commons() {
-		if(instance == null)
+		if (instance == null)
 			throw new NullPointerException("Not initialized! Did you accidentally shade in the entire commons lib?");
 		return instance;
 	}
@@ -60,7 +60,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return events.getEventRegistry();
 	}
 
-	public SessionProvider getDatabase(){
+	public SessionProvider getDatabase() {
 		// todo
 //		return PostgreSQLSession::new;
 		return () -> new SQLiteSession(getDataFolder());
@@ -78,7 +78,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	@Override
 	public void enable() {
-		Menus.enable();
+		// Menus.enable();
 		getLogger().info("(enable) commons plugin hello");
 
 		dataStorage = new PlayerDefaultAccountStorage(getDatabase());
@@ -92,7 +92,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	@Override
 	public void disable() {
-		Menus.disable();
+		//Menus.disable();
 		getLogger().info("(disable) commons plugin goodbye");
 		storage.saveAll();
 		pool.shutdownNow();

@@ -9,7 +9,8 @@ import java.util.HashMap;
 
 public class BlockRegistryImpl implements BlockRegistry {
 
-	@Getter private final HashMap<String, AspectHolder> blockMap;
+	@Getter
+	private final HashMap<String, AspectHolder> blockMap;
 
 	public BlockRegistryImpl() {
 		this.blockMap = new HashMap<>();

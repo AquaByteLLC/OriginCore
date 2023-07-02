@@ -13,11 +13,11 @@ import org.bukkit.entity.Player;
  */
 public class TierUp implements Upgrade {
 
-	private final Tier   next;
+	private final Tier next;
 	private final double price;
 
 	public TierUp(Tier next, double price) {
-		this.next  = next;
+		this.next = next;
 		this.price = price;
 	}
 

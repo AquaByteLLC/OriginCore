@@ -29,12 +29,12 @@ public class GenStorage {
 
 	@SneakyThrows
 	public void load() {
-		try(DatabaseSession session = provider.session()) {
+		try (DatabaseSession session = provider.session()) {
 			Dao<Gen, UUID> dao = session.getDAO(Gen.class, UUID.class);
 
 			Iterator<Gen> iterator = dao.queryForAll().iterator();
 			Gen gen;
-			while(iterator.hasNext()) {
+			while (iterator.hasNext()) {
 				gen = iterator.next();
 
 				// gen world is lazily set from uuid field upon getter invokation
@@ -45,13 +45,13 @@ public class GenStorage {
 
 	@SneakyThrows
 	public void save() {
-		try(DatabaseSession session = provider.session()) {
+		try (DatabaseSession session = provider.session()) {
 			Dao<Gen, UUID> dao = session.getDAO(Gen.class, UUID.class);
 			TableUtils.clearTable(session.getConnectionSource(), dao.getDataClass());
 
 			Iterator<Generator> iterator = registry.all();
 			Gen gen;
-			while(iterator.hasNext()) {
+			while (iterator.hasNext()) {
 				gen = (Gen) iterator.next();
 				dao.create(gen);
 			}

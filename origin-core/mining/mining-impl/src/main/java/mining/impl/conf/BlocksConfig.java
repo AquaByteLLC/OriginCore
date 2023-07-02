@@ -8,6 +8,7 @@ public class BlocksConfig extends YamlFile {
 
 	public BlocksConfig(ResourceProvider resourceProvider) {
 		super("blocks.yml", resourceProvider);
+		setDefaultTemplate();
 	}
 
 	@Override

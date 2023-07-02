@@ -30,21 +30,21 @@ public final class PDCUtil {
 	}
 
 	public static Double getDropPrice(ItemStack potentialDrop) {
-		if(!potentialDrop.hasItemMeta()) return null;
+		if (!potentialDrop.hasItemMeta()) return null;
 		PersistentDataContainer pdc = potentialDrop.getItemMeta().getPersistentDataContainer();
 
-		if(pdc.has(DROP_PRICE))
+		if (pdc.has(DROP_PRICE))
 			return pdc.get(DROP_PRICE, PersistentDataType.DOUBLE);
 		else
 			return null;
 	}
 
 	public static void setDropPrice(ItemStack drop, Double newPrice) {
-		if(!drop.hasItemMeta()) throw new IllegalArgumentException("drop");
+		if (!drop.hasItemMeta()) throw new IllegalArgumentException("drop");
 		drop.editMeta(meta -> {
 			PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
-			if(newPrice != null)
+			if (newPrice != null)
 				pdc.set(DROP_PRICE, PersistentDataType.DOUBLE, newPrice);
 			else
 				pdc.remove(DROP_PRICE);
@@ -52,17 +52,17 @@ public final class PDCUtil {
 	}
 
 	public static OfflinePlayer getDropOwner(ItemStack potentialDrop) {
-		if(!potentialDrop.hasItemMeta()) return null;
+		if (!potentialDrop.hasItemMeta()) return null;
 		PersistentDataContainer pdc = potentialDrop.getItemMeta().getPersistentDataContainer();
 
-		if(pdc.has(DROP_OWNER))
+		if (pdc.has(DROP_OWNER))
 			return Bukkit.getOfflinePlayer(PackUtil.bytes2uuid(pdc.get(DROP_OWNER, PersistentDataType.BYTE_ARRAY)));
 		else
 			return null;
 	}
 
 	public static void setDropOwner(ItemStack drop, OfflinePlayer newOwner) {
-		if(!drop.hasItemMeta()) throw new IllegalArgumentException("drop");
+		if (!drop.hasItemMeta()) throw new IllegalArgumentException("drop");
 		drop.editMeta(meta -> {
 			PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
@@ -83,10 +83,10 @@ public final class PDCUtil {
 	private static final NamespacedKey GEN_OWNER = new NamespacedKey("generators", "gen.owner");
 
 	public static Integer getGenTier(ItemStack potentialGen) {
-		if(!potentialGen.hasItemMeta()) return null;
+		if (!potentialGen.hasItemMeta()) return null;
 		PersistentDataContainer pdc = potentialGen.getItemMeta().getPersistentDataContainer();
 
-		if(pdc.has(GEN_TIER))
+		if (pdc.has(GEN_TIER))
 			return pdc.get(GEN_TIER, PersistentDataType.INTEGER);
 		else
 			return null;
@@ -105,17 +105,17 @@ public final class PDCUtil {
 	}
 
 	public static OfflinePlayer getGenOwner(ItemStack potentialGen) {
-		if(!potentialGen.hasItemMeta()) return null;
+		if (!potentialGen.hasItemMeta()) return null;
 		PersistentDataContainer pdc = potentialGen.getItemMeta().getPersistentDataContainer();
 
-		if(pdc.has(GEN_OWNER))
+		if (pdc.has(GEN_OWNER))
 			return Bukkit.getOfflinePlayer(PackUtil.bytes2uuid(pdc.get(GEN_OWNER, PersistentDataType.BYTE_ARRAY)));
 		else
 			return null;
 	}
 
 	public static void setGenOwner(ItemStack gen, OfflinePlayer newOwner) {
-		if(!gen.hasItemMeta()) throw new IllegalArgumentException("gen");
+		if (!gen.hasItemMeta()) throw new IllegalArgumentException("gen");
 		gen.editMeta(meta -> {
 			PersistentDataContainer pdc = meta.getPersistentDataContainer();
 

@@ -6,8 +6,20 @@
     "bypassesPlayerLimit": false
   },
   {
+    "uuid": "497f1223-a24f-4ee4-be6e-c248e8050c8d",
+    "name": "NotZlurpy",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
     "uuid": "dba273aa-d92c-488b-bbdc-ec583c075e4c",
     "name": "who_dat_chungus",
+    "level": 4,
+    "bypassesPlayerLimit": false
+  },
+  {
+    "uuid": "ce74312c-3de9-4bf3-ac27-9561d1dfbe06",
+    "name": "Napkins",
     "level": 4,
     "bypassesPlayerLimit": false
   },

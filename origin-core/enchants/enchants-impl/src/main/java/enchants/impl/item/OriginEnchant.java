@@ -12,9 +12,9 @@ import java.util.List;
 
 public class OriginEnchant implements Enchant {
 
-	private final EnchantKey          key;
+	private final EnchantKey key;
 	private final List<EnchantTarget> targets;
-	private final List<String>        information;
+	private final List<String> information;
 	private final String lore;
 	private final ItemStack menuItem;
 	private final int maxLevel;
@@ -28,24 +28,24 @@ public class OriginEnchant implements Enchant {
 	private final EnchantmentConfiguration config;
 
 	public OriginEnchant(EnchantKey key, List<EnchantTarget> targets,
-						 List<String> information, String lore, ItemStack menuItem,
-						 int maxLevel, double startCost, double maxCost, double startChance, double maxChance,
-						 ProgressionType chanceType, ProgressionType costType,
-						 EventSubscriber handleEnchant, EnchantmentConfiguration config) {
-		this.key           = key;
-		this.targets       = targets;
-		this.information   = information;
-		this.lore          = lore;
-		this.menuItem      = menuItem;
-		this.maxLevel      = maxLevel;
-		this.startCost     = startCost;
-		this.maxCost       = maxCost;
-		this.startChance   = startChance;
-		this.maxChance     = maxChance;
-		this.chanceType    = chanceType;
-		this.costType      = costType;
+	                     List<String> information, String lore, ItemStack menuItem,
+	                     int maxLevel, double startCost, double maxCost, double startChance, double maxChance,
+	                     ProgressionType chanceType, ProgressionType costType,
+	                     EventSubscriber handleEnchant, EnchantmentConfiguration config) {
+		this.key = key;
+		this.targets = targets;
+		this.information = information;
+		this.lore = lore;
+		this.menuItem = menuItem;
+		this.maxLevel = maxLevel;
+		this.startCost = startCost;
+		this.maxCost = maxCost;
+		this.startChance = startChance;
+		this.maxChance = maxChance;
+		this.chanceType = chanceType;
+		this.costType = costType;
 		this.handleEnchant = handleEnchant;
-		this.config        = config;
+		this.config = config;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class OriginEnchant implements Enchant {
 	@Override
 	public boolean targetsItem(Material type) {
 		for (EnchantTarget target : targets)
-			if(target.appliesToType(type))
+			if (target.appliesToType(type))
 				return true;
 		return false;
 	}

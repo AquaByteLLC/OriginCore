@@ -13,22 +13,22 @@ import org.bukkit.entity.Player
  */
 class BuyMenu(plugin: GensPlugin) : GenMenu<Tier>(plugin) {
 
-	@Suppress("UNUSED_ANONYMOUS_PARAMETER")
-	override val menu: MenuList<Tier> = template.toList(queryItems(), transformer = { it.menuItem }) {
-		title = config().buyMenuTitle
+    @Suppress("UNUSED_ANONYMOUS_PARAMETER")
+    override val menu: MenuList<Tier> = template.toList(queryItems(), transformer = { it.menuItem }) {
+        title = config().buyMenuTitle
 
-		next = buttons[NEXT_SLOT]!! to NEXT_SLOT
-		back = buttons[BACK_SLOT]!! to BACK_SLOT
+        next = buttons[NEXT_SLOT]!! to NEXT_SLOT
+        back = buttons[BACK_SLOT]!! to BACK_SLOT
 
-		fill = exclude(*frame())
+        fill = exclude(*frame())
 
-		select = { event, button, tier ->
-			val player = event.whoClicked as Player
-			player.inventory.addItem(tier.getGeneratorItem(player))
-			//todo: econ
-		}
-	}
+        select = { event, button, tier ->
+            val player = event.whoClicked as Player
+            player.inventory.addItem(tier.getGeneratorItem(player))
+            //todo: econ
+        }
+    }
 
-	override fun queryItems(): MutableList<Tier> = conf.open(Tiers::class.java).allTiers()
+    override fun queryItems(): MutableList<Tier> = conf.open(Tiers::class.java).allTiers()
 
 }

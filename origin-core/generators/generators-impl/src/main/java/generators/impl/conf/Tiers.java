@@ -26,9 +26,9 @@ public class Tiers extends YamlFile {
 		this.prov = prov;
 	}
 
-	private       Tier                first;
+	private Tier first;
 	private final Map<Material, Tier> byMaterial = new HashMap<>();
-	private final List<Tier>          byIndex    = new ArrayList<>();
+	private final List<Tier> byIndex = new ArrayList<>();
 
 	public Tier findTier(Material material) {
 		return byMaterial.get(material);
@@ -50,7 +50,7 @@ public class Tiers extends YamlFile {
 	public void load() {
 		super.load();
 
-		ConfigurationAccessor   conf = getConfigurationAccessor().getObject("tiers");
+		ConfigurationAccessor conf = getConfigurationAccessor().getObject("tiers");
 		ConfigurationAccessor[] keys = conf.getChildren();
 
 		Arrays.sort(keys, (k1, k2) -> {
@@ -74,17 +74,17 @@ public class Tiers extends YamlFile {
 		byMaterial.clear();
 		byIndex.clear();
 
-		int  i    = keys.length;
+		int i = keys.length;
 		Tier last = null;
 		for (ConfigurationAccessor child : keys) {
-			ConfigurationAccessor price    = child.getObject("price");
+			ConfigurationAccessor price = child.getObject("price");
 			ConfigurationAccessor material = child.getObject("material");
 
-			Material block   = Material.matchMaterial(material.getString("gen"));
-			Material drop    = Material.matchMaterial(material.getString("drop"));
-			double   sell    = price.getDouble("sell");
-			double   buy     = price.getDouble("buy");
-			Upgrade  upgrade = null;
+			Material block = Material.matchMaterial(material.getString("gen"));
+			Material drop = Material.matchMaterial(material.getString("drop"));
+			double sell = price.getDouble("sell");
+			double buy = price.getDouble("buy");
+			Upgrade upgrade = null;
 
 			if (last != null && !price.has("upgrade")) // non-leaf tier missing upgrade block
 				logError(resourceProvider.getLogger(), price.currentPath() + ".upgrade", "tier upgrade cost");
@@ -100,11 +100,11 @@ public class Tiers extends YamlFile {
 			assert drop != null;
 
 			Placeholder pl = StringPlaceholder.builder()
-											  .set("drop_name", StringUtil.convertToUserFriendlyCase(drop.name()))
-											  .set("drop_price", StringUtil.formatNumber(sell))
-											  .set("buy_price", StringUtil.formatNumber(buy))
-											  .set("gen_tier", StringUtil.formatNumber(i + 1))
-											  .build();
+					.set("drop_name", StringUtil.convertToUserFriendlyCase(drop.name()))
+					.set("drop_price", StringUtil.formatNumber(sell))
+					.set("buy_price", StringUtil.formatNumber(buy))
+					.set("gen_tier", StringUtil.formatNumber(i + 1))
+					.build();
 
 			last = new GenInfo(--i, buy, block, upgrade, new GenDrop(sell, prov.open(Config.class).getGeneratorDrop().format(drop, pl).build()), prov);
 

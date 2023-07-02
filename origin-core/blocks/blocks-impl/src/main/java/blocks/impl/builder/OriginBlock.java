@@ -72,7 +72,8 @@ public class OriginBlock extends BlockAdapter implements FixedAspectHolder {
 
 	@Override
 	public <T> FixedAspectHolder handle(Class<T> eventClazz, Consumer<T> eventConsumer) {
-		if(true) throw new UnsupportedOperationException("this operation is not implemented. none of the eventSubscribers are ever binded");
+		if (true)
+			throw new UnsupportedOperationException("this operation is not implemented. none of the eventSubscribers are ever binded");
 		eventSubscribers.add(new DetachedSubscriber<>(eventClazz, ((context, event) -> eventConsumer.accept(event))));
 		return this;
 	}

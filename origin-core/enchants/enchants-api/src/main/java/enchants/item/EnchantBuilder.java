@@ -31,5 +31,5 @@ public interface EnchantBuilder {
 	EnchantBuilder setCostType(Enchant.ProgressionType type);
 
 	Enchant build(EventSubscriber handleEnchant, EnchantTarget... targets);
-	
+
 }

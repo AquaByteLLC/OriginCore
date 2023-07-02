@@ -11,7 +11,6 @@ public class ProgressRegistryImpl implements ProgressRegistry {
 	private final ConcurrentHashMap<BlockPosition, Boolean> blocksBreaking;
 	private final ConcurrentHashMap<BlockPosition, Double> blockProgress;
 	private final ConcurrentHashMap<BlockPosition, Double> oldBlockProgress;
-
 	public ProgressRegistryImpl() {
 		this.randomIntegers = new ConcurrentHashMap<>();
 		this.blocksBreaking = new ConcurrentHashMap<>();
@@ -31,16 +30,19 @@ public class ProgressRegistryImpl implements ProgressRegistry {
 		oldBlockProgress.remove(pos);
 		oldBlockProgress.put(pos, blockProgress.get(pos));
 	}
+
 	@Nonnull
 	@Override
 	public ConcurrentHashMap<BlockPosition, Double> getBlockProgress() {
 		return blockProgress;
 	}
+
 	@Nonnull
 	@Override
 	public ConcurrentHashMap<BlockPosition, Double> getOldBlockProgress() {
 		return oldBlockProgress;
 	}
+
 	@Nonnull
 	@Override
 	public ConcurrentHashMap<BlockPosition, Boolean> getBlocksBreaking() {

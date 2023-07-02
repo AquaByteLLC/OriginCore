@@ -55,7 +55,7 @@ public class RegionCommands extends BaseCommand {
 	@Subcommand("test")
 	public void test(Player player) {
 		ItemStack stack = ItemStackBuilder.of(Material.STONE_AXE).name("&c&lTesting").build();
-		MiningAPI.getHelper().getBreakSpeed().setSpeed(stack, 100f);
+		MiningAPI.getHelper().getBreakSpeed().setSpeed(stack, 0.2f);
 		player.getInventory().addItem(stack);
 	}
 }

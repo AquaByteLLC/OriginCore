@@ -27,22 +27,27 @@ public class AspectFactoryImpl implements AspectFactory {
 	public Dropable newDropable() {
 		return new Drop(block);
 	}
+
 	@Override
 	public Effectable newEffectable() {
 		return new Effect(block);
 	}
+
 	@Override
 	public Hardenable newHardenable() {
 		return new Harden(block);
 	}
+
 	@Override
 	public Regenable newRegenable() {
 		return new Regeneration(block);
 	}
+
 	@Override
 	public Overlayable newOverlayable() {
 		return new Overlay(block);
 	}
+
 	@Override
 	public Projectable newProjectable() {
 		return new Projection(block);

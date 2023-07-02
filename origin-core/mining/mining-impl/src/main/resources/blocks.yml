@@ -10,10 +10,9 @@ Blocks:
     effects:
       particles:
         type: "DRAGON_BREATH"
-        amount: 3
+        amount: 20
       effect:
         type: "DRAGON_BREATH"
-        data: 1
         radius: 10
     drops:
       diamond:
@@ -23,40 +22,3 @@ Blocks:
         data: 0
         lore:
           - "&aThis is a dragon stone diamond."
-      ruby:
-        material: "REDSTONE_BLOCK"
-        itemName: "&cDragonStoneRuby"
-        glowing: false
-        data: 0
-        lore:
-          - "&aThis is a dragon stone ruby"
-  dragonStone:
-    blockName: "DragonStone"
-    regenTime: 10
-    hardnessMultiplier: 500
-    modelData: 0
-    hasParticle: false
-    hasEffect: false
-    effects:
-      particles:
-        type: "DRAGON_BREATH"
-        amount: 3
-      effect:
-        type: "DRAGON_BREATH"
-        data: 1
-        radius: 10
-    drops:
-      diamond:
-        material: "DIAMOND"
-        itemName: "&cDragonStoneDiamond"
-        glowing: true
-        data: 0
-        lore:
-          - "&aThis is a dragon stone diamond."
-      ruby:
-        material: "REDSTONE_BLOCK"
-        itemName: "&cDragonStoneRuby"
-        glowing: false
-        data: 0
-        lore:
-          - "&aThis is a dragon stone ruby"

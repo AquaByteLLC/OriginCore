@@ -17,6 +17,7 @@ import java.util.UUID;
 public interface GeneratorRegistry {
 
 	void createGen(Generator generator);
+
 	void deleteGen(Generator generator);
 
 	@Nullable Generator getGenAt(Location location);

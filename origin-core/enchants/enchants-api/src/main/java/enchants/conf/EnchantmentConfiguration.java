@@ -19,12 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 public class EnchantmentConfiguration {
-	@Getter private final YamlConfiguration configuration;
+	@Getter
+	private final YamlConfiguration configuration;
 	private static final HashMap<String, YamlConfiguration> configurations = new HashMap<>();
 	private static final HashMap<String, File> enchantFiles = new HashMap<>();
-	
+
 	private final String enchantKey;
-	
+
 	public EnchantmentConfiguration(JavaPlugin plugin, String enchantKey) throws IOException {
 		this.enchantKey = enchantKey;
 		final File enchantFile = new File(plugin.getDataFolder(), enchantKey + ".yml");
@@ -94,16 +95,16 @@ public class EnchantmentConfiguration {
 			if (configuration.isConfigurationSection(enchantsSectionReplaced)) return;
 
 			final ConfigurationSection enchantsSection = getOrCreate(configuration, enchantsSectionReplaced);
-			final ConfigurationSection baseSection     = getOrCreate(configuration, baseSectionReplaced);
-			final ConfigurationSection costSection     = getOrCreate(configuration, costSectionReplaced);
-			final ConfigurationSection menuSection     = getOrCreate(configuration, menuSectionReplaced);
-			final ConfigurationSection chanceSection   = getOrCreate(configuration, chanceSectionReplaced);
+			final ConfigurationSection baseSection = getOrCreate(configuration, baseSectionReplaced);
+			final ConfigurationSection costSection = getOrCreate(configuration, costSectionReplaced);
+			final ConfigurationSection menuSection = getOrCreate(configuration, menuSectionReplaced);
+			final ConfigurationSection chanceSection = getOrCreate(configuration, chanceSectionReplaced);
 
 			assert enchantsSection != null;
-			assert baseSection     != null;
-			assert costSection     != null;
-			assert menuSection     != null;
-			assert chanceSection   != null;
+			assert baseSection != null;
+			assert costSection != null;
+			assert menuSection != null;
+			assert chanceSection != null;
 
 			baseSection.set(getAsRelative(lorePath), "%name% -> %level%");
 			baseSection.set(getAsRelative(descriptionPath), List.of("Description of the enchant", "This enchant is super cool"));
@@ -146,6 +147,7 @@ public class EnchantmentConfiguration {
 		final String descriptionPath = EnchantConfigPaths.getAndReplace(path, enchantKey);
 		return configuration.getStringList(descriptionPath);
 	}
+
 	public Enchant.ProgressionType getChanceType() {
 		final String path = EnchantConfigPaths.chanceTypePath;
 		final String chanceTypePath = EnchantConfigPaths.getAndReplace(path, enchantKey);

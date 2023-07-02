@@ -12,6 +12,7 @@ public class RegionRegistryImpl implements RegionRegistry {
 	public RegionRegistryImpl() {
 		this.regions = new HashMap<>();
 	}
+
 	@Override
 	public void createRegion(String wgID, OriginRegion.RegionInstance instance) {
 		regions.put(wgID, instance);

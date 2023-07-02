@@ -7,7 +7,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 public class BlocksConfig extends YamlFile {
 
-	@Getter private final YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
+	@Getter
+	private final YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
 
 	public BlocksConfig(ResourceProvider resourceProvider) {
 		super("blocks.yml", resourceProvider);

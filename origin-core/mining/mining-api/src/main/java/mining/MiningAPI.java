@@ -30,12 +30,14 @@ public class MiningAPI {
 	}
 
 	public static YamlConfiguration getGeneralConfig() {
-		if (generalConfig == null) throw new RuntimeException("The MiningAPI hasn't been initialized anywhere. Create a new instance of the MiningAPI class in the 'onEnable' method.");
+		if (generalConfig == null)
+			throw new RuntimeException("The MiningAPI hasn't been initialized anywhere. Create a new instance of the MiningAPI class in the 'onEnable' method.");
 		return generalConfig;
 	}
 
 	public static BlockAnimHelper getHelper() {
-		if (helper == null)  throw new RuntimeException("The MiningAPI hasn't been initialized correctly. Create a new instance of the MiningAPI class in the 'onEnable' method and map the helper.");
+		if (helper == null)
+			throw new RuntimeException("The MiningAPI hasn't been initialized correctly. Create a new instance of the MiningAPI class in the 'onEnable' method and map the helper.");
 		return helper;
 	}
 
@@ -45,7 +47,7 @@ public class MiningAPI {
 	}
 
 	public static void map(BossBar bossBar) {
-		helper = new BlockAnimHelper(bossBar);
+		helper = new BlockAnimHelper();
 		Schedulers.bukkit().runTaskTimer(injector.getInstance(JavaPlugin.class), $ -> {
 			helper.progression();
 		}, 1, 1);

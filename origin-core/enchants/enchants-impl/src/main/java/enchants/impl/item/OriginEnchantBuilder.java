@@ -16,8 +16,8 @@ import java.util.List;
 public class OriginEnchantBuilder implements EnchantBuilder {
 
 	private final EnchantKey key;
-	private EnchantTarget[]  targets;
-	private String           lore;
+	private EnchantTarget[] targets;
+	private String lore;
 	private List<String> information;
 	private int maxLevel;
 	private ItemStack menuItem;
@@ -36,16 +36,16 @@ public class OriginEnchantBuilder implements EnchantBuilder {
 
 		this.config = new EnchantmentConfiguration(EnchantAPI.get().getInstance(JavaPlugin.class), enchantName);
 
-		this.lore        = config.getEnchantLore();
+		this.lore = config.getEnchantLore();
 		this.information = config.getDescription();
-		this.maxLevel    = config.getMaxLevel();
-		this.menuItem    = config.getMenuItem();
-		this.startCost   = config.getStartCost();
-		this.maxCost     = config.getMaxCost();
+		this.maxLevel = config.getMaxLevel();
+		this.menuItem = config.getMenuItem();
+		this.startCost = config.getStartCost();
+		this.maxCost = config.getMaxCost();
 		this.startChance = config.getStartChance();
-		this.maxChance   = config.getMaxChance();
-		this.chanceType  = config.getChanceType();
-		this.costType    = config.getCostType();
+		this.maxChance = config.getMaxChance();
+		this.chanceType = config.getChanceType();
+		this.costType = config.getCostType();
 	}
 
 	public EnchantBuilder setLore(String lore) {

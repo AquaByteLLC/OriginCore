@@ -25,7 +25,7 @@ tiers:
     material:
       gen: IRON_BLOCK
       drop: IRON_INGOT
-      
+
   4:
     price:
       sell: 100

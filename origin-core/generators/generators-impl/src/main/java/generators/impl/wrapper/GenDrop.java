@@ -14,7 +14,7 @@ public class GenDrop implements Drop {
 
 	public GenDrop(double sellPrice, ItemStack drop) {
 		this.sellPrice = sellPrice;
-		this.drop      = drop.clone();
+		this.drop = drop.clone();
 	}
 
 	@Override

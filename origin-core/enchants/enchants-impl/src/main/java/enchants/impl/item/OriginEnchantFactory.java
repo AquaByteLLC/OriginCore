@@ -1,15 +1,12 @@
 package enchants.impl.item;
 
-import enchants.item.EnchantFactory;
 import enchants.EnchantKey;
 import enchants.item.EnchantBuilder;
+import enchants.item.EnchantFactory;
 import enchants.item.EnchantedItem;
 import me.lucko.helper.item.ItemStackBuilder;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.function.Consumer;
 
@@ -36,8 +33,6 @@ public class OriginEnchantFactory implements EnchantFactory {
 	public EnchantBuilder newEnchantBuilder(EnchantKey key) {
 		return new OriginEnchantBuilder(key);
 	}
-
-
 
 
 }

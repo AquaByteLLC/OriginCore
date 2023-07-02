@@ -12,9 +12,12 @@ public enum AspectType {
 	PROJECTABLE("projectable"),
 	DROPABLE("drop");
 
-	@Getter private final String name;
+	@Getter
+	private final String name;
 
-	AspectType(String name) { this.name = name; }
+	AspectType(String name) {
+		this.name = name;
+	}
 
 
 }

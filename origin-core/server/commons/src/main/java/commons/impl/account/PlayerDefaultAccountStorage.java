@@ -21,7 +21,7 @@ public class PlayerDefaultAccountStorage extends ORMLiteAccountStorage<PlayerDef
 	@Override
 	protected PlayerDefaultAccount load(UUID uuid, Dao<PlayerDefaultAccount, UUID> dao) throws SQLException {
 		PlayerDefaultAccount account = dao.queryForId(uuid);
-		if(account == null)
+		if (account == null)
 			account = factory.create(uuid);
 		return account;
 	}

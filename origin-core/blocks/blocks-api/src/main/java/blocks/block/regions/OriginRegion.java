@@ -18,14 +18,15 @@ public record OriginRegion(String regionID, String allowedBlock, World world) {
 	@Getter
 	public static final class RegionInstance {
 
-		private final         OriginRegion    region;
-		private final         String          block;
-		@Getter private final ProtectedRegion wgRegion;
-		private static final  RegionRegistry  registry = BlocksAPI.getInstance().getRegionRegistry();
+		private final OriginRegion region;
+		private final String block;
+		@Getter
+		private final ProtectedRegion wgRegion;
+		private static final RegionRegistry registry = BlocksAPI.getInstance().getRegionRegistry();
 
 		public RegionInstance(OriginRegion region, String block) {
 			this.region = region;
-			this.block  = block;
+			this.block = block;
 			final RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
 			System.out.println(region.regionID);
 			System.out.println(region.regionID);
