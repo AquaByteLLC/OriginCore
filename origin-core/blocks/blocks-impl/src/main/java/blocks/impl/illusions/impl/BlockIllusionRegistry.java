@@ -8,6 +8,7 @@ import blocks.block.util.PlayerInteraction;
 import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
+import commons.util.ReflectUtil;
 import commons.util.reflect.FieldAccess;
 import commons.util.reflect.Reflection;
 import net.minecraft.core.SectionPosition;
@@ -125,7 +126,7 @@ class BlockIllusionRegistry implements IllusionRegistry {
 
 	@Subscribe
 	void click(EventContext context, PacketPlayInUseEntity packet) throws Throwable {
-		if(!receiver.appliesTo(context.getPlayer())) return;
+		if (!receiver.appliesTo(context.getPlayer())) return;
 		Player player = context.getPlayer();
 
 		class adapter implements PacketPlayInUseEntity.c {
@@ -147,8 +148,8 @@ class BlockIllusionRegistry implements IllusionRegistry {
 			 */
 			@Override
 			public void a(EnumHand enumHand) {
-				if(enumHand != EnumHand.a) return; // MAIN_HAND
-				if(callback != null)
+				if (enumHand != EnumHand.a) return; // MAIN_HAND
+				if (callback != null)
 					callback.onClick(player, PlayerInteraction.RIGHT_CLICK);
 			}
 
@@ -165,11 +166,17 @@ class BlockIllusionRegistry implements IllusionRegistry {
 			 */
 			@Override
 			public void a() {
-				if(callback != null)
+				if (callback != null)
 					callback.onClick(player, PlayerInteraction.LEFT_CLICK);
 			}
+
 		}
 
-		packet.a(new adapter(PacketPlayInUseEntity_a.get(packet)));
+		try {
+			packet.a(new adapter(PacketPlayInUseEntity_a.get(packet)));
+		} catch (Exception e) {
+			ReflectUtil.serr("Caught exception in ClickCallback!");
+			ReflectUtil.serr(e);
+		}
 	}
 }
