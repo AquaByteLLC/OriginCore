@@ -10,15 +10,12 @@ import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.block.regions.registry.RegionRegistry;
 import blocks.impl.anim.item.BreakSpeed;
-import blocks.impl.illusions.BlockIllusionRegistry;
-import blocks.impl.illusions.IllusionFactoryImpl;
-import blocks.impl.illusions.Illusions;
+import blocks.impl.illusions.impl.Illusions;
 import blocks.impl.registry.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.CommonsPlugin;
-import commons.events.api.EventRegistry;
 import lombok.Getter;
 import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -49,11 +46,9 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider {
 
 	@Override
 	public void onEnable() {
-		EventRegistry events = CommonsPlugin.commons().getEventRegistry();
-
 		this.blockRegistry = new BlockRegistryImpl();
 		this.overlayLocationRegistry = new OverlayRegistryImpl();
-		this.illusions = new Illusions(new IllusionFactoryImpl(), new BlockIllusionRegistry(this, events));
+		this.illusions = new Illusions(this, CommonsPlugin.commons().getEventRegistry());
 		this.regenerationRegistry = new RegenerationRegistryImpl(this, illusions);
 		this.blockLocationRegistry = new LocationRegistryImpl();
 		this.progressRegistry = new ProgressRegistryImpl();

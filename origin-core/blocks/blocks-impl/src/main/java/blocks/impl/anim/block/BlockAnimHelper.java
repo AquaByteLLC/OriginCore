@@ -13,7 +13,7 @@ import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.impl.event.OriginBreakEvent;
-import commons.events.impl.impl.PacketEventListener;
+import commons.util.BukkitUtil;
 import commons.util.reflect.FieldAccess;
 import commons.util.reflect.Reflection;
 import lombok.Getter;
@@ -63,7 +63,7 @@ public class BlockAnimHelper {
 				}
 
 				PacketPlayOutBlockBreakAnimation packet = new PacketPlayOutBlockBreakAnimation(registry.getRandomIntegers().get(blockPosition), blockPosition, (progressInt / 10));
-				PacketEventListener.sendPacket(player, packet);
+				BukkitUtil.sendPacket(player, packet);
 			}
 		}
 	}
@@ -162,7 +162,7 @@ public class BlockAnimHelper {
 			registry.resetAll(blockPosition);
 			int randomInts = registry.getRandomIntegers().get(blockPosition) != null ? registry.getRandomIntegers().get(blockPosition) : new Random().nextInt(999999999);
 			PacketPlayOutBlockBreakAnimation packet = new PacketPlayOutBlockBreakAnimation(randomInts, blockPosition, 0);
-			PacketEventListener.sendPacket(player, packet);
+			BukkitUtil.sendPacket(player, packet);
 		}
 		bossBar.removePlayer(player);
 	}

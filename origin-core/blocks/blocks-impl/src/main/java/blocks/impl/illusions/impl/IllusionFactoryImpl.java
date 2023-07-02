@@ -1,4 +1,4 @@
-package blocks.impl.illusions;
+package blocks.impl.illusions.impl;
 
 import blocks.block.util.ClickCallback;
 import blocks.block.illusions.BlockOverlay;
@@ -12,6 +12,7 @@ import org.bukkit.block.data.BlockData;
 /**
  * @author vadim
  */
+@Deprecated(forRemoval = true)
 public class IllusionFactoryImpl implements IllusionFactory {
 
 	@Override
@@ -35,7 +36,7 @@ public class IllusionFactoryImpl implements IllusionFactory {
 
 	@Override
 	public FakeBlock newCustomBlock(Location location, BlockData projected, BlockOverlay overlay) {
-		return new PacketBasedFakeBlock(location, projected, overlay);
+		return new PacketBasedFakeBlock(location, projected, (FallingBlockOverlay) overlay);
 	}
 
 	@Override

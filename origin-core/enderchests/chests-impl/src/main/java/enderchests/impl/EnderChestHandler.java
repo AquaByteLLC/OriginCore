@@ -73,7 +73,7 @@ public class EnderChestHandler implements Listener {
 			//todo: add item
 			ChestNetwork net   = registry.getNetwork(account.temp, player);
 			LinkedChest  chest = registry.createChest(net, block.getLocation(), ((Directional) data).getFacing());
-			illusions.registry().register(chest);
+			illusions.globalRegistry().register(chest);
 			block.setType(Material.CHEST);
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				player.sendBlockChange(block.getLocation(), chest.getProjectedBlockData());

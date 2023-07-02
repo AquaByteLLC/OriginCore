@@ -28,12 +28,35 @@ import org.bukkit.entity.Player;
 @CommandAlias("illusion")
 public class IllusionCommand extends BaseCommand {
 
-	private final IllusionRegistry registry;
-	private final IllusionFactory factory;
+	private final IllusionsAPI api;
+	boolean global = true;
 
 	public IllusionCommand(IllusionsAPI api) {
-		this.registry = api.registry();
-		this.factory  = api.factory();
+		this.api = api;
+	}
+
+	private IllusionRegistry registry(Player player) {
+		if(global)
+			return api.globalRegistry();
+		else
+			return api.localRegistry(player);
+	}
+
+	@Subcommand("querymode")
+	void pero(Player sender) {
+		sender.sendMessage(global ? "in global illusion mode" : "in local player mode");
+	}
+
+	@Subcommand("setlocalmode")
+	void loco(Player sender) {
+		global = false;
+		sender.sendMessage("Now in local player mode");
+	}
+
+	@Subcommand("setglobalmode")
+	void contigo(Player sender) {
+		global = true;
+		sender.sendMessage("Now in global illusion mode");
 	}
 
 	@Subcommand("fakeblock")
@@ -53,9 +76,9 @@ public class IllusionCommand extends BaseCommand {
 		if(data instanceof Directional directional && face != null)
 			directional.setFacing(face);
 
-		FakeBlock fake = factory.newFakeBlock(block.getLocation(), data);
+		FakeBlock fake = api.newIllusionBuilder().fakeProjectedBlockData(data).build(block.getLocation());
 
-		registry.register(fake);
+		registry(sender).register(fake);
 		sender.sendBlockChange(fake.getBlockLocation(), fake.getProjectedBlockData());
 		sender.sendMessage("done");
 	}
@@ -76,8 +99,11 @@ public class IllusionCommand extends BaseCommand {
 		}
 
 		Location location = block.getLocation();
-		FakeBlock fake = factory.newHighlightedBlock(location, color, (Player player, PlayerInteraction click) -> chestToggle(player, click, location));
-		registry.register(fake);
+		FakeBlock fake = api.newIllusionBuilder()
+							.overlayHighlightColor(color)
+							.overlayClickCallback((Player player, PlayerInteraction click) -> chestToggle(player, click, location))
+							.build(location);
+		registry(sender).register(fake);
 	}
 
 	@Subcommand("overlay")
@@ -89,42 +115,30 @@ public class IllusionCommand extends BaseCommand {
 		}
 
 		Location location = block.getLocation();
-		FakeBlock fake = factory.newOverlayedBlock(location, material.createBlockData(), (Player player, PlayerInteraction click) -> chestToggle(player, click, location));
-		registry.register(fake);
+		FakeBlock fake = api.newIllusionBuilder()
+							.overlayData(material.createBlockData())
+							.overlayClickCallback((Player player, PlayerInteraction click) -> chestToggle(player, click, location))
+							.build(location);
+		registry(sender).register(fake);
 	}
 
 	@Subcommand("reset")
 	void del(Player sender) {
-		boolean did = false;
-
 		Block block = sender.getTargetBlockExact(10);
-		if(block != null) {
-			if(unset(sender, block.getLocation())) {
-				sender.sendBlockChange(block.getLocation(), block.getBlockData());
-				did = true;
-			}
+		if(block == null) {
+			sender.sendMessage("look at a block ._.");
+			return;
 		}
 
-		Entity entity = sender.getTargetEntity(10, true);
-		if(entity instanceof FallingBlock fb) {
-			if(registry.isOverlayEntity(fb) && unset(sender, entity.getLocation())) {
-				entity.remove();
-				did = true;
-			}
-		}
-
-		if(!did)
-			sender.sendMessage("bruh '_'");
-		else
-			sender.sendMessage("done");
-	}
-
-	private boolean unset(Player sender, Location location) {
+		IllusionRegistry registry = registry(sender);
+		Location location = block.getLocation();
 		FakeBlock fake = registry.getBlockAt(location);
-		if(fake == null)
-			return false;
+		if(fake == null) {
+			sender.sendMessage("dat thing is real");
+			return;
+		}
 		registry.unregister(fake);
-		return true;
+		sender.sendMessage("done");
 	}
 
 }

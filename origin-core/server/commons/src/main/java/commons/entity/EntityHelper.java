@@ -3,7 +3,7 @@ package commons.entity;
 import com.google.common.collect.ConcurrentHashMultiset;
 import commons.CommonsPlugin;
 import commons.entity.interfaces.Tickable;
-import commons.events.impl.impl.PacketEventListener;
+import commons.util.BukkitUtil;
 import me.lucko.helper.Schedulers;
 import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity;
 import net.minecraft.world.entity.Entity;
@@ -73,7 +73,7 @@ public class EntityHelper {
 		public void spawnEntity(Player... players) {
 			final PacketPlayOutSpawnEntity packetPlayOutSpawnEntity = new PacketPlayOutSpawnEntity(this.entity);
 			for (final Player player : players) {
-				PacketEventListener.sendPacket(player, packetPlayOutSpawnEntity);
+				BukkitUtil.sendPacket(player, packetPlayOutSpawnEntity);
 			}
 		}
 

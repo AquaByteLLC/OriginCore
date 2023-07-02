@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @author vadim
  */
-public interface BlockOverlay extends BlockLike {
+public interface BlockOverlay extends BlockLike, Illusion {
 
 	@Nullable ChatColor getHighlightColor();
 
@@ -20,8 +20,5 @@ public interface BlockOverlay extends BlockLike {
 	BlockData getOverlayData();
 
 	ClickCallback getCallback();
-
-	@ApiStatus.Internal
-	FallingBlock spawnNew();
 
 }

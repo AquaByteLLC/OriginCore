@@ -14,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandle;
+import java.sql.Ref;
 
 /**
  * Listener that {@linkplain EventRegistry#publish(EventContext, Object) publishes} Bukkit events.
@@ -44,23 +45,27 @@ public class BukkitEventListener<T extends Event> implements EventListener, Even
 	@Override
 	@SneakyThrows
 	public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
+		if(events == null) return;
 		if(!clazz.isInstance(event)) return; // Paper impl has this =P
 		try {
-			if (events != null) {
-				ContextBuilder builder = events.prepareContext();
-				if (event instanceof Cancellable cancellable)
-					builder.withInitialCancelledState(cancellable.isCancelled());
+			ContextBuilder builder = events.prepareContext();
+			boolean initialCancelState;
+			if (event instanceof Cancellable cancellable)
+				initialCancelState = cancellable.isCancelled();
+			else
+				initialCancelState = false;
+			builder.withInitialCancelledState(initialCancelState);
 
-				MethodHandle[] getters = ReflectUtil.getPublicMethodsByReturnType(event.getClass(), Player.class); // this method is cached
-				if (getters.length >= 1) // involves a player, let's try to get it
-					builder.withPlayer((Player) getters[0].invoke(event));
+			MethodHandle[] getters = ReflectUtil.getPublicMethodsByReturnType(event.getClass(), Player.class); // this method is cached
+			if (getters.length >= 1) // involves a player, let's try to get it
+				builder.withPlayer((Player) getters[0].invoke(event));
 
-				EventContext context = builder.build();
-				events.publish(context, event);
-//				System.out.println(event.getClass().getCanonicalName() + " was cancelled " );
-				if (event instanceof Cancellable cancellable)
-					cancellable.setCancelled(context.isCancelled());
-			}
+			EventContext context = builder.build();
+			events.publish(context, event);
+			boolean finalCancelState = context.isCancelled();
+			if (event instanceof Cancellable cancellable)
+				if(initialCancelState != finalCancelState) // due to Bukkit stupidity, isCancelled may not reflect all conditions updated inside setCancelled (see PlayerInteractEvent)
+					cancellable.setCancelled(finalCancelState); // event.setCancelled(event.isCancelled()) may actually change the state so only change it if it has been modified
 		} catch (EventExecutionException e) {
 			ReflectUtil.serr("WARN: exception while processing event " + event.getClass().getCanonicalName());
 			ReflectUtil.serr(e);

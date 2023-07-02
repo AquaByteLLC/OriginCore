@@ -2,7 +2,7 @@ package blocks.impl.anim.entity;
 
 import com.mojang.datafixers.util.Pair;
 import commons.entity.EntityHelper;
-import commons.events.impl.impl.PacketEventListener;
+import commons.util.BukkitUtil;
 import commons.util.reflect.FieldAccess;
 import commons.util.reflect.Reflection;
 import net.minecraft.network.protocol.game.PacketPlayOutEntity;
@@ -34,8 +34,6 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 	private double difY = 0;
 	private double difZ = 0;
 
-	private static final FieldAccess<DataWatcher> am = Reflection.unreflectFieldAccess(Entity.class, "am");
-
 	public BlockEntity(Player owner, World world, Block block, ItemStack item) {
 		super(
 				new EntityArmorStand(world, block.getX() + 0.5, block.getY() + 0.5, block.getZ() + 0.5),
@@ -56,14 +54,14 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 			System.out.println("5");
 			this.spawnEntity(this.owner);
 
-			DataWatcher watcher = am.get((getEntity()).getBukkitEntity().getHandle());
+			DataWatcher watcher = getEntity().aj();
 			final PacketPlayOutEntityEquipment packetPlayOutEntityEquipment = new PacketPlayOutEntityEquipment(this.getEntity().getBukkitEntity().getEntityId(),
 					List.of(Pair.of(EnumItemSlot.f, CraftItemStack.asNMSCopy(this.item))));
 			final PacketPlayOutEntityMetadata packetPlayOutEntityMetadata = new PacketPlayOutEntityMetadata(
 					this.getEntity().getBukkitEntity().getEntityId(), watcher.c());
 
-			PacketEventListener.sendPacket(this.owner, packetPlayOutEntityEquipment);
-			PacketEventListener.sendPacket(this.owner, packetPlayOutEntityMetadata);
+			BukkitUtil.sendPacket(this.owner, packetPlayOutEntityEquipment);
+			BukkitUtil.sendPacket(this.owner, packetPlayOutEntityMetadata);
 		}
 
 		System.out.println("6");
@@ -98,7 +96,7 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 				this.cancel();
 
 				final PacketPlayOutEntityDestroy packetPlayOutEntityDestroy = new PacketPlayOutEntityDestroy(this.getEntity().getBukkitEntity().getEntityId());
-				PacketEventListener.sendPacket(this.owner, packetPlayOutEntityDestroy);
+				BukkitUtil.sendPacket(this.owner, packetPlayOutEntityDestroy);
 				return;
 			}
 		}
@@ -108,7 +106,7 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 				moveX, moveY, moveZ,
 				headRotation, (byte) 0,
 				true);
-		PacketEventListener.sendPacket(this.owner, packetPlayOutRelEntityMoveLook);
+		BukkitUtil.sendPacket(this.owner, packetPlayOutRelEntityMoveLook);
 	}
 
 	@Override

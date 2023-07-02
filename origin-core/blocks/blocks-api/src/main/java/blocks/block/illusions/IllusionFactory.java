@@ -8,6 +8,7 @@ import org.bukkit.block.data.BlockData;
 /**
  * @author vadim
  */
+@Deprecated(forRemoval = true)
 public interface IllusionFactory {
 
 	FakeBlock newFakeBlock(Location location, BlockData projected);

@@ -28,11 +28,15 @@ public class PluginEventRegistry implements EventRegistry {
 
 	@Override
 	public void addSubscriptionHook(Consumer<Class<?>> onSubscribeEvent) {
+		if(onSubscribeEvent == null) throw new IllegalArgumentException("Callback may not be null.");
 		subscriptionHooks.add(onSubscribeEvent);
 	}
 
 	@Override
 	public void subscribeAll(Object listener) {
+		if (listener == null) throw new IllegalArgumentException("Listener may not be null.");
+		unsubscribe(listener);
+
 		Map<Class<?>, List<Method>> methodsByEventType = new HashMap<>();
 		for (Method method : listener.getClass().getDeclaredMethods()) {
 			Subscribe annotation = method.getAnnotation(Subscribe.class);
@@ -71,6 +75,10 @@ public class PluginEventRegistry implements EventRegistry {
 
 	@Override
 	public <T> void subscribeOne(Object listener, Subscriber<T> subscriber, Class<?> eventClass) {
+		if (listener == null) throw new IllegalArgumentException("Listener may not be null.");
+		if (subscriber == null) throw new IllegalArgumentException("Subscriber may not be null.");
+		if (eventClass == null) throw new IllegalArgumentException("Event class may not be null.");
+
 		Subscription subscription = new Subscription();
 		subscription.listener  = new WeakReference<>(listener);
 		subscription.events    = Collections.singleton(eventClass);
@@ -82,8 +90,7 @@ public class PluginEventRegistry implements EventRegistry {
 
 	@Override
 	public void unsubscribe(Object listener) {
-		if (listener == null)
-			throw new IllegalArgumentException("Null listener in #unsubscribe.");
+		if (listener == null) throw new IllegalArgumentException("Listener may not be null.");
 
 		for (List<Subscription> list : subscriptions.values())
 			list.removeIf(subscription -> subscription.listener.refersTo(listener));
@@ -92,6 +99,9 @@ public class PluginEventRegistry implements EventRegistry {
 	@Override
 	@SuppressWarnings("rawtypes,unchecked")
 	public <T> void publish(EventContext context, T event) throws EventExecutionException {
+		if (context == null) throw new IllegalArgumentException("Context may not be null.");
+		if (event == null) throw new IllegalArgumentException("Event may not be null.");
+
 		Class<?>           clazz = event.getClass();
 		List<Subscription> subs  = subscriptions.get(clazz);
 		if (subs != null) {

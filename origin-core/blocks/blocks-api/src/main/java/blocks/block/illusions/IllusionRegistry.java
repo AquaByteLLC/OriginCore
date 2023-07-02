@@ -13,7 +13,4 @@ public interface IllusionRegistry {
 
 	@Nullable FakeBlock getBlockAt(Location location);
 
-	@ApiStatus.Internal
-	boolean isOverlayEntity(FallingBlock block);
-
 }

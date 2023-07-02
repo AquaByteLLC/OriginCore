@@ -3,16 +3,14 @@ package enderchests.impl;
 import blocks.BlocksAPI;
 import blocks.block.illusions.BlockOverlay;
 import blocks.block.util.PlayerInteraction;
-import blocks.impl.illusions.PacketBasedFakeBlock;
+import blocks.impl.illusions.impl.FallingBlockOverlay;
+import blocks.impl.illusions.impl.PacketBasedFakeBlock;
 import commons.util.BukkitUtil;
 import enderchests.ChestNetwork;
 import enderchests.LinkedChest;
 import enderchests.impl.data.EnderChestAccount;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockAction;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
@@ -22,12 +20,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.awt.Color;
 import java.util.UUID;
 
 /**
  * @author vadim
  */
 public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChest {
+
+	private static org.bukkit.Color awt2bukkit(Color color) {
+		return org.bukkit.Color.fromRGB(color.getRed(), color.getGreen(), color.getBlue());
+	}
 
 	private static BlockData blockDataFromFaceParameter(BlockFace face) {
 		Directional data = (Directional) Material.ENDER_CHEST.createBlockData();
@@ -38,23 +41,30 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 		return data;
 	}
 	private final ChestNetwork network;
-	private final BlockOverlay overlay;
+	private final FallingBlockOverlay overlay;
 
 	LinkedEnderChest(Location location, BlockFace face, ChestNetwork network) {
-		super(location, blockDataFromFaceParameter(face));
+		super(location, blockDataFromFaceParameter(face), null);
 		this.network  = network;
-		this.overlay = BlocksAPI.getInstance().getIllusions().factory().newHighlightedOverlay(location, network.getColor().chatColor, (player, click) -> {
+		this.overlay = new FallingBlockOverlay(location, network.getColor().chatColor, Material.GLASS.createBlockData(), (player, click) -> {
 			//todo: sound
 			if(click == PlayerInteraction.RIGHT_CLICK) {
-				open(player);
+				Bukkit.getScheduler().runTask(EnderChestsPlugin.singletonCringe(), () -> open(player));
 			}
 			if(click == PlayerInteraction.LEFT_CLICK) {
 				//break
-				BlocksAPI.getInstance().getIllusions().registry().unregister(this);
-				getBlock().setType(Material.AIR);
-				if(player.getGameMode() != GameMode.CREATIVE)
-					player.getInventory().addItem(new ItemStack(Material.ENDER_CHEST));
-				//todo: item
+				Location loc = getBlockLocation().add(.5, .5, .5);
+				player.playSound(getBlockLocation(), Sound.BLOCK_STONE_BREAK, 1f, 1f);
+				player.spawnParticle(Particle.BLOCK_CRACK, loc, 75, 0.3, 0.3, 0.3, 0.6, Material.ENDER_CHEST.createBlockData());
+				Color net = getNetwork().getColor().toColor();
+				player.spawnParticle(Particle.DUST_COLOR_TRANSITION, loc, 1, new Particle.DustTransition(awt2bukkit(net.brighter()), awt2bukkit(net.darker()), 2));
+				Bukkit.getScheduler().runTask(EnderChestsPlugin.singletonCringe(), () -> {
+					getBlock().setType(Material.AIR);
+					if(player.getGameMode() != GameMode.CREATIVE)
+						player.getInventory().addItem(new ItemStack(Material.ENDER_CHEST));
+					BlocksAPI.getInstance().getIllusions().globalRegistry().unregister(this);
+					//todo: item
+				});
 			}
 		});
 	}
@@ -87,7 +97,7 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 	/* constructor gayness bypass */
 
 	@Override
-	public BlockOverlay getOverlay() {
+	public FallingBlockOverlay getOverlay() {
 		return overlay;
 	}
 

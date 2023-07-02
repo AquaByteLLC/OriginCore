@@ -1,6 +1,5 @@
 package commons.events.impl.impl;
 
-import com.sun.jna.platform.win32.WinBase;
 import commons.events.api.EventContext;
 import commons.events.api.EventExecutionException;
 import commons.events.api.EventRegistry;
@@ -100,6 +99,7 @@ public final class PacketEventListener implements EventListener {
 		 * @return {@code true} to pass along {@code msg}, {@code false} to discard {@code msg}
 		 */
 		private boolean publish(Object msg) {
+			if(events == null) return true;
 			try {
 				if (msg instanceof BundlePacket<?> bundle) { // fire each bundle event separately
 					final List<Object> packets = new ArrayList<>();
@@ -141,10 +141,10 @@ public final class PacketEventListener implements EventListener {
 
 	}
 
-	private static final FieldAccess<NetworkManager> h = Reflection.unreflectFieldAccess(PlayerConnection.class, "h");
+	private static final FieldAccess<NetworkManager> PlayerConnection_h = Reflection.unreflectFieldAccess(PlayerConnection.class, "h");
 
 	public static Channel getChannel(Player player) {
-		return h.get(((CraftPlayer) player).getHandle().b).m;
+		return PlayerConnection_h.get(((CraftPlayer) player).getHandle().b).m;
 	}
 
 	public static void sendPacket(Player player, Packet<?> packet) {
