@@ -58,14 +58,11 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider {
 
 		chestRegistry = new EnderChestRegistry(lfc);
 		accountStorage = new EChestAccountStorage(chestRegistry, lfc, CommonsPlugin.commons().getDatabase());
-		chestHandler  = new EnderChestHandler(this, chestRegistry, accountStorage);
+		chestHandler  = new EnderChestHandler(this, chestRegistry, accountStorage, CommonsPlugin.commons().getEventRegistry());
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new IllusionCommand(BlocksAPI.getInstance().getIllusions()));
 		commands.registerCommand(new EnderChestCommand(chestRegistry, accountStorage));
-
-		EventRegistry events = CommonsPlugin.commons().getEventRegistry();
-		events.subscribeAll(chestHandler);
 	}
 
 	@Override

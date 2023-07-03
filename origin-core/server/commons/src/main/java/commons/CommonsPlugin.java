@@ -22,9 +22,14 @@ import me.vadim.util.menu.MenusKt;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.concurrent.*;
 
 /**
  * @author vadim
@@ -74,6 +79,54 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		com.j256.ormlite.logger.Logger.setGlobalLogLevel(Level.WARNING); // supress spam from TableUtils class
 		DataPersisterManager.registerDataPersisters(new LocationPersister());
 		getDataFolder().mkdirs();
+
+		// 'FUCK YOU' LIST:
+		// Fuck you, underscore11code, inventor of this GAY SHIT: https://github.com/PaperMC/Paper/commit/ed1dc272e65a367cf1e405f9208a42911e4e19ba
+		// Fuck anyone who contributed to this obscenity:
+		//  - Proximyst
+		//	- TheLukeGuy
+		//	- electronicboy
+		//	- jpenilla
+		//	- Machine-Maker
+		//	- kennytv
+		// == Complete list of motherfuckers as of 2023-07-02
+		class gayness_remover extends PrintStream {
+			gayness_remover(@NotNull OutputStream out) {
+				super(out);
+			}
+		}
+		System.setOut(new gayness_remover(System.out));
+		System.setErr(new gayness_remover(System.err));
+		System.out.println("If this message is not prepended by [STDOUT], then the gay-ass paper logger has been disabled.");
+	}
+
+	// we do a little bit of syncronization =P
+
+	private BukkitTask syncer;
+	private final Queue<FutureTask<?>> futures = new ArrayDeque<>();
+
+	public Future<?> sync(Runnable runnable) {
+		FutureTask<?> future = new FutureTask<>(runnable, null);
+		futures.add(future);
+		return future;
+	}
+
+	public <T> Future<T> sync(Callable<T> callable) {
+		FutureTask<T> future = new FutureTask<>(callable);
+		futures.add(future);
+		return future;
+	}
+
+	private void await() {
+		FutureTask<?> future;
+		while((future = futures.poll()) != null) {
+			try {
+				future.run();
+			}  catch (Exception e) {
+				System.err.println("WARN: Problem executing future task:");
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -88,6 +141,8 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		events.enable();
 
 		getEventRegistry().subscribeAll(this);
+
+		syncer = getServer().getScheduler().runTaskTimer(this, this::await, 1L, 1L);
 	}
 
 	@Override
@@ -97,6 +152,8 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		storage.saveAll();
 		pool.shutdownNow();
 		events.disable();
+		syncer.cancel();
+		await();
 	}
 
 	@Subscribe

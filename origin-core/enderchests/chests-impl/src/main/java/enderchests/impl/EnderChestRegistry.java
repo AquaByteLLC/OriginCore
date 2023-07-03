@@ -22,7 +22,7 @@ import java.util.UUID;
  */
 public class EnderChestRegistry implements ChestRegistry {
 
-	private final Map<Long, LinkedChest> chests = new HashMap<>();
+	private final Map<Location, LinkedChest> chests = new HashMap<>();
 	private final Map<UUID, Map<NetworkColor, ChestNetwork>> networks = new HashMap<>();
 	private final ConfigurationProvider conf;
 
@@ -32,7 +32,7 @@ public class EnderChestRegistry implements ChestRegistry {
 
 	@Override
 	public @Nullable LinkedChest getChestAt(Location location) {
-		return chests.get(PackUtil.packLoc(location.getBlock().getLocation()));
+		return chests.get(location.getBlock().getLocation());
 	}
 
 	@Override
@@ -42,13 +42,15 @@ public class EnderChestRegistry implements ChestRegistry {
 
 	@Override
 	public @NotNull LinkedChest createChest(ChestNetwork network, Location location, BlockFace face) {
-		return ((EnderChestNetwork) network).newChest(location, face);
+		LinkedChest chest = ((EnderChestNetwork) network).newChest(location, face);
+		chests.put(chest.getBlockLocation(), chest);
+		return chest;
 	}
 
 	@Override
 	public void deleteChest(LinkedChest chest) {
 		((EnderChestNetwork) chest.getNetwork()).delChest(chest);
-		chests.remove(PackUtil.packLoc(chest.getBlockLocation()));
+		chests.remove(chest.getBlockLocation());
 	}
 
 }

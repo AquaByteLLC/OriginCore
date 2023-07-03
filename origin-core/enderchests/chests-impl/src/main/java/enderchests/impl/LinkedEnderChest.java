@@ -8,6 +8,7 @@ import commons.util.BukkitUtil;
 import enderchests.ChestNetwork;
 import enderchests.LinkedChest;
 import enderchests.impl.data.EnderChestAccount;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockAction;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -26,6 +27,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.awt.Color;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
 /**

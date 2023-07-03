@@ -36,4 +36,23 @@ public class PackUtil {
 		return new UUID(byteBuffer.getLong(), byteBuffer.getLong());
 	}
 
+	// copied & deobf'd from ChunkCoordIntPair
+
+	public static long packChunk(int x, int z) {
+		return (long)x & 0xffffffffL | ((long)z & 0xffffffffL) << 32;
+	}
+
+	public static long packChunk(Location location) {
+		return packChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+	}
+
+	public static int unpackChunkX(long var0) {
+		return (int)(var0 & 0xffffffffL);
+	}
+
+	public static int unpackChunkZ(long var0) {
+		return (int)(var0 >>> 32 & 0xffffffffL);
+	}
+
+
 }

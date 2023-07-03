@@ -80,10 +80,10 @@ public class ReflectUtil {
 		}
 	}
 
-	public static MethodHandle unreflectMethodHandle(Class<?> clazz, String name) {
+	public static MethodHandle unreflectMethodHandle(Class<?> clazz, String name, Class<?>... params) {
 		Method method;
 		try {
-			method = clazz.getDeclaredMethod(name);
+			method = clazz.getDeclaredMethod(name, params);
 			method.setAccessible(true);
 			return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflect(method);
 		} catch (NoSuchMethodException | IllegalAccessException e) {

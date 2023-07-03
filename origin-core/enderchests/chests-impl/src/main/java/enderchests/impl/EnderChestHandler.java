@@ -3,26 +3,35 @@ package enderchests.impl;
 import blocks.BlocksAPI;
 import blocks.block.illusions.IllusionsAPI;
 import commons.data.AccountProvider;
+import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import enderchests.ChestNetwork;
 import enderchests.ChestRegistry;
 import enderchests.LinkedChest;
 import enderchests.NetworkColor;
 import enderchests.impl.data.EnderChestAccount;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.world.level.chunk.Chunk;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.nio.ByteBuffer;
 
 /**
  * @author vadim
@@ -34,20 +43,76 @@ public class EnderChestHandler implements Listener {
 	private final IllusionsAPI illusions;
 	private final AccountProvider<EnderChestAccount> accounts;
 
-	public EnderChestHandler(JavaPlugin plugin, ChestRegistry registry, AccountProvider<EnderChestAccount> accounts) {
+	public EnderChestHandler(JavaPlugin plugin, ChestRegistry registry, AccountProvider<EnderChestAccount> accounts, EventRegistry events) {
 		this.plugin    = plugin;
 		this.registry  = registry;
 		this.illusions = BlocksAPI.getInstance().getIllusions();
 		this.accounts  = accounts;
+		events.subscribeAll(this);
 	}
 
 	@Subscribe
-	void onMove(InventoryMoveItemEvent event) {
-		InventoryHolder holder = event.getDestination().getHolder();
-		if (!(holder instanceof Container container)) return;
+	@SuppressWarnings("DuplicatedCode")
+	void onMoveInto(InventoryMoveItemEvent event) {
+		Inventory into = event.getDestination();
+		Inventory from = event.getSource();
+
+		InventoryHolder holder = into.getHolder();
+		if (!(holder instanceof Chest container)) return;
 
 		LinkedChest chest = registry.getChestAt(container.getLocation());
 		if (chest == null) return;
+
+		event.setCancelled(true);
+		ItemStack item = event.getItem().clone();
+
+		Bukkit.getScheduler().runTaskLater(EnderChestsPlugin.singletonCringe(), () -> {
+			// remove single item
+			from.removeItem(item);
+			chest.getInventory().addItem(item);
+		}, 1L);
+	}
+
+	@Subscribe
+	@SuppressWarnings("DuplicatedCode")
+	void onMoveFrom(InventoryMoveItemEvent event) {
+		Inventory into = event.getDestination();
+		Inventory from = event.getSource();
+
+		InventoryHolder holder = from.getHolder();
+		if (!(holder instanceof Chest container)) return;
+
+		LinkedChest chest = registry.getChestAt(container.getLocation());
+		if (chest == null) return;
+
+		event.setCancelled(true);
+
+		Inventory cI = chest.getInventory();
+
+		if(cI.isEmpty()) return;
+
+		Bukkit.getScheduler().runTaskLater(EnderChestsPlugin.singletonCringe(), () -> {
+			// remove single item
+			ItemStack item = null;
+			ItemStack[] contents = cI.getContents();
+			for (int i = 0; i < contents.length; i++) {
+				ItemStack content = contents[i];
+				if (content != null) {
+					item = content.clone();
+					item.setAmount(1);
+					if(content.getAmount() > 1)
+						content.setAmount(content.getAmount() - 1);
+					else
+						contents[i] = null;
+					break;
+				}
+			}
+			if(item != null) {
+				cI.setContents(contents);
+				into.addItem(item);
+			}
+		}, 1L);
+
 	}
 
 	@Subscribe
@@ -75,10 +140,14 @@ public class EnderChestHandler implements Listener {
 			LinkedChest  chest = registry.createChest(net, block.getLocation(), ((Directional) data).getFacing());
 			illusions.globalRegistry().register(chest);
 			block.setType(Material.CHEST);
+			((Chest) block.getState()).getBlockInventory().addItem(new ItemStack(Material.STONE)); // add dummy item to trigger inventory move event
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				player.sendBlockChange(block.getLocation(), chest.getProjectedBlockData());
 			}, 1L);
+
+//			new Chunk()
+
+//			ClientboundLevelChunkWithLightPacket
 		}
 	}
-
 }

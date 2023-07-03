@@ -33,7 +33,8 @@ import java.util.List;
  */
 public final class PacketEventListener implements EventListener {
 
-	private static final String PIPELINE = "PacketPublisher";
+	private static final String PIPELINE_INCOMING = "incoming.PacketPublisher";
+	private static final String PIPELINE_OUTGOING = "outgoing.PacketPublisher";
 
 	private EventRegistry events;
 
@@ -68,24 +69,40 @@ public final class PacketEventListener implements EventListener {
 	private void inject(Player player) {
 		final Channel channel = getChannel(player);
 
-		PacketInterceptor interceptor = (PacketInterceptor) channel.pipeline().get(PIPELINE);
+		PacketInterceptor interceptor;
 
+		// inject IncomingInterceptor BEFORE the server's packet handler
+		interceptor = (PacketInterceptor) channel.pipeline().get(PIPELINE_INCOMING);
 		if (interceptor == null) {
-			interceptor = new PacketInterceptor(player);
-			channel.pipeline().addBefore("packet_handler", PIPELINE, interceptor);
+			interceptor = new IncomingInterceptor(player);
+			channel.pipeline().addBefore("packet_handler", PIPELINE_INCOMING, interceptor);
+		}
+
+		// inject OutoingInterceptor AFTER the server's packet handler
+		interceptor = (PacketInterceptor) channel.pipeline().get(PIPELINE_OUTGOING);
+		if (interceptor == null) {
+			interceptor = new OutgoingInterceptor(player);
+			channel.pipeline().addAfter("packet_handler", PIPELINE_OUTGOING, interceptor);
 		}
 	}
 
 	private void uninject(Player player) {
 		final Channel channel = getChannel(player);
 
+		// safely remove both PacketInterceptors
 		channel.eventLoop().execute(() -> {
-			if(channel.pipeline().get(PIPELINE) != null)
-				channel.pipeline().remove(PIPELINE);
+			if(channel.pipeline().get(PIPELINE_INCOMING) != null)
+				channel.pipeline().remove(PIPELINE_INCOMING);
+
+			if(channel.pipeline().get(PIPELINE_OUTGOING) != null)
+				channel.pipeline().remove(PIPELINE_OUTGOING);
 		});
 	}
 
-	private final class PacketInterceptor extends ChannelDuplexHandler {
+	/**
+	 * Abstract event publisher, to be registered either before or after the server's ChannelDuplexHandler.
+	 */
+	private abstract class PacketInterceptor extends ChannelDuplexHandler {
 
 		final Player player;
 
@@ -98,7 +115,7 @@ public final class PacketEventListener implements EventListener {
 		/**
 		 * @return {@code true} to pass along {@code msg}, {@code false} to discard {@code msg}
 		 */
-		private boolean publish(Object msg) {
+		protected boolean publish(Object msg) {
 			if(events == null) return true;
 			try {
 				if (msg instanceof BundlePacket<?> bundle) { // fire each bundle event separately
@@ -126,11 +143,15 @@ public final class PacketEventListener implements EventListener {
 				return false;
 			}
 		}
+	}
 
-		@Override
-		public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-			if (publish(msg))
-				super.write(ctx, msg, promise);
+	/**
+	 * ChannelDuplexHandler added <i>before</i> the server's.
+	 */
+	private final class IncomingInterceptor extends PacketInterceptor {
+
+		IncomingInterceptor(Player player) {
+			super(player);
 		}
 
 		@Override
@@ -139,6 +160,22 @@ public final class PacketEventListener implements EventListener {
 				super.channelRead(ctx, msg);
 		}
 
+	}
+
+	/**
+	 * ChannelDuplexHandler added <i>after</i> the server's.
+	 */
+	private final class OutgoingInterceptor extends PacketInterceptor {
+
+		OutgoingInterceptor(Player player) {
+			super(player);
+		}
+
+		@Override
+		public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+			if (publish(msg))
+				super.write(ctx, msg, promise);
+		}
 	}
 
 	private static final FieldAccess<NetworkManager> PlayerConnection_h = Reflection.unreflectFieldAccess(PlayerConnection.class, "h");
