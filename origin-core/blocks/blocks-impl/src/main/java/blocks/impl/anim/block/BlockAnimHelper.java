@@ -13,7 +13,7 @@ import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.impl.BlocksPlugin;
-import blocks.impl.account.BlockAccount;
+import blocks.impl.data.account.BlockAccount;
 import blocks.impl.event.OriginBreakEvent;
 import commons.events.impl.impl.PacketEventListener;
 import commons.util.reflect.FieldAccess;

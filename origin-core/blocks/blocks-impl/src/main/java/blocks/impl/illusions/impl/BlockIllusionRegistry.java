@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
-class BlockIllusionRegistry implements IllusionRegistry {
+public class BlockIllusionRegistry implements IllusionRegistry {
 
 	private final JavaPlugin plugin;
 	private final HashMap<Location, FakeBlock> byLocation = new HashMap<>();

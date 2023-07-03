@@ -5,7 +5,7 @@ import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.block.builder.FixedAspectHolder;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.impl.BlocksPlugin;
-import blocks.impl.account.BlockAccount;
+import blocks.impl.data.account.BlockAccount;
 import commons.events.api.EventContext;
 import commons.events.impl.EventSubscriber;
 import commons.events.impl.impl.DetachedSubscriber;

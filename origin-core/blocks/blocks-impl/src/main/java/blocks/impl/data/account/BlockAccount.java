@@ -1,4 +1,4 @@
-package blocks.impl.account;
+package blocks.impl.data.account;
 
 
 import blocks.impl.registry.ProgressRegistryImpl;
@@ -13,11 +13,10 @@ import org.bukkit.Bukkit;
 
 import java.util.UUID;
 
-@DatabaseTable
+@DatabaseTable(tableName = "blockAccount")
 public class BlockAccount extends AbstractAccount {
 
 	private final RegenerationRegistryImpl regenerationRegistry;
-
 	private final ProgressRegistryImpl progressRegistry;
 	private final BossBar playerBar;
 
@@ -25,7 +24,9 @@ public class BlockAccount extends AbstractAccount {
 		super(null);
 		this.regenerationRegistry = new RegenerationRegistryImpl();
 		this.progressRegistry = new ProgressRegistryImpl();
-		this.playerBar = new BukkitBossBarFactory(Bukkit.getServer()).newBossBar().color(BossBarColor.GREEN).style(BossBarStyle.SOLID);
+		this.playerBar = new BukkitBossBarFactory(Bukkit.getServer()).newBossBar()
+				.color(BossBarColor.GREEN)
+				.style(BossBarStyle.SOLID);
 	}
 
 	BlockAccount(UUID uuid) {

@@ -9,12 +9,10 @@ import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.block.regions.registry.RegionRegistry;
-import blocks.impl.account.BlockAccount;
-import blocks.impl.account.BlockAccountStorage;
+import blocks.impl.data.account.BlockAccount;
+import blocks.impl.data.account.BlockAccountStorage;
 import blocks.impl.anim.item.BreakSpeed;
-import blocks.impl.illusions.BlockIllusionRegistry;
-import blocks.impl.illusions.IllusionFactoryImpl;
-import blocks.impl.illusions.Illusions;
+import blocks.impl.illusions.impl.Illusions;
 import blocks.impl.registry.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -58,7 +56,7 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider {
 
 		this.blockRegistry = new BlockRegistryImpl();
 		this.overlayLocationRegistry = new OverlayRegistryImpl();
-		this.illusions = new Illusions(new IllusionFactoryImpl(), new BlockIllusionRegistry(events));
+		this.illusions = new Illusions(this, CommonsPlugin.commons().getEventRegistry());
 		this.regenerationRegistry = new RegenerationRegistryImpl();
 		this.blockLocationRegistry = new LocationRegistryImpl();
 		this.progressRegistry = new ProgressRegistryImpl();

@@ -4,7 +4,7 @@ import blocks.BlocksAPI;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.block.builder.FixedAspectHolder;
 import blocks.impl.BlocksPlugin;
-import blocks.impl.account.BlockAccount;
+import blocks.impl.data.account.BlockAccount;
 import net.minecraft.core.BlockPosition;
 import org.bukkit.Location;
 import org.bukkit.block.Block;

@@ -1,7 +1,6 @@
 package blocks.impl.aspect.effect.type;
 
 import blocks.block.effects.EffectType;
-import me.lucko.helper.utils.Players;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -31,7 +30,7 @@ public class OriginEffect implements EffectType<Effect> {
 		if (type == null) return;
 		Location newLoc = new Location(player.getWorld(),
 				location.getX() + 0.5D, location.getY() + 0.5D, location.getZ() + 0.5D);
-		Players.spawnEffect(player, newLoc, this.type, this.val0);
+		// Players.spawnEffect(player, newLoc, this.type, this.val0);
 		System.out.println("DOING EFFECT");
 	}
 }

@@ -1,4 +1,4 @@
-package mining.impl.commands;
+package farming.impl.commands;
 
 import blocks.block.BlockRegistry;
 import blocks.block.regions.OriginRegion;
@@ -15,15 +15,14 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import farming.impl.Messages;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.text3.Text;
-import mining.MiningAPI;
-import mining.impl.Messages;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-@CommandAlias("mining")
+@CommandAlias("farming")
 public class RegionCommands extends BaseCommand {
 
 	private final BlockRegistry registry;
@@ -82,7 +81,6 @@ public class RegionCommands extends BaseCommand {
 	@Subcommand("test")
 	public void test(Player player) {
 		ItemStack stack = ItemStackBuilder.of(Material.STONE_AXE).name("&c&lTesting").build();
-		MiningAPI.getHelper().getBreakSpeed().setSpeed(stack, 0.2f);
 		player.getInventory().addItem(stack);
 	}
 }

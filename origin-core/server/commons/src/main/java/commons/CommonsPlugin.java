@@ -17,6 +17,7 @@ import commons.impl.account.PlayerDefaultAccount;
 import commons.impl.account.PlayerDefaultAccountStorage;
 import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import me.vadim.util.menu.Menus;
 import me.vadim.util.menu.MenusKt;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -78,7 +79,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	@Override
 	public void enable() {
-		// Menus.enable();
+		Menus.enable();
 		getLogger().info("(enable) commons plugin hello");
 
 		dataStorage = new PlayerDefaultAccountStorage(getDatabase());
@@ -92,7 +93,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	@Override
 	public void disable() {
-		//Menus.disable();
+		Menus.disable();
 		getLogger().info("(disable) commons plugin goodbye");
 		storage.saveAll();
 		pool.shutdownNow();

@@ -1,5 +1,6 @@
-package blocks.impl.account;
+package blocks.impl.data.account;
 
+import blocks.block.regions.registry.RegionRegistry;
 import com.j256.ormlite.dao.Dao;
 import commons.data.ORMLiteAccountStorage;
 import commons.data.SessionProvider;
@@ -9,8 +10,9 @@ import java.util.UUID;
 
 public class BlockAccountStorage extends ORMLiteAccountStorage<BlockAccount> {
 
+
 	public BlockAccountStorage(SessionProvider provider) {
-		super(BlockAccount::new, provider, BlockAccount.class);
+		super(uuid -> new BlockAccount(uuid), provider, BlockAccount.class);
 	}
 
 	@Override

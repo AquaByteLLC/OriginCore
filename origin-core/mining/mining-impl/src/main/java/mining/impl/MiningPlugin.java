@@ -75,7 +75,7 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 		lfc.open(BlocksConfig.class).save();
 
 		Bukkit.getOnlinePlayers().forEach(player ->
-				RegenerationRegistry.cancelRegenerations(
+				RegenerationRegistry.cancelRegenerations(player,
 						blocksPlugin.getAccounts()
 								.getAccount(player)
 								.getRegenerationRegistry()
@@ -99,12 +99,12 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 
 	private void setup() {
 		PaperCommandManager commands = new PaperCommandManager(this);
-		commands.registerCommand(new RegionCommands(blocksAPI.getBlockRegistry()));
+		commands.registerCommand(new RegionCommands(blocksAPI.getBlockRegistry(), blocksAPI.getRegionRegistry()));
 
 		YamlConfiguration conf = lfc.open(BlocksConfig.class).getConfiguration();
 		for (String blockKey : conf.getConfigurationSection("Blocks").getKeys(false)) {
-			String mainPath = "Blocks." + blockKey + ".";
 
+			String mainPath = "Blocks." + blockKey + ".";
 			String blockName = conf.getString(mainPath + "blockName");
 			int customModelData = conf.getInt(mainPath + "modelData");
 			double hardnessMultiplier = conf.getDouble(mainPath + "hardnessMultiplier");

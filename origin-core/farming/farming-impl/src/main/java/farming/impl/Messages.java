@@ -1,4 +1,4 @@
-package mining.impl;
+package farming.impl;
 
 import me.lucko.helper.text3.TextComponent;
 import me.lucko.helper.text3.format.TextColor;
