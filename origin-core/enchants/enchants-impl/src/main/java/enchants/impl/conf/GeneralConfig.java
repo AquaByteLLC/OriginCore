@@ -24,7 +24,7 @@ public class GeneralConfig extends YamlFile {
 	private ItemStack getItem(String path) {
 		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
 
-		String   name = conf.getString("name");
+		String name = conf.getString("name");
 		String[] lore = conf.getStringArray("lore");
 		Material type = Material.matchMaterial(conf.getString("type"));
 
@@ -38,9 +38,9 @@ public class GeneralConfig extends YamlFile {
 	private UnformattedItem getUnformatted(String path) {
 		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
 		Material type = null;
-		if(conf.has("type")) {
+		if (conf.has("type")) {
 			type = Material.matchMaterial(conf.getString("type"));
-			if(type == null)
+			if (type == null)
 				logError(resourceProvider.getLogger(), path + ".type", "item type");
 		}
 		return new UnformattedItem(type, conf.getPlaceholder("name"), Arrays.stream(conf.getStringArray("lore")).map(UnformattedMessage::new).map(PlaceholderMessage.class::cast).toList());
@@ -63,7 +63,7 @@ public class GeneralConfig extends YamlFile {
 		return getUnformatted("menu.button.upgrade");
 	}
 
-	public PlaceholderMessage getEnchantMenuTitle(){
+	public PlaceholderMessage getEnchantMenuTitle() {
 		return getConfigurationAccessor().getObject("menu").getPlaceholder("title");
 	}
 
@@ -75,20 +75,20 @@ public class GeneralConfig extends YamlFile {
 
 		private UnformattedItem(Material material, PlaceholderMessage name, List<PlaceholderMessage> lore) {
 			this.material = material;
-			this.name     = name;
-			this.lore     = lore;
+			this.name = name;
+			this.lore = lore;
 		}
 
 		public ItemBuilder format(Placeholder placeholder) {
-			if(material == null)
+			if (material == null)
 				throw new UnsupportedOperationException("type unset, call #format(Material, Placeholder)");
 			return format(material, placeholder);
 		}
 
 		public ItemBuilder format(Material material, Placeholder placeholder) {
 			return ItemBuilder.create(material)
-							  .displayName(name.format(placeholder))
-							  .lore(lore.stream().map(msg -> msg.format(placeholder)).toList());
+					.displayName(name.format(placeholder))
+					.lore(lore.stream().map(msg -> msg.format(placeholder)).toList());
 		}
 
 	}

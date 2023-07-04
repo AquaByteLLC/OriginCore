@@ -8,12 +8,10 @@ import org.bukkit.entity.Player;
 public class OriginEffect implements EffectType<Effect> {
 
 	private final int val0;
-	private final int val1;
-	private Effect type = Effect.ANVIL_BREAK;
+	private Effect type;
 
-	public OriginEffect(int val0, int val1) {
+	public OriginEffect(int val0) {
 		this.val0 = val0;
-		this.val1 = val1;
 	}
 
 	@Override
@@ -28,13 +26,11 @@ public class OriginEffect implements EffectType<Effect> {
 	}
 
 	@Override
-	public void handleEffect(Player player, Location location, boolean global) {
+	public void handleEffect(Player player, Location location) {
 		if (type == null) return;
-
-		if (global) {
-			player.getWorld().playEffect(location, type, this.val0, this.val1);
-		} else {
-			player.getWorld().playEffect(player.getLocation(), type, this.val0, this.val1);
-		}
+		Location newLoc = new Location(player.getWorld(),
+				location.getX() + 0.5D, location.getY() + 0.5D, location.getZ() + 0.5D);
+		// Players.spawnEffect(player, newLoc, this.type, this.val0);
+		System.out.println("DOING EFFECT");
 	}
 }

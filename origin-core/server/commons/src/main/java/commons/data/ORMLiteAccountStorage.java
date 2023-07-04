@@ -18,13 +18,13 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 	private final Map<UUID, T> cache = new HashMap<>(500);
 
 	protected final AccountFactory<T> factory;
-	protected final SessionProvider   provider;
-	protected final Class<T>          clazz;
+	protected final SessionProvider provider;
+	protected final Class<T> clazz;
 
 	public ORMLiteAccountStorage(AccountFactory<T> factory, SessionProvider provider, Class<T> clazz) {
-		this.factory  = factory;
+		this.factory = factory;
 		this.provider = provider;
-		this.clazz    = clazz;
+		this.clazz = clazz;
 	}
 
 	@Override
@@ -41,10 +41,10 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 	@SneakyThrows
 	public final void flushAndSave() {
 		try (DatabaseSession sesh = provider.session()) {
-			Set<UUID>    online = Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
-			Dao<T, UUID> dao    = sesh.getDAO(clazz, UUID.class);
+			Set<UUID> online = Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toSet());
+			Dao<T, UUID> dao = sesh.getDAO(clazz, UUID.class);
 
-			UUID           uuid;
+			UUID uuid;
 			Iterator<UUID> iter = cache.keySet().iterator();
 			while (iter.hasNext()) {
 				uuid = iter.next();

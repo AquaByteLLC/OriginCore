@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 public abstract class BlockAdapter implements BlockLike {
 
 	private final Location location;
+
 	public BlockAdapter(Location location) {
 		this.location = location == null ? null : location.getBlock().getLocation();
 	}

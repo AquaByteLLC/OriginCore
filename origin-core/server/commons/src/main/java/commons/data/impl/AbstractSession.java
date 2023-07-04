@@ -17,7 +17,7 @@ import java.util.List;
  */
 public abstract class AbstractSession implements DatabaseSession {
 
-	private final ConnectionSource   source;
+	private final ConnectionSource source;
 
 	public AbstractSession(ConnectionSource source) {
 		this.source = source;
@@ -47,7 +47,7 @@ public abstract class AbstractSession implements DatabaseSession {
 	@SneakyThrows
 	public final void close() {
 		for (Dao<?, ?> dao : daos)
-			try(DatabaseConnection connection = source.getReadWriteConnection(dao.getTableName())) {
+			try (DatabaseConnection connection = source.getReadWriteConnection(dao.getTableName())) {
 				table(dao);
 				connection.setAutoCommit(false);
 				dao.commit(connection);

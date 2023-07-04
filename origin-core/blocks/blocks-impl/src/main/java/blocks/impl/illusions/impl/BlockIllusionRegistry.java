@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-class BlockIllusionRegistry implements IllusionRegistry {
+public class BlockIllusionRegistry implements IllusionRegistry {
 
 	private final JavaPlugin plugin;
 	private final Map<Location, FakeBlock> byLocation = new HashMap<>();

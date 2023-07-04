@@ -22,22 +22,22 @@ import java.util.UUID;
 @DatabaseTable
 public class Gen extends PlayerOwned implements Generator {
 
-	private final @DatabaseField Tier     tier;
+	private final @DatabaseField Tier tier;
 	private final @DatabaseField Location location;
-	private final @DatabaseField UUID     world; // ORMLite workaround
+	private final @DatabaseField UUID world; // ORMLite workaround
 
 	private Gen() { // ORMLite
 		super(null);
-		this.tier     = null;
+		this.tier = null;
 		this.location = null;
-		this.world    = null;
+		this.world = null;
 	}
 
 	public Gen(OfflinePlayer owner, Tier tier, Location location) {
 		super(owner.getUniqueId());
-		this.tier     = tier;
+		this.tier = tier;
 		this.location = location.getBlock().getLocation().clone();
-		this.world    = location.getWorld().getUID();
+		this.world = location.getWorld().getUID();
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class Gen extends PlayerOwned implements Generator {
 
 		if (player == null) return UpgradeResult.OWNER_OFFLINE;
 
-		Block   block   = location.getBlock();
+		Block block = location.getBlock();
 		Upgrade upgrade = getCurrentTier().getNextUpgrade();
 		if (upgrade == null) return UpgradeResult.MAX_LEVEL; // max lvl
 

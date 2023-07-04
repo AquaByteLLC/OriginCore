@@ -76,17 +76,18 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 
 	@Subscribe
 	void onRtClick(PlayerInteractEvent event) {
-		if(event.getHand() != EquipmentSlot.HAND) return;
+		if (event.getHand() != EquipmentSlot.HAND) return;
 
 		switch (event.getAction()) {
 			case LEFT_CLICK_AIR, PHYSICAL, LEFT_CLICK_BLOCK -> {
 				return;
 			}
-			default -> {}
+			default -> {
+			}
 		}
 
 		EnchantedItem item = factory.wrapItemStack(event.getItem());
-		if(item == null || !item.isEnchantable()) return;
+		if (item == null || !item.isEnchantable()) return;
 
 		Menu menu = new EnchantMenuImpl(this, item).getMenu();
 		menu.regen();

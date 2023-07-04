@@ -1,0 +1,23 @@
+regenMaterial: AIR
+Blocks:
+  CoolWheat:
+    blockName: "CoolWheat"
+    regenTime: 10
+    modelData: 0
+    hasParticle: true
+    hasEffect: true
+    effects:
+      particles:
+        type: "DRAGON_BREATH"
+        amount: 20
+      effect:
+        type: "DRAGON_BREATH"
+        radius: 10
+    drops:
+      diamond:
+        material: "DIAMOND"
+        itemName: "&cDragonStoneDiamond"
+        glowing: true
+        data: 0
+        lore:
+          - "&aThis is a dragon stone diamond."

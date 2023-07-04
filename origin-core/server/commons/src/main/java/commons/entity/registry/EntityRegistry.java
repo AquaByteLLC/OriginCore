@@ -5,7 +5,8 @@ import commons.entity.EntityHelper;
 import lombok.Getter;
 
 public class EntityRegistry {
-	@Getter private final ConcurrentHashMultiset<EntityHelper.EntityWrapper<?>> entities;
+	@Getter
+	private final ConcurrentHashMultiset<EntityHelper.EntityWrapper<?>> entities;
 
 	public EntityRegistry() {
 		entities = ConcurrentHashMultiset.create();

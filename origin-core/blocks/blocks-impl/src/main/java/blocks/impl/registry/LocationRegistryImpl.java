@@ -20,8 +20,7 @@ public class LocationRegistryImpl implements BlockLocationRegistry {
 
 	@Override
 	public @NotNull FixedAspectHolder createBlock(AspectHolder editor, Location block) {
-		if(editor == null || block == null) throw new IllegalArgumentException("null param in createBlock");
-
+		if (editor == null || block == null) throw new IllegalArgumentException("null param in createBlock");
 		FixedAspectHolder fah = editor.asLocationBased(block);
 		blocks.put(fah.getBlockLocation(), fah);
 		return fah;
@@ -29,13 +28,13 @@ public class LocationRegistryImpl implements BlockLocationRegistry {
 
 	@Override
 	public void deleteBlock(FixedAspectHolder editor) {
-		if(editor == null) return;
+		if (editor == null) return;
 		blocks.remove(editor.getBlockLocation());
 	}
 
 	@Override
 	public void deleteBlock(Location location) {
-		if(location == null) return;
+		if (location == null) return;
 		blocks.remove(location.getBlock().getLocation());
 	}
 

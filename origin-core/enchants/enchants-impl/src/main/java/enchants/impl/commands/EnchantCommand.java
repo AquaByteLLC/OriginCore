@@ -30,8 +30,8 @@ public class EnchantCommand extends BaseCommand {
 	private final EnchantRegistry registry;
 
 	public EnchantCommand(EnchantPlugin plugin, EnchantFactory factory, EnchantRegistry registry) {
-		this.plugin   = plugin;
-		this.factory  = factory;
+		this.plugin = plugin;
+		this.factory = factory;
 		this.registry = registry;
 	}
 
@@ -50,7 +50,6 @@ public class EnchantCommand extends BaseCommand {
 					else text.append(Text.colorize($) + "\n");
 				});
 			}))).build();
-
 			sendables.add(hoverText);
 		}
 
@@ -75,7 +74,7 @@ public class EnchantCommand extends BaseCommand {
 	@Subcommand("menu")
 	public void openMenu(Player player) {
 		EnchantedItem item = arg2item(player);
-		if(item == null) return;
+		if (item == null) return;
 
 		Menu menu = new EnchantMenuImpl(plugin, item).getMenu();
 		menu.regen();
@@ -95,7 +94,7 @@ public class EnchantCommand extends BaseCommand {
 	@CommandPermission("origin.admin.enchants")
 	public void disenchantAll(Player player) {
 		final EnchantedItem enchantedItem = arg2item(player);
-		if(enchantedItem == null) return;
+		if (enchantedItem == null) return;
 
 		enchantedItem.removeAllEnchants();
 		Text.sendMessage(player, Messages.ALL_ENCHANTS_REMOVED);
@@ -112,7 +111,7 @@ public class EnchantCommand extends BaseCommand {
 		}
 
 		final EnchantedItem enchantedItem = arg2item(player);
-		if(enchantedItem == null) return;
+		if (enchantedItem == null) return;
 
 		enchantedItem.removeEnchant(key);
 		Text.sendMessage(player, Messages.ENCHANT_REMOVED);
@@ -130,7 +129,7 @@ public class EnchantCommand extends BaseCommand {
 
 		final Enchant enchant = registry.getByKey(key);
 		final EnchantedItem enchantedItem = arg2item(player);
-		if(enchantedItem == null) return;
+		if (enchantedItem == null) return;
 
 		enchantedItem.addEnchant(key, levelCount);
 		if (levelCount > enchant.getMaxLevel()) Text.sendMessage(player, Messages.ENCHANT_MAX_LEVEL);

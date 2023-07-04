@@ -15,8 +15,12 @@ public class EnchantPlaceholder extends StringPlaceholder {
 		super(format, placeholders);
 	}
 
-	public static Builder builder() { return StringPlaceholder.builder().setFormat(format); }
+	public static Builder builder() {
+		return StringPlaceholder.builder().setFormat(format);
+	}
 
-	public static StringPlaceholder of(String key, String value) { return builder().set(key, value).build(); }
+	public static StringPlaceholder of(String key, String value) {
+		return builder().set(key, value).build();
+	}
 
 }

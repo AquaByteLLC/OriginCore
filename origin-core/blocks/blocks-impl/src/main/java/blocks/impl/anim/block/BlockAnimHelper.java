@@ -12,8 +12,10 @@ import blocks.block.illusions.FakeBlock;
 import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
+import blocks.impl.BlocksPlugin;
+import blocks.impl.data.account.BlockAccount;
 import blocks.impl.event.OriginBreakEvent;
-import commons.util.BukkitUtil;
+import commons.events.impl.impl.PacketEventListener;
 import commons.util.reflect.FieldAccess;
 import commons.util.reflect.Reflection;
 import lombok.Getter;
@@ -35,36 +37,34 @@ import java.util.Random;
 
 public class BlockAnimHelper {
 
-	private final ProgressRegistry registry;
 	private final BlockRegistry blockRegistry;
 	private final IllusionsAPI illusions;
-	private final RegenerationRegistry regenerationRegistry;
-	@Getter private final SpeedAttribute breakSpeed;
-	private final BossBar bossBar;
+	@Getter
+	private final SpeedAttribute breakSpeed;
+	private static final BlocksPlugin plugin = BlocksPlugin.get().getInstance(BlocksPlugin.class);
 
-	public BlockAnimHelper(BossBar bossBar) {
-		this.registry = BlocksAPI.getInstance().getProgressRegistry();
+
+	public BlockAnimHelper() {
 		this.blockRegistry = BlocksAPI.getInstance().getBlockRegistry();
 		this.breakSpeed = BlocksAPI.getInstance().getSpeedAttribute();
-		this.regenerationRegistry = BlocksAPI.getInstance().getRegenerationRegistry();
 		this.illusions = BlocksAPI.getInstance().getIllusions();
-		this.bossBar = bossBar;
 	}
 
-	private void updatePacket() {
-		for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-			for (BlockPosition blockPosition : registry.getBlockProgress().keySet()) {
-				double progress = registry.getBlockProgress().get(blockPosition);
-				int progressInt = (int) progress;
+	private void updatePacket(Player player) {
+		final BlockAccount playerAccount = plugin.getAccounts().getAccount(player);
+		final ProgressRegistry progressRegistry = playerAccount.getProgressRegistry();
 
-				if (!registry.getRandomIntegers().containsKey(blockPosition)) {
-					Random random = new Random(System.currentTimeMillis());
-					registry.getRandomIntegers().put(blockPosition, random.nextInt(1000));
-				}
+		for (BlockPosition blockPosition : progressRegistry.getBlockProgress().keySet()) {
+			double progress = progressRegistry.getBlockProgress().get(blockPosition);
+			int progressInt = (int) progress;
 
-				PacketPlayOutBlockBreakAnimation packet = new PacketPlayOutBlockBreakAnimation(registry.getRandomIntegers().get(blockPosition), blockPosition, (progressInt / 10));
-				BukkitUtil.sendPacket(player, packet);
+			if (!progressRegistry.getRandomIntegers().containsKey(blockPosition)) {
+				Random random = new Random(System.currentTimeMillis());
+				progressRegistry.getRandomIntegers().put(blockPosition, random.nextInt(1000));
 			}
+
+			PacketPlayOutBlockBreakAnimation packet = new PacketPlayOutBlockBreakAnimation(progressRegistry.getRandomIntegers().get(blockPosition), blockPosition, (progressInt / 10));
+			PacketEventListener.sendPacket(player, packet);
 		}
 	}
 
@@ -75,19 +75,24 @@ public class BlockAnimHelper {
 	public void progression() {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player == null) return;
+
 			try {
+				final BlockAccount playerAccount = plugin.getAccounts().getAccount(player);
+				final RegenerationRegistry regenerationRegistry = playerAccount.getRegenerationRegistry();
+				final ProgressRegistry progressRegistry = playerAccount.getProgressRegistry();
+				final BossBar playerBar = playerAccount.getPlayerBar();
+
 				Block block = player.getTargetBlockExact(5);
 				double blockProgress = 0;
 				if (block == null) return;
 
 				BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
 				FixedAspectHolder originBlock = BlocksAPI.getBlock(block.getLocation());
+
 				if (originBlock == null) return;
 
-//				¿ was this supposed to be a distance check ?
-//				->   player.getLocation().distanceSquared(block.getLocation()) >= 12*12
-				if ((player.getLocation().getZ() + 12.0 >= block.getZ()) || (player.getLocation().getX() + 12.0 >= block.getX()) || player.getLocation().getZ() + 12.0 >= block.getZ())
-					cleanup(blockPosition, block, player, blockProgress);
+				if (player.getLocation().distanceSquared(block.getLocation()) >= 16)
+					cleanup(blockPosition, block, player, blockProgress, playerAccount);
 
 				Hardenable hardenable = (Hardenable) originBlock.getAspects().get(AspectType.HARDENABLE);
 				Projectable projectable = (Projectable) originBlock.getAspects().get(AspectType.PROJECTABLE);
@@ -100,7 +105,7 @@ public class BlockAnimHelper {
 
 				double hardnessMultiplier = 1d / (hardenable.getHardnessMultiplier() / 100d);
 
-				if (registry.getBlockBreak(blockPosition)) {
+				if (progressRegistry.getBlockBreak(blockPosition)) {
 					EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
 					final int currentDigTick = currentDigTickField.get(entityPlayer.d);
@@ -110,6 +115,7 @@ public class BlockAnimHelper {
 
 					final ItemStack playerStack = player.getInventory().getItemInMainHand();
 					if (!playerStack.hasItemMeta()) return;
+
 					final PersistentDataContainer container = playerStack.getItemMeta().getPersistentDataContainer();
 					if (!container.has(SpeedAttribute.getKey())) return;
 
@@ -117,25 +123,25 @@ public class BlockAnimHelper {
 					final float newDamage = breakValue * (float) (newDigTick + 1);
 					final double doubleProgress = (newDamage * 100f) * hardnessMultiplier;
 
-					registry.getBlockProgress().remove(blockPosition);
+					progressRegistry.getBlockProgress().remove(blockPosition);
 
 					double oldProgress = 0;
 
-					if (registry.getOldBlockProgress().containsKey(blockPosition)) {
-						oldProgress = registry.getOldBlockProgress().get(blockPosition);
+					if (progressRegistry.getOldBlockProgress().containsKey(blockPosition)) {
+						oldProgress = progressRegistry.getOldBlockProgress().get(blockPosition);
 					}
 
 					if (player.getGameMode() != GameMode.CREATIVE) {
 						blockProgress = doubleProgress + oldProgress;
-						registry.getBlockProgress().put(blockPosition, blockProgress);
+						progressRegistry.getBlockProgress().put(blockPosition, blockProgress);
 					}
 
 					final double bossBarProgress = blockProgress / 100;
 
 					if (blockProgress < 100 && blockProgress > -1) {
-						bossBar.title("&a&lBlock Progress: &f&l" + (Math.round(blockProgress * 100) / 100.0) + "%");
-						bossBar.addPlayer(player);
-						bossBar.progress(bossBarProgress);
+						playerBar.title("&a&lBlock Progress: &f&l" + (Math.round(blockProgress * 100) / 100.0) + "%");
+						playerBar.addPlayer(player);
+						playerBar.progress(bossBarProgress);
 						continue;
 					}
 
@@ -148,23 +154,25 @@ public class BlockAnimHelper {
 					long endTime = (long) (System.currentTimeMillis() + regenable.getRegenTime() * 1000);
 					regenerationRegistry.createRegen(regenable, block, player, endTime);
 					new OriginBreakEvent(block, player).callEvent();
-					cleanup(blockPosition, block, player, blockProgress);
+					cleanup(blockPosition, block, player, blockProgress, playerAccount);
+					updatePacket(player);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		updatePacket();
 	}
 
-	private void cleanup(BlockPosition blockPosition, Block block, Player player, double progress) {
+	private void cleanup(BlockPosition blockPosition, Block block, Player player, double progress, BlockAccount account) {
+		final ProgressRegistry registry = account.getProgressRegistry();
+		final BossBar bar = account.getPlayerBar();
 		if (progress > 0) {
 			registry.resetAll(blockPosition);
 			int randomInts = registry.getRandomIntegers().get(blockPosition) != null ? registry.getRandomIntegers().get(blockPosition) : new Random().nextInt(999999999);
-			PacketPlayOutBlockBreakAnimation packet = new PacketPlayOutBlockBreakAnimation(randomInts, blockPosition, 0);
-			BukkitUtil.sendPacket(player, packet);
+			PacketPlayOutBlockBreakAnimation packet = new PacketPlayOutBlockBreakAnimation(randomInts, blockPosition, -1);
+			PacketEventListener.sendPacket(player, packet);
 		}
-		bossBar.removePlayer(player);
+		bar.removePlayer(player);
 	}
 
 }

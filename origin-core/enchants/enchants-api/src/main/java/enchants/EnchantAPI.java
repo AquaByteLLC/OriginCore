@@ -42,9 +42,9 @@ public final class EnchantAPI {
 		private final EnchantFactory factory;
 
 		EnchantModule(JavaPlugin plugin, EnchantRegistry registry, EnchantFactory factory) {
-			this.plugin   = plugin;
+			this.plugin = plugin;
 			this.registry = registry;
-			this.factory  = factory;
+			this.factory = factory;
 		}
 
 		protected void configure() {

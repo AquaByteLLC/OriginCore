@@ -20,6 +20,7 @@ dependencies {
     compileOnly(Dependencies.WORLD_GUARD)
     compileOnly(project(":commons"))
     compileOnly(project(":enchants-api"))
+    compileOnly(project(":enchants-impl"))
     compileOnly(project(":blocks-api"))
     compileOnly(project(":blocks-impl"))
     implementation(project(":mining-api"))

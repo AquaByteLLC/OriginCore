@@ -12,7 +12,6 @@ import org.bukkit.block.data.BlockData;
 /**
  * @author vadim
  */
-@Deprecated(forRemoval = true)
 public class IllusionFactoryImpl implements IllusionFactory {
 
 	@Override

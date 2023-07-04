@@ -24,7 +24,6 @@ public class GenAccount extends AbstractAccount {
 
 	GenAccount(UUID uuid, GeneratorRegistry registry, ConfigurationProvider conf) {
 		super(uuid);
-
 		this.registry = registry;
 		slotLimit = conf.open(Config.class).getDefaultMaxSlots();
 	}
@@ -32,11 +31,15 @@ public class GenAccount extends AbstractAccount {
 	@DatabaseField
 	public int slotLimit;
 
-	public int getSlotsUsed() { return registry.countGenerators(getOwnerUUID()); }
+	public int getSlotsUsed() {
+		return registry.countGenerators(getOwnerUUID());
+	}
 
-	public boolean isAtSlotLimit() { return getSlotsUsed() >= slotLimit; }
+	public boolean isAtSlotLimit() {
+		return getSlotsUsed() >= slotLimit;
+	}
 
-	public boolean canBulkUpgrade(){
+	public boolean canBulkUpgrade() {
 		return getOfflineOwner().getPlayer().hasPermission("gens.bulk");
 	}
 

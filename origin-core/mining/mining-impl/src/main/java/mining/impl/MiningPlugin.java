@@ -8,12 +8,12 @@ import blocks.block.aspects.projection.Projectable;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.block.builder.EffectHolder;
+import blocks.impl.BlocksPlugin;
 import blocks.impl.aspect.effect.type.OriginEffect;
 import blocks.impl.aspect.effect.type.OriginParticle;
 import blocks.impl.builder.OriginBlock;
 import blocks.impl.factory.BlockFactoryImpl;
 import blocks.impl.factory.EffectFactoryImpl;
-import mining.impl.conf.BlocksConfig;
 import co.aikar.commands.PaperCommandManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -28,10 +28,12 @@ import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import mining.MiningAPI;
-import mining.event.MiningBreakEvent;
 import mining.impl.commands.RegionCommands;
+import mining.impl.conf.BlocksConfig;
 import mining.impl.conf.GeneralConfig;
+import mining.impl.events.MiningEvents;
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -46,6 +48,7 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 	private static Injector injector;
 	private EventRegistry eventRegistry;
 	private BlocksAPI blocksAPI;
+	private BlocksPlugin blocksPlugin;
 	private MiningAPI miningAPI;
 	private LiteConfig lfc;
 
@@ -56,17 +59,27 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.register(BlocksConfig.class, BlocksConfig::new);
 		lfc.reload();
+
 		this.miningAPI = new MiningAPI(this);
 		this.blocksAPI = BlocksAPI.getInstance();
-		injector       = Guice.createInjector(new MiningModule(this, lfc, blocksAPI, miningAPI));
-		MiningBreakEvent.init(eventRegistry);
+		this.blocksPlugin = BlocksPlugin.get().getInstance(BlocksPlugin.class);
+
+		injector = Guice.createInjector(new MiningModule(this, lfc, blocksAPI, miningAPI));
+
+		MiningEvents.init(eventRegistry);
 		setup();
 	}
 
 	@Override
 	protected void disable() {
 		lfc.open(BlocksConfig.class).save();
-		RegenerationRegistry.cancelRegenerations(blocksAPI.getRegenerationRegistry().getRegenerations());
+
+		Bukkit.getOnlinePlayers().forEach(player ->
+				RegenerationRegistry.cancelRegenerations(player,
+						blocksPlugin.getAccounts()
+								.getAccount(player)
+								.getRegenerationRegistry()
+								.getRegenerations()));
 	}
 
 	public GeneralConfig getGeneralConfig() {
@@ -86,68 +99,62 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 
 	private void setup() {
 		PaperCommandManager commands = new PaperCommandManager(this);
-		commands.registerCommand(new RegionCommands(blocksAPI.getBlockRegistry()));
+		commands.registerCommand(new RegionCommands(blocksAPI.getBlockRegistry(), blocksAPI.getRegionRegistry()));
 
 		YamlConfiguration conf = lfc.open(BlocksConfig.class).getConfiguration();
 		for (String blockKey : conf.getConfigurationSection("Blocks").getKeys(false)) {
+
 			String mainPath = "Blocks." + blockKey + ".";
+			String blockName = conf.getString(mainPath + "blockName");
+			int customModelData = conf.getInt(mainPath + "modelData");
+			double hardnessMultiplier = conf.getDouble(mainPath + "hardnessMultiplier");
+			double regenTime = conf.getDouble(mainPath + "regenTime");
+			boolean hasParticles = conf.getBoolean(mainPath + "hasParticle");
+			boolean hasEffect = conf.getBoolean(mainPath + "hasEffect");
 
-			String  blockName          = conf.getString(mainPath + "blockName");
-			int     customModelData    = conf.getInt(mainPath + "modelData");
-			double  hardnessMultiplier = conf.getDouble(mainPath + "hardnessMultiplier");
-			double  regenTime          = conf.getDouble(mainPath + "regenTime");
-			boolean hasParticles       = conf.getBoolean(mainPath + "hasParticle");
-			boolean hasEffect          = conf.getBoolean(mainPath + "hasEffect");
+			final OriginBlock originBlock = new BlockFactoryImpl().newBlock()
+					.setName(blockName)
+					.setModelData(customModelData);
 
-			OriginBlock originBlock = new BlockFactoryImpl().newBlock()
-															.setName(blockName)
-															.setModelData(customModelData);
-
-			Dropable    drop        = originBlock.getFactory().newDropable();
-			Effectable  effectable  = originBlock.getFactory().newEffectable();
-			Hardenable  hardenable  = originBlock.getFactory().newHardenable();
-			Regenable   regenable   = originBlock.getFactory().newRegenable();
-			Projectable projectable = originBlock.getFactory().newProjectable();
+			final Dropable drop = originBlock.getFactory().newDropable();
+			final Effectable effectable = originBlock.getFactory().newEffectable();
+			final Hardenable hardenable = originBlock.getFactory().newHardenable();
+			final Regenable regenable = originBlock.getFactory().newRegenable();
+			final Projectable projectable = originBlock.getFactory().newProjectable();
 
 			hardenable.setHardnessMultiplier(hardnessMultiplier);
 			regenable.setRegenTime(regenTime);
 
 			if (hasParticles) {
 				String particleType = conf.getString(mainPath + "effects.particles.type");
-				int    amount       = conf.getInt(mainPath + "effects.particles.amount");
+				int amount = conf.getInt(mainPath + "effects.particles.amount");
 
 				OriginParticle originParticles = new OriginParticle(amount);
 				originParticles.setType(Particle.valueOf(particleType));
-
 				EffectHolder particleEffect = new EffectFactoryImpl().newEffect();
 				particleEffect.setEffectType(originParticles);
-
 				effectable.addEffect(particleEffect);
 			}
 
 			if (hasEffect) {
 				String effectType = conf.getString(mainPath + "effects.effect.type");
-				int    data       = conf.getInt(mainPath + "effects.effect.data");
-				int    radius     = conf.getInt(mainPath + "effects.effect.radius");
+				int data = conf.getInt(mainPath + "effects.effect.data");
 
-				OriginEffect originEffect = new OriginEffect(data, radius);
-
-				originEffect.setType(org.bukkit.Effect.valueOf(effectType));
-
+				OriginEffect originEffect = new OriginEffect(data);
+				originEffect.setType(Effect.valueOf(effectType));
 				EffectHolder effect = new EffectFactoryImpl().newEffect();
 				effect.setEffectType(originEffect);
-
 				effectable.addEffect(effect);
 			}
 
 			for (String dropKey : conf.getConfigurationSection("Blocks." + blockKey + ".drops").getKeys(false)) {
 				String dropPath = mainPath + "drops." + dropKey + ".";
 
-				String       material = conf.getString(dropPath + "material");
-				String       dropName = conf.getString(dropPath + "itemName");
-				List<String> lore     = conf.getStringList(dropPath + "lore");
-				int          data     = conf.getInt(dropPath + "data");
-				boolean      glowing  = conf.getBoolean(dropPath + "glowing");
+				String material = conf.getString(dropPath + "material");
+				String dropName = conf.getString(dropPath + "itemName");
+				List<String> lore = conf.getStringList(dropPath + "lore");
+				int data = conf.getInt(dropPath + "data");
+				boolean glowing = conf.getBoolean(dropPath + "glowing");
 
 				if (material == null || dropName == null) return;
 
@@ -160,10 +167,11 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 				drop.addDrop(builder.build());
 			}
 
-			projectable.setProjectedBlockData(Material.matchMaterial(conf.getString("regenMaterial")).createBlockData());
+			projectable.setProjectedBlockData(
+					Material.matchMaterial(conf.getString("regenMaterial")).createBlockData()
+			);
 
-			originBlock
-					.createAspect(effectable)
+			originBlock.createAspect(effectable)
 					.createAspect(hardenable)
 					.createAspect(regenable)
 					.createAspect(projectable)
@@ -182,8 +190,8 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 		private final MiningAPI miningApi;
 
 		MiningModule(JavaPlugin plugin, LiteConfig lfc, BlocksAPI blocksAPI, MiningAPI api) {
-			this.plugin    = plugin;
-			this.lfc       = lfc;
+			this.plugin = plugin;
+			this.lfc = lfc;
 			this.blocksAPI = blocksAPI;
 			this.miningApi = api;
 		}

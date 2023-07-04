@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
  */
 public interface IllusionsAPI {
 
-	@Deprecated(forRemoval = true)
 	IllusionFactory factory();
 
 	/**

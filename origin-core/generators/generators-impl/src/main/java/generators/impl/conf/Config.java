@@ -26,11 +26,17 @@ public class Config extends YamlFile {
 		setDefaultTemplate();
 	}
 
-	public long getDropRateTicks() { return Math.round(getConfigurationAccessor().getDouble("drop_rate_seconds") * 20.0); }
+	public long getDropRateTicks() {
+		return Math.round(getConfigurationAccessor().getDouble("drop_rate_seconds") * 20.0);
+	}
 
-	public int getDefaultMaxSlots() { return getConfigurationAccessor().getInt("default_slots"); }
+	public int getDefaultMaxSlots() {
+		return getConfigurationAccessor().getInt("default_slots");
+	}
 
-	public int getAutosaveIntervalTicks() { return getConfigurationAccessor().getInt("autosave_interval_minutes") * 60 * 20; }
+	public int getAutosaveIntervalTicks() {
+		return getConfigurationAccessor().getInt("autosave_interval_minutes") * 60 * 20;
+	}
 
 	public UnformattedItem getGeneratorDrop() {
 		return getUnformatted("drop_item");
@@ -83,9 +89,9 @@ public class Config extends YamlFile {
 	private UnformattedItem getUnformatted(String path) {
 		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
 		Material type = null;
-		if(conf.has("type")) {
+		if (conf.has("type")) {
 			type = Material.matchMaterial(conf.getString("type"));
-			if(type == null)
+			if (type == null)
 				logError(resourceProvider.getLogger(), path + ".type", "item type");
 		}
 		return new UnformattedItem(type, conf.getPlaceholder("name"), Arrays.stream(conf.getStringArray("lore")).map(UnformattedMessage::new).map(PlaceholderMessage.class::cast).toList());
@@ -94,7 +100,7 @@ public class Config extends YamlFile {
 	private ItemStack getItem(String path) {
 		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
 
-		String   name = conf.getString("name");
+		String name = conf.getString("name");
 		String[] lore = conf.getStringArray("lore");
 		Material type = Material.matchMaterial(conf.getString("type"));
 
@@ -120,13 +126,13 @@ public class Config extends YamlFile {
 	public final class UnformattedItem {
 
 		private final Material material;
-		private final PlaceholderMessage       name;
+		private final PlaceholderMessage name;
 		private final List<PlaceholderMessage> lore;
 
 		private UnformattedItem(Material material, PlaceholderMessage name, List<PlaceholderMessage> lore) {
 			this.material = material;
-			this.name     = name;
-			this.lore     = lore;
+			this.name = name;
+			this.lore = lore;
 		}
 
 		private double upgradePrice;
@@ -149,20 +155,20 @@ public class Config extends YamlFile {
 		}
 
 		public ItemBuilder format(Placeholder placeholder) {
-			if(material == null)
+			if (material == null)
 				throw new UnsupportedOperationException("type unset, call #format(Material, Placeholder)");
 			return format(material, placeholder);
 		}
 
 		public ItemBuilder format(Material material, Placeholder placeholder) {
 			Placeholder pl = StringPlaceholder.builder()
-											  .set("price_symbol", Double.isNaN(upgradePrice) ? "" : getGenMenuItemPriceSymbol())
-											  .set("upgrade_price", Double.isNaN(upgradePrice) ? getGenMenuItemMaxLevel() : StringUtil.formatNumber(upgradePrice))
-											  .build();
+					.set("price_symbol", Double.isNaN(upgradePrice) ? "" : getGenMenuItemPriceSymbol())
+					.set("upgrade_price", Double.isNaN(upgradePrice) ? getGenMenuItemMaxLevel() : StringUtil.formatNumber(upgradePrice))
+					.build();
 
 			return ItemBuilder.create(material)
-							  .displayName(pl.format(name.format(placeholder)))
-							  .lore(lore.stream().map(msg -> pl.format(msg.format(placeholder))).toList());
+					.displayName(pl.format(name.format(placeholder)))
+					.lore(lore.stream().map(msg -> pl.format(msg.format(placeholder))).toList());
 		}
 
 	}

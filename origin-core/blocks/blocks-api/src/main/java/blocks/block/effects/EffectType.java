@@ -9,6 +9,6 @@ public interface EffectType<T> {
 
 	EffectType<T> setType(T type);
 
-	void handleEffect(Player player, Location location, boolean global);
+	void handleEffect(Player player, Location location);
 
 }

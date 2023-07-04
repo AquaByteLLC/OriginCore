@@ -19,5 +19,6 @@ dependencies {
     compileOnly(Dependencies.MENUS)
     compileOnly(Dependencies.WORLD_GUARD)
     compileOnly(project(":commons"))
-    implementation(project(":blocks-api"))
+    compileOnly(project(":blocks-api"))
+    compileOnly(project(":blocks-impl"))
 }

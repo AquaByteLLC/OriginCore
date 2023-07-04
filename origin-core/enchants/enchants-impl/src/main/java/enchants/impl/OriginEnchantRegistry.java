@@ -52,8 +52,8 @@ public class OriginEnchantRegistry implements EnchantRegistry {
 	@Override
 	public @NotNull Enchant getByKey(EnchantKey key) {
 		Enchant enchant = enchants.get(key);
-		if(enchant == null)
-			throw new IllegalArgumentException("invalid enchant key "+key);
+		if (enchant == null)
+			throw new IllegalArgumentException("invalid enchant key " + key);
 		return enchant;
 	}
 

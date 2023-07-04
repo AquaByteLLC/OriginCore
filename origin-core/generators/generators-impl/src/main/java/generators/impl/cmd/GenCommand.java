@@ -29,16 +29,16 @@ public class GenCommand extends BaseCommand {
 	private final GensPlugin plugin;
 	private final GenStorage genStorage;
 
-	private final GeneratorRegistry           reg;
-	private final ConfigurationProvider       conf;
+	private final GeneratorRegistry reg;
+	private final ConfigurationProvider conf;
 	private final AccountProvider<GenAccount> accounts;
 
 	public GenCommand(GensPlugin plugin, GenStorage genStorage) {
-		this.plugin     = plugin;
+		this.plugin = plugin;
 		this.genStorage = genStorage;
-		this.reg        = plugin.getRegistry();
-		this.conf       = plugin.getConfiguration();
-		this.accounts   = plugin.getAccounts();
+		this.reg = plugin.getRegistry();
+		this.conf = plugin.getConfiguration();
+		this.accounts = plugin.getAccounts();
 	}
 
 	@Subcommand("setmaxslots")
@@ -69,7 +69,7 @@ public class GenCommand extends BaseCommand {
 			return;
 		}
 
-		Location L  = new Location(sender.getWorld(), 0, 0, 0);
+		Location L = new Location(sender.getWorld(), 0, 0, 0);
 		Location sL = sender.getLocation();
 		double
 				sX = sL.getX(),

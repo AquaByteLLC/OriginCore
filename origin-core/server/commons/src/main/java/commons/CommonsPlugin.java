@@ -37,10 +37,11 @@ import java.util.concurrent.*;
 public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	private static CommonsPlugin instance;
-	@Getter private final EntityRegistry entityRegistry = new EntityRegistry();
+	@Getter
+	private final EntityRegistry entityRegistry = new EntityRegistry();
 
 	public static CommonsPlugin commons() {
-		if(instance == null)
+		if (instance == null)
 			throw new NullPointerException("Not initialized! Did you accidentally shade in the entire commons lib?");
 		return instance;
 	}
@@ -65,7 +66,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return events.getEventRegistry();
 	}
 
-	public SessionProvider getDatabase(){
+	public SessionProvider getDatabase() {
 		// todo
 //		return PostgreSQLSession::new;
 		return () -> new SQLiteSession(getDataFolder());
