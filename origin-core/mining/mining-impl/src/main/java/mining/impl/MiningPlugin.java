@@ -180,6 +180,7 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 			if (blockName == null) return;
 			blocksAPI.getBlockRegistry().createBlock(originBlock);
 		}
+
 		MiningAPI.map(new BukkitBossBarFactory(Bukkit.getServer()).newBossBar().color(BossBarColor.PINK).style(BossBarStyle.SOLID));
 	}
 

@@ -14,7 +14,7 @@ import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.impl.BlocksPlugin;
 import blocks.impl.data.account.BlockAccount;
-import blocks.impl.event.OriginBreakEvent;
+import blocks.impl.events.AbstractBreakEvent;
 import commons.events.impl.impl.PacketEventListener;
 import commons.util.reflect.FieldAccess;
 import commons.util.reflect.Reflection;
@@ -152,8 +152,8 @@ public class BlockAnimHelper {
 					regenable.setFakeBlock(fake);
 
 					long endTime = (long) (System.currentTimeMillis() + regenable.getRegenTime() * 1000);
-					regenerationRegistry.createRegen(regenable, block, player, endTime);
-					new OriginBreakEvent(block, player).callEvent();
+					regenerationRegistry.createRegen(regenable, block);
+					new AbstractBreakEvent(block, player).callEvent();
 					cleanup(blockPosition, block, player, blockProgress, playerAccount);
 					updatePacket(player);
 				}

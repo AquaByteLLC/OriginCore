@@ -12,11 +12,11 @@ import blocks.block.illusions.IllusionFactory;
 import blocks.block.illusions.IllusionRegistry;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.impl.BlocksPlugin;
-import blocks.impl.data.account.BlockAccount;
 import blocks.impl.anim.entity.BlockEntity;
 import blocks.impl.builder.OriginBlock;
-import blocks.impl.event.OriginBreakEvent;
-import blocks.impl.event.OriginRegenerationEvent;
+import blocks.impl.data.account.BlockAccount;
+import blocks.impl.events.AbstractBreakEvent;
+import blocks.impl.events.AbstractRegenEvent;
 import commons.events.api.EventRegistry;
 import commons.events.impl.impl.DetachedSubscriber;
 import commons.events.impl.impl.PacketEventListener;
@@ -50,8 +50,8 @@ import java.util.Random;
 public class MiningEvents {
 
 	private static DetachedSubscriber<PacketPlayInBlockDig> digInPacket;
-	private static DetachedSubscriber<OriginRegenerationEvent> regenEvent;
-	private static DetachedSubscriber<OriginBreakEvent> breakEvent;
+	private static DetachedSubscriber<AbstractRegenEvent> regenEvent;
+	private static DetachedSubscriber<AbstractBreakEvent> breakEvent;
 	private static final FieldAccess<PacketPlayInBlockDig.EnumPlayerDigType> c = Reflection.unreflectFieldAccess(PacketPlayInBlockDig.class, "c");
 	private static final FieldAccess<BlockPosition> a = Reflection.unreflectFieldAccess(PacketPlayInBlockDig.class, "a");
 	private static final BlocksPlugin plugin = BlocksPlugin.get().getInstance(BlocksPlugin.class);
@@ -93,7 +93,7 @@ public class MiningEvents {
 	}
 
 	private static void initBreak() {
-		breakEvent = new DetachedSubscriber<>(OriginBreakEvent.class, (context, event) -> {
+		breakEvent = new DetachedSubscriber<>(AbstractBreakEvent.class, (context, event) -> {
 			Player player = event.getPlayer();
 			Block block = event.getBlock();
 
@@ -101,6 +101,7 @@ public class MiningEvents {
 			if (account == null) return;
 
 			final ProgressRegistry progressRegistry = account.getProgressRegistry();
+			final RegenerationRegistry regenerationRegistry = account.getRegenerationRegistry();
 
 			final List<ItemStack> clonedDrops = new ArrayList<>(block.getDrops());
 			if (clonedDrops.isEmpty()) {
@@ -127,6 +128,23 @@ public class MiningEvents {
 					// TODO: ITEM BACKPACKS?????
 					new BlockEntity(player, nmsWorld, block, drop);
 				});
+
+				Projectable projectable = (Projectable) originBlock.getAspects().get(AspectType.PROJECTABLE);
+
+				if (projectable == null) return;
+				if (projectable.getProjectedBlockData() == null) return;
+
+				FakeBlock fake = projectable.toFakeBlock(originBlock.getBlockLocation());
+				Regenable regenable = (Regenable) originBlock.getAspects().get(AspectType.REGENABLE);
+
+				if (regenable == null) return;
+				if (regenable.getRegenTime() <= 0) return;
+
+				regenable.setFakeBlock(fake);
+
+				long endTime = (long) (System.currentTimeMillis() + regenable.getRegenTime() * 1000);
+				regenerationRegistry.createRegen(regenable, block);
+				new AbstractRegenEvent(regenable, player, block, endTime).callEvent();
 			}
 
 			final BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
@@ -142,7 +160,7 @@ public class MiningEvents {
 	}
 
 	private static void initRegen() {
-		regenEvent = new DetachedSubscriber<>(OriginRegenerationEvent.class, ((context, event) -> {
+		regenEvent = new DetachedSubscriber<>(AbstractRegenEvent.class, ((context, event) -> {
 
 			final BlockAccount account = plugin.getAccounts().getAccount(event.getPlayer());
 			if (account == null) return;
@@ -163,28 +181,9 @@ public class MiningEvents {
 			illusionRegistry.register(fakeBlock);
 			player.sendBlockChange(location, fakeBlock.getProjectedBlockData());
 
-
 			Schedulers.bukkit().runTaskTimer(plugin, bukkitTask -> {
 				if (System.currentTimeMillis() >= event.getEnd()) {
-
-					/*
-					if (blockData instanceof Ageable ageable) {
-						Schedulers.bukkit().runTaskTimer(plugin, runnable -> {
-							if (!(ageable.getAge() == ageable.getMaximumAge())) {
-								ageable.setAge(ageable.getAge() + 1);
-								projectable.setProjectedBlockData(ageable);
-								FakeBlock newFakeBlock = projectable.toFakeBlock(location);
-								illusionRegistry.unregister(regenBlock.getFakeBlock());
-								illusionRegistry.register(newFakeBlock);
-								player.sendBlockChange(location, newFakeBlock.getProjectedBlockData());
-							} else {
-								runnable.cancel();
-							}
-						}, 10, 10);
-					}
-					 */
-
-					regenerationRegistry.deleteRegen(regenBlock);
+					regenerationRegistry.deleteRegen(block);
 					illusionRegistry.unregister(fakeBlock);
 					player.sendBlockChange(location, blockData);
 					bukkitTask.cancel();
