@@ -13,7 +13,7 @@ class ServerPacketReceiver implements PacketReceiver {
 
 	@Override
 	public boolean appliesTo(Player player) {
-		return player.isOnline();
+		return player != null && player.isOnline();
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package blocks.impl.aspect;
 import blocks.block.aspects.AspectType;
 import blocks.block.aspects.BlockAspect;
 import blocks.block.builder.AspectHolder;
-import org.bukkit.Location;
 
 /**
  * @author vadim

@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 /**
@@ -24,7 +25,7 @@ public class PluginEventRegistry implements EventRegistry {
 
 	private final Map<Class<?>, List<Subscription>> subscriptions = new ConcurrentHashMap<>();
 
-	private final List<Consumer<Class<?>>> subscriptionHooks = new ArrayList<>();
+	private final List<Consumer<Class<?>>> subscriptionHooks = new CopyOnWriteArrayList<>();
 
 	@Override
 	public void addSubscriptionHook(Consumer<Class<?>> onSubscribeEvent) {
@@ -65,10 +66,10 @@ public class PluginEventRegistry implements EventRegistry {
 		Subscription subscription = new Subscription();
 		subscription.listener  = new WeakReference<>(listener);
 		subscription.events    = Collections.unmodifiableSet(methodsByEventType.keySet());
-		subscription.callbacks = callbacks;
+		subscription.callbacks = Collections.unmodifiableMap(callbacks);
 
 		for (Class<?> event : subscription.events)
-			subscriptions.computeIfAbsent(event, x -> new ArrayList<>()).add(subscription);
+			getSubscriptions(event).add(subscription);
 
 		invokeSubscriptionHooks(subscription);
 	}
@@ -84,7 +85,7 @@ public class PluginEventRegistry implements EventRegistry {
 		subscription.events    = Collections.singleton(eventClass);
 		subscription.callbacks = Map.of(eventClass, Collections.singletonList(subscriber));
 
-		subscriptions.computeIfAbsent(eventClass, x -> new ArrayList<>()).add(subscription);
+		getSubscriptions(eventClass).add(subscription);
 		invokeSubscriptionHooks(subscription);
 	}
 
@@ -128,6 +129,10 @@ public class PluginEventRegistry implements EventRegistry {
 		for (Consumer<Class<?>> hook : subscriptionHooks)
 			for (Class<?> event : subscription.events)
 				hook.accept(event);
+	}
+
+	private List<Subscription> getSubscriptions(Class<?> eventClass) {
+		return subscriptions.computeIfAbsent(eventClass, x -> new CopyOnWriteArrayList<>());
 	}
 
 }

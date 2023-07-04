@@ -3,15 +3,15 @@ package blocks.impl.factory;
 import blocks.block.aspects.drop.Dropable;
 import blocks.block.aspects.effect.Effectable;
 import blocks.block.aspects.harden.Hardenable;
-import blocks.block.aspects.projection.Projectable;
 import blocks.block.aspects.overlay.Overlayable;
+import blocks.block.aspects.projection.Projectable;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.factory.AspectFactory;
 import blocks.impl.aspect.drop.Drop;
 import blocks.impl.aspect.effect.Effect;
 import blocks.impl.aspect.harden.Harden;
-import blocks.impl.aspect.projection.Projection;
 import blocks.impl.aspect.overlay.Overlay;
+import blocks.impl.aspect.projection.Projection;
 import blocks.impl.aspect.regen.Regeneration;
 import blocks.impl.builder.OriginBlock;
 

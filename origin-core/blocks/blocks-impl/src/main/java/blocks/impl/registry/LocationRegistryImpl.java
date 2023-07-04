@@ -3,7 +3,6 @@ package blocks.impl.registry;
 import blocks.block.aspects.location.registry.BlockLocationRegistry;
 import blocks.block.builder.AspectHolder;
 import blocks.block.builder.FixedAspectHolder;
-import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

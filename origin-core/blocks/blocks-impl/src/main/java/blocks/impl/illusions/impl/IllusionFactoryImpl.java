@@ -1,9 +1,9 @@
 package blocks.impl.illusions.impl;
 
-import blocks.block.util.ClickCallback;
 import blocks.block.illusions.BlockOverlay;
 import blocks.block.illusions.FakeBlock;
 import blocks.block.illusions.IllusionFactory;
+import blocks.block.util.ClickCallback;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;

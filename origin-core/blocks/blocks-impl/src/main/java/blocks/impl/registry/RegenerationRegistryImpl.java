@@ -1,10 +1,13 @@
 package blocks.impl.registry;
 
+import blocks.block.aspects.AspectType;
 import blocks.block.aspects.projection.Projectable;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
-import blocks.block.illusions.*;
-import blocks.block.aspects.AspectType;
+import blocks.block.illusions.FakeBlock;
+import blocks.block.illusions.IllusionFactory;
+import blocks.block.illusions.IllusionRegistry;
+import blocks.block.illusions.IllusionsAPI;
 import me.lucko.helper.Schedulers;
 import net.minecraft.core.BlockPosition;
 import org.bukkit.Location;

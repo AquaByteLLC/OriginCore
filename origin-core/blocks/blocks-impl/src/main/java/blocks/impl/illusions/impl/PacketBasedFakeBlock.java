@@ -2,12 +2,9 @@ package blocks.impl.illusions.impl;
 
 import blocks.block.illusions.BlockOverlay;
 import blocks.block.illusions.FakeBlock;
-import blocks.block.util.ClickCallback;
-import blocks.impl.illusions.BlockAdapter;
 import blocks.block.util.PacketReceiver;
-import com.google.common.util.concurrent.FakeTimeLimiter;
+import blocks.impl.illusions.BlockAdapter;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockChange;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;

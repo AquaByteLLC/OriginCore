@@ -1,12 +1,10 @@
 package blocks.impl.aspect.regen;
 
-import blocks.BlocksAPI;
 import blocks.block.aspects.AspectType;
 import blocks.block.aspects.BlockAspect;
-import blocks.block.illusions.FakeBlock;
 import blocks.block.aspects.regeneration.Regenable;
-import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.block.builder.AspectHolder;
+import blocks.block.illusions.FakeBlock;
 import blocks.impl.aspect.BaseAspect;
 
 public class Regeneration extends BaseAspect implements Regenable {

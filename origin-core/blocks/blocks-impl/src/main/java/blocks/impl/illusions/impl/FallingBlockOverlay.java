@@ -2,8 +2,8 @@ package blocks.impl.illusions.impl;
 
 import blocks.block.illusions.BlockOverlay;
 import blocks.block.util.ClickCallback;
-import blocks.impl.illusions.BlockAdapter;
 import blocks.block.util.PacketReceiver;
+import blocks.impl.illusions.BlockAdapter;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity;
@@ -18,7 +18,6 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftFallingBlock;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftLocation;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;

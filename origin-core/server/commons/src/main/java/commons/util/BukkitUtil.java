@@ -4,9 +4,11 @@ import commons.CommonsPlugin;
 import lombok.SneakyThrows;
 import me.lucko.helper.text3.Text;
 import me.vadim.util.conf.wrapper.Placeholder;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.SectionPosition;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkSection;
+import net.minecraft.world.level.levelgen.HeightMap;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
@@ -15,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author vadim
@@ -76,6 +79,36 @@ public class BukkitUtil {
 
 	public static BukkitTask async(Exceptional exceptional, long ticks) {
 		return Bukkit.getScheduler().runTaskLaterAsynchronously(CommonsPlugin.commons(), wrap(exceptional), ticks);
+	}
+
+
+	/*
+	 * These are useful methods, so I'm leaving them here.
+	 * However, they did not work for my purposes.
+	 */
+
+	public static @NotNull ChunkSection getSection(Chunk chunk, int blockY) {
+		int sY = chunk.e(blockY & 15); // since Y can be negative, LevelHeightAccessor apparantly "converts" this to a ChunkSection index
+		ChunkSection[] sections = chunk.d(); // chunk.getSections()
+		ChunkSection section = sections[sY];
+		if(section == null)
+			section = sections[sY] = new ChunkSection(sY, chunk.biomeRegistry);
+		return section;
+	}
+
+	public static void setBlockState(Chunk chunk, int x, int y, int z, IBlockData data) {
+		setBlockState(getSection(chunk, y), chunk, x, y, z, data);
+	}
+
+	public static void setBlockState(@NotNull ChunkSection section, Chunk chunk, int x, int y, int z, IBlockData data) {
+		// update inside chunk section
+		section.a(x, y, z, data, false); // section.setType(x, y, z, data, some_kind_of_update)
+
+		// update heightmap
+		chunk.g.get(HeightMap.Type.e).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.MOTION_BLOCKING)).update(j, i, l, blockstate);
+		chunk.g.get(HeightMap.Type.f).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.MOTION_BLOCKING_NO_LEAVES)).update(j, i, l, blockstate);
+		chunk.g.get(HeightMap.Type.d).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.OCEAN_FLOOR)).update(j, i, l, blockstate);
+		chunk.g.get(HeightMap.Type.b).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.WORLD_SURFACE)).update(j, i, l, blockstate);
 	}
 
 }

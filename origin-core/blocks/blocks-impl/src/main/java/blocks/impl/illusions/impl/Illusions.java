@@ -6,7 +6,9 @@ import blocks.block.illusions.IllusionRegistry;
 import blocks.block.illusions.IllusionsAPI;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -52,7 +54,7 @@ public class Illusions implements IllusionsAPI {
 
 	@Override
 	public IllusionRegistry localRegistry(Player player) {
-		return local.computeIfAbsent(player.getUniqueId(), x -> new BlockIllusionRegistry(plugin, new PlayerPacketReceiver(player), events));
+		return local.computeIfAbsent(player.getUniqueId(), uuid -> new BlockIllusionRegistry(plugin, new PlayerPacketReceiver(uuid), events));
 	}
 
 	@Override
@@ -60,12 +62,22 @@ public class Illusions implements IllusionsAPI {
 		return new IllusionBuilderImpl();
 	}
 
-	// performance
+	// unsubscribe on quit, to prevent invoking methods that won't even run past the first line
 	@Subscribe
-	void leave(PlayerQuitEvent event) {
-		IllusionRegistry reg = local.get(event.getPlayer().getUniqueId());
+	void quit(PlayerQuitEvent event) {
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			IllusionRegistry reg = local.get(event.getPlayer().getUniqueId());
+			if(reg != null)
+				events.unsubscribe(reg);
+		});
+	}
+
+	// resubscribe on join, but do so async to avoid lag caused by reflective calls in subscribeAll
+	@Subscribe
+	void join(AsyncPlayerPreLoginEvent event) {
+		IllusionRegistry reg = local.get(event.getUniqueId());
 		if(reg != null)
-			events.unsubscribe(reg);
+			events.subscribeAll(reg);
 	}
 
 }

@@ -1,47 +1,42 @@
 package blocks.impl.illusions.impl;
 
-import blocks.block.illusions.BlockOverlay;
 import blocks.block.illusions.FakeBlock;
 import blocks.block.illusions.IllusionRegistry;
 import blocks.block.util.ClickCallback;
 import blocks.block.util.PacketReceiver;
 import blocks.block.util.PlayerInteraction;
-import blocks.impl.BlocksPlugin;
-import commons.CommonsPlugin;
 import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
-import commons.util.BukkitUtil;
 import commons.util.PackUtil;
 import commons.util.ReflectUtil;
 import commons.util.reflect.FieldAccess;
 import commons.util.reflect.Reflection;
-import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import lombok.SneakyThrows;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
 import net.minecraft.core.SectionPosition;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketDataSerializer;
-import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.EnumHand;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.BiomeBase;
-import net.minecraft.world.level.biome.BiomeSettingsGeneration;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ITileEntity;
+import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.chunk.*;
 import net.minecraft.world.level.levelgen.HeightMap;
+import net.minecraft.world.level.levelgen.blending.BlendingData;
 import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
@@ -50,14 +45,16 @@ import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftLocation;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.invoke.MethodHandle;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 class BlockIllusionRegistry implements IllusionRegistry {
 
@@ -68,7 +65,7 @@ class BlockIllusionRegistry implements IllusionRegistry {
 	private final PacketReceiver receiver;
 
 	BlockIllusionRegistry(JavaPlugin plugin, PacketReceiver receiver, EventRegistry events) {
-		this.plugin = plugin;
+		this.plugin   = plugin;
 		this.receiver = receiver;
 		events.subscribeAll(this);
 	}
@@ -76,15 +73,15 @@ class BlockIllusionRegistry implements IllusionRegistry {
 	@Override
 	public void register(FakeBlock block) {
 		FakeBlock old = getBlockAt(block.getBlockLocation());
-		if(old != null)
+		if (old != null)
 			unregister(old);
 
 		Location loc = block.getBlockLocation();
 		byLocation.put(block.getBlockLocation(), block);
 		byChunk.computeIfAbsent(PackUtil.packChunk(loc), __ -> new ArrayList<>()).add(block);
 		block.send(receiver);
-		if(block.hasOverlay())
-			if(block instanceof PacketBasedFakeBlock packet)
+		if (block.hasOverlay())
+			if (block instanceof PacketBasedFakeBlock packet)
 				byOverlay.put(packet.getOverlay().getEntityID(), block);
 	}
 
@@ -94,8 +91,8 @@ class BlockIllusionRegistry implements IllusionRegistry {
 		byLocation.remove(loc);
 		byChunk.computeIfAbsent(PackUtil.packChunk(loc), __ -> new ArrayList<>()).remove(block);
 		block.remove(receiver);
-		if(block.hasOverlay())
-			if(block instanceof PacketBasedFakeBlock packet)
+		if (block.hasOverlay())
+			if (block instanceof PacketBasedFakeBlock packet)
 				byOverlay.remove(packet.getOverlay().getEntityID());
 	}
 
@@ -116,7 +113,7 @@ class BlockIllusionRegistry implements IllusionRegistry {
 
 	@Subscribe
 	void sendBlockChange(EventContext context, PacketPlayOutBlockChange packet) {
-		if(!receiver.appliesTo(context.getPlayer())) return;
+		if (!receiver.appliesTo(context.getPlayer())) return;
 //		Location  location = CraftLocation.toBukkit(packet.c(), context.getPlayer().getWorld());
 		Vector    vector   = CraftVector.toBukkit(packet.c().b()); // whatever
 		Location  location = vector.toLocation(context.getPlayer().getWorld());
@@ -134,7 +131,7 @@ class BlockIllusionRegistry implements IllusionRegistry {
 	@Subscribe
 	@SuppressWarnings("PointlessBitwiseExpression")
 	void sendMultiBlockChange(EventContext context, PacketPlayOutMultiBlockChange packet) {
-		if(!receiver.appliesTo(context.getPlayer())) return;
+		if (!receiver.appliesTo(context.getPlayer())) return;
 		SectionPosition pos  = PacketPlayOutMultiBlockChange_b.get(packet);
 		short[]         rel  = PacketPlayOutMultiBlockChange_c.get(packet);
 		IBlockData[]    data = PacketPlayOutMultiBlockChange_d.get(packet);
@@ -163,27 +160,21 @@ class BlockIllusionRegistry implements IllusionRegistry {
 	}
 
 	private static final FieldAccess<ClientboundLevelChunkPacketData> ClientboundLevelChunkWithLightPacket_c = Reflection.unreflectFieldAccess(ClientboundLevelChunkWithLightPacket.class, "c");
-//	private static final FieldAccess<byte[]> ClientboundLevelChunkPacketData_c = Reflection.unreflectFieldAccess(ClientboundLevelChunkPacketData.class, "c");
-	private static final MethodHandle ClientboundLevelChunkPacketData_c = ReflectUtil.unreflectMethodHandle(ClientboundLevelChunkPacketData.class, "c");
+	private static final FieldAccess<byte[]> ClientboundLevelChunkPacketData_c = Reflection.unreflectFieldAccess(ClientboundLevelChunkPacketData.class, "c");
 
-	List<Long> recentlySent = new ArrayList<>();
 	@Subscribe
 	@SneakyThrows
 	void sendMapChunk(EventContext context, ClientboundLevelChunkWithLightPacket packet) {
 		if (!receiver.appliesTo(context.getPlayer())) return;
 		Player player = context.getPlayer();
 
-		//:Prayge:
-
 		int cX = packet.a();
 		int cZ = packet.c();
 
-		if(recentlySent.contains(PackUtil.packChunk(cX, cZ))) return;
-
 		List<FakeBlock> fakes = getBlocksByChunk(cX, cZ);
-		if(fakes.isEmpty()) return;
+		if (fakes.isEmpty()) return;
 
-		World world = player.getWorld();
+		World            world  = player.getWorld();
 		org.bukkit.Chunk bukkit = world.getChunkAtAsync(cX, cZ).get();
 
 		Chunk original = (Chunk) ((CraftChunk) bukkit).getHandle(ChunkStatus.o);
@@ -192,6 +183,7 @@ class BlockIllusionRegistry implements IllusionRegistry {
 		LightEngine engine = server.k().a();
 
 		class accessor implements LevelHeightAccessor {
+
 			@Override
 			public int w_() {
 				return original.w_();
@@ -202,122 +194,226 @@ class BlockIllusionRegistry implements IllusionRegistry {
 				return original.v_();
 			}
 
-			/*
-			* These are useful methods, so I'm leaving them here.
-			* However, they did not work for my purposes.
-			*/
+		}
+		;
 
-			public static @NotNull ChunkSection getSection(Chunk chunk, int blockY) {
-				int sY = chunk.e(blockY & 15); // since Y can be negative, LevelHeightAccessor apparantly "converts" this to a ChunkSection index
-				ChunkSection[] sections = chunk.d(); // chunk.getSections()
-				ChunkSection section = sections[sY];
-				if(section == null)
-					section = sections[sY] = new ChunkSection(sY, chunk.biomeRegistry);
+		/**
+		 * ProtoChunk extension with helper methods and methods from Chunk.
+		 */
+		class AsyncChunk extends ProtoChunk {
+
+			AsyncChunk(ChunkCoordIntPair var0, ChunkConverter var1, LevelHeightAccessor var2, IRegistry<BiomeBase> var3, @Nullable BlendingData var4) {
+				super(var0, var1, var2, var3, var4);
+			}
+
+			public @NotNull ChunkSection getSection(int blockY) {
+				int            sY       = e(blockY & 15); // since Y can be negative, LevelHeightAccessor apparantly "converts" this to a ChunkSection index
+				ChunkSection[] sections = this.k; // this.sections
+				ChunkSection   section  = sections[sY];
+				if (section == null)
+					section = sections[sY] = new ChunkSection(sY, biomeRegistry);
 				return section;
 			}
 
-			public static void setBlockState(Chunk chunk, int x, int y, int z, IBlockData data) {
-				setBlockState(getSection(chunk, y), chunk, x, y, z, data);
+			public void setBlockState(int x, int y, int z, IBlockData data) {
+				setBlockState(getSection(y), x, y, z, data);
 			}
 
-			public static void setBlockState(@NotNull ChunkSection section, Chunk chunk, int x, int y, int z, IBlockData data) {
+//			public void a(TileEntity tileentity) {
+//				BlockPosition blockposition = tileentity.p();
+//				if (this.a_(blockposition).q()) {
+//					tileentity.a(server); // setLevel
+//					tileentity.s();
+//					TileEntity tileentity1 = (TileEntity)this.i.put(blockposition.i(), tileentity);
+//					if (tileentity1 != null && tileentity1 != tileentity) {
+//						tileentity1.ar_();
+//					}
+//				} else {
+//					System.out.println("Attempted to place a tile entity (" + tileentity + ") at " + tileentity.p().u() + "," + tileentity.p().v() + "," + tileentity.p().w() + " (" + this.a_(blockposition) + ") where there was no entity tile!");
+//					System.out.println("Chunk coordinates: " + this.c.e * 16 + "," + this.c.f * 16);
+//					(new Exception()).printStackTrace();
+//				}
+//
+//			}
+
+			private @javax.annotation.Nullable TileEntity a(BlockPosition blockposition, NBTTagCompound nbttagcompound) {
+				IBlockData iblockdata = this.a_(blockposition);
+				TileEntity tileentity;
+				if ("DUMMY".equals(nbttagcompound.l("id"))) {
+					if (iblockdata.q()) {
+						tileentity = ((ITileEntity) iblockdata.b()).a(blockposition, iblockdata);
+					} else {
+						tileentity = null;
+//						l.warn("Tried to load a DUMMY block entity @ {} but found not block entity block {} at location", blockposition, iblockdata);
+					}
+				} else {
+					tileentity = TileEntity.a(blockposition, iblockdata, nbttagcompound);
+				}
+
+				if (tileentity != null) {
+					tileentity.a(server); // setLevel
+					this.a(tileentity);
+				} else {
+//					l.warn("Tried to load a block entity for block {} but failed at location {}", iblockdata, blockposition);
+				}
+
+				return tileentity;
+			}
+
+			private @Nullable TileEntity _j(BlockPosition blockposition) {
+				IBlockData iblockdata = this.a_(blockposition);
+				return !iblockdata.q() ? null : ((ITileEntity) iblockdata.b()).a(blockposition, iblockdata);
+			}
+
+			public @Nullable TileEntity getBlockEntity(BlockPosition blockposition) {
+				TileEntity tileentity = tileentity = (TileEntity) this.i.get(blockposition);
+
+				if (tileentity == null) {
+					NBTTagCompound nbttagcompound = (NBTTagCompound) this.h.remove(blockposition);
+					if (nbttagcompound != null) {
+						TileEntity tileentity1 = this.a(blockposition, nbttagcompound);
+						if (tileentity1 != null) {
+							return tileentity1;
+						}
+					}
+				}
+
+				if (tileentity == null) {
+					tileentity = this._j(blockposition);
+					if (tileentity != null) {
+						this.a(tileentity);
+					}
+				} else if (tileentity.r()) {
+					this.i.remove(blockposition);
+					return null;
+				}
+
+				return tileentity;
+			}
+
+			public void setBlockState(@NotNull ChunkSection section, int x, int y, int z, IBlockData data) {
 				// update inside chunk section
 				section.a(x, y, z, data, false); // section.setType(x, y, z, data, some_kind_of_update)
 
 				// update heightmap
-				chunk.g.get(HeightMap.Type.e).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.MOTION_BLOCKING)).update(j, i, l, blockstate);
-				chunk.g.get(HeightMap.Type.f).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.MOTION_BLOCKING_NO_LEAVES)).update(j, i, l, blockstate);
-				chunk.g.get(HeightMap.Type.d).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.OCEAN_FLOOR)).update(j, i, l, blockstate);
-				chunk.g.get(HeightMap.Type.b).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.WORLD_SURFACE)).update(j, i, l, blockstate);
+				g.get(HeightMap.Type.e).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.MOTION_BLOCKING)).update(j, i, l, blockstate);
+				g.get(HeightMap.Type.f).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.MOTION_BLOCKING_NO_LEAVES)).update(j, i, l, blockstate);
+				g.get(HeightMap.Type.d).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.OCEAN_FLOOR)).update(j, i, l, blockstate);
+				g.get(HeightMap.Type.b).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.WORLD_SURFACE)).update(j, i, l, blockstate);
 			}
 
-		};
+			public void replaceWithPacketData(PacketDataSerializer packetdataserializer, NBTTagCompound heightmaps, Consumer<ClientboundLevelChunkPacketData.b> consumer) {
+				ChunkSection[] achunksection = this.k;
+				int            i             = achunksection.length;
 
-		// shallow-clone the original nms chunk
-		// inside this constructor chain this.k (chunkSections) is passed as null and re-initialized
-		// so the data is not actually being copied
-		ProtoChunk proto = new ProtoChunk(new ChunkCoordIntPair(cX, cZ),
+				int j;
+				for (j = 0; j < i; ++j) {
+					ChunkSection chunksection = achunksection[j];
+					chunksection.a(packetdataserializer);
+				}
+
+				HeightMap.Type[] aheightmap_type = HeightMap.Type.values();
+				i = aheightmap_type.length;
+
+				for (j = 0; j < i; ++j) {
+					HeightMap.Type heightmap_type = aheightmap_type[j];
+					String         s              = heightmap_type.a();
+					if (heightmaps.b(s, 12)) {
+						this.a((HeightMap.Type) heightmap_type, (long[]) heightmaps.o(s));
+					}
+				}
+
+				consumer.accept((blockposition, tileentitytypes, nbttagcompound1) -> {
+					TileEntity tileentity = this.getBlockEntity(blockposition);
+					if (tileentity != null && nbttagcompound1 != null && tileentity.u() == tileentitytypes) {
+						tileentity.a(nbttagcompound1);
+					}
+				});
+			}
+
+			public int getSerializedSize() {
+				int len = 0;
+				for (ChunkSection section : this.k) {
+					len += section.k();
+				}
+				return len;
+			}
+
+		}
+
+		// create empty chunk
+		// proto chunks appears to be async-friendly
+		// and are used during chunk loading, however
+		// they lack many of the methods that Chunk
+		// has, so I extended ProtoChunk and added
+		// the necessary methods back
+		AsyncChunk proto = new AsyncChunk(new ChunkCoordIntPair(cX, cZ),
 										  original.r(), // ChunkConverter
 										  new accessor()/*original.j*/, // LevelHeightAccessor
 										  original.biomeRegistry/*server.u_().d(Registries.an)*/, // BiomeRegistry
 										  original.t() // BlendingData
 		);
 
-		proto.a(original.j()); // ChunkStatus
-		proto.a(engine); // LightEngine
-		proto.a(() -> original.a(() -> (BiomeSettingsGeneration)null)); // Biomes (?) -- deprecated but I don't see any replacement
-		original.i.forEach((bp, tile) -> { // original.tileEntities
-			proto.a(bp, original.a_(bp), false); // proto.setType(bp, original.getType(bp), false);
-			proto.a(tile); // proto.setTileEntity(tile)
-		});
+		// read packet data
+		ClientboundLevelChunkPacketData packet_data = packet.d();
+		byte[]                          c           = ClientboundLevelChunkPacketData_c.get(packet_data);
+		PacketDataSerializer            serializer  = new PacketDataSerializer(Unpooled.wrappedBuffer(c));
 
-		// chunk_c <class Chunk.c> appears to be a callback:
-		// <init> chunk_c -> this.s -> public void C()
-		Chunk shallowClone = new Chunk(server, proto, null);
+		// reset read head
+		serializer.writerIndex(serializer.capacity());
+		serializer.readerIndex(0);
 
-		// now we can modify shallowClone
+		// populate empty chunk from packet data
+		// this means we won't overwrite global/local fake blocks!
+		proto.replaceWithPacketData(serializer, packet_data.b(), packet_data.a(cX, cZ));
+		// proto.replaceWithPacketData(new FriendlyByteBuf(packet_data.getReadBuffer()), packet_data.getHeightmaps(), packet_data.getBlockEntitiesTagsConsumer(x,z));
 
-		// copy real blocks
-		ChunkSection[] sectionsOld = original.d();
-		ChunkSection[] sectionsNew = shallowClone.d();
-		for (int i = 0; i < sectionsOld.length; i++) {
-			if(sectionsOld[i] == null) {
-				sectionsNew[i] = null;
-				continue;
-			}
-			for (int x = 0; x < 16; x++) {
-				for (int z = 0; z < 16; z++) {
-					for (int y = 0; y < 16; y++) {
-						ChunkSection section = sectionsNew[i];
-						if(section == null)
-							section = sectionsNew[i] = new ChunkSection(sectionsOld[i].g(), shallowClone.biomeRegistry); // sectionsOld[i].getY()
-						// for some reason this works here, but not for my projected block data
-						// probably because we've done a shallow copy and this is the data that's
-						// supposed to be there in the first place
-						section.a(x, y, z, sectionsOld[i].a(x, y, z), false); // section.setType(x, y, z, sectionsOld[i].getType(x, y, z), some_kind_of_update)
-//						accessor.setBlockState(section, shallowClone, x, y, z, ibd);
-					}
-				}
-			}
-		}
-		// replace fake blocks
+		// replace fake blocks in the new chunk
 		for (FakeBlock fake : fakes) {
-			if(fake.hasOverlay())
+			if (fake.hasOverlay())
 				fake.getOverlay().send(receiver); // go ahead and send the overlay
-			if(!fake.hasProjection()) continue;
-			Location loc = fake.getBlockLocation();
-			// this doesn't work, for some reason
-			/*
-			int rX = loc.getBlockX() & 15;
-			int rY = loc.getBlockY() & 15;
-			int rZ = loc.getBlockZ() & 15;
-			int sY = shallowClone.e(rY); // since Y can be negative, LevelHeightAccessor apparantly "converts" this to a ChunkSection index
-			ChunkSection section = sectionsNew[sY];
-			if(section == null)
-				section = sectionsNew[sY] = new ChunkSection(sY, shallowClone.biomeRegistry);
-			accessor.setBlockState(section, shallowClone, rX, rY, rZ, ((CraftBlockData) fake.getProjectedBlockData()).getState());
-			*/
+			if (!fake.hasProjection()) continue;
+			Location      loc = fake.getBlockLocation();
+			BlockPosition bp  = CraftLocation.toBlockPosition(loc);
 
-			// so we do this instead, however setBlockState want to be run on main thread
-			// so we permorm miniscule amounts of devious synchronization on the packet thread
-			// :SillyChamp:
-			CommonsPlugin.commons().sync(() -> {
-				shallowClone.a(CraftLocation.toBlockPosition(loc), ((CraftBlockData) fake.getProjectedBlockData()).getState(), false); // setBlockState
-			}).get();
+			BlockData  proj = fake.getProjectedBlockData();
+			IBlockData ibd  = ((CraftBlockData) proj).getState();
+			TileEntity tile = proto.getBlockEntity(bp); // create
+
+			// creating a tile entity where there wasn't a tile entity is just not working
+			if (ibd.q() && tile != null) { // ibd.hasBlockEntity()
+				proto.a(bp, ibd, true);
+				// put tile entity
+				tile = proto.getBlockEntity(bp);
+				if (tile == null)
+					tile = ((ITileEntity) ibd.b()).a(bp, ibd); // create
+				if (tile != null)
+					proto.a(tile); // place
+			} else {
+				// so, send a delayed block change if there is not already a tile entity on this block
+				Bukkit.getScheduler().runTaskLater(plugin, () -> fake.send(receiver), 15L);
+				// if this is sent too early, the light is not updated
+				// sometimes the light is not updated at all
+			}
 		}
 
-		// instead of writing my own parser (https://wiki.vg/Chunk_Format)
-		// we will just use a cheeky amount of reflection to gain access to the buffer
-		// (byte[] c) and re-serialize the ChunkPacketData on our new chunk
-		ClientboundLevelChunkPacketData data = packet.d();
-		ByteBuf byteBuf_c = (ByteBuf) ClientboundLevelChunkPacketData_c.invoke(data);
-		ClientboundLevelChunkPacketData.a(new PacketDataSerializer(byteBuf_c), shallowClone);
-	}
+		// re-serialize modified chunk
 
+		// reset write head
+		byte[] buffer = new byte[proto.getSerializedSize()];
+		serializer = new PacketDataSerializer(Unpooled.wrappedBuffer(buffer));
+		serializer.readerIndex(0);
+		serializer.writerIndex(0);
 
-	@Subscribe
-	void quit(PlayerQuitEvent event) {
-		recentlySent.clear();
+		// this method operates on Chunk, but only uses the sections, so I will just replicate what it does here
+//		ClientboundLevelChunkPacketData.a(serializer, chunk); // ClientboundLevelChunkPacketData.extractChunkData(friendlyByteBuf, chunk);
+		for (ChunkSection section : proto.d()) {
+			section.c(serializer); // section.write(serializer);
+		}
+
+		// set re-serialized buffer
+		// the reason we can't just write to it directly is because the size may have changed when populating fake blocks
+		ClientboundLevelChunkPacketData_c.set(packet_data, buffer);
 	}
 
 	private static final FieldAccess<Integer> PacketPlayInUseEntity_a = Reflection.unreflectFieldAccess(PacketPlayInUseEntity.class, "a");
@@ -377,4 +473,5 @@ class BlockIllusionRegistry implements IllusionRegistry {
 			ReflectUtil.serr(e);
 		}
 	}
+
 }

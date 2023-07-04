@@ -1,6 +1,5 @@
 package blocks.impl.illusions.impl;
 
-import blocks.block.illusions.BlockOverlay;
 import blocks.block.illusions.FakeBlock;
 import blocks.block.illusions.IllusionBuilder;
 import blocks.block.util.ClickCallback;

@@ -14,7 +14,6 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandle;
-import java.sql.Ref;
 
 /**
  * Listener that {@linkplain EventRegistry#publish(EventContext, Object) publishes} Bukkit events.
