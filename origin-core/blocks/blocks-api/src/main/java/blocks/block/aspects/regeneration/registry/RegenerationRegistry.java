@@ -14,9 +14,9 @@ public interface RegenerationRegistry {
 
 	IllusionsAPI illusionsAPI = BlocksAPI.getInstance().getIllusions();
 
-	void createRegen(Regenable block, Block original, Player player, long end);
+	void createRegen(Regenable block, Block original);
 
-	void deleteRegen(Regenable block);
+	void deleteRegen(Block block);
 
 	@NotNull HashMap<BlockPosition, Regenable> getRegenerations();
 

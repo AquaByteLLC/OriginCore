@@ -8,6 +8,7 @@ import com.google.inject.Injector;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.bossbar.BossBar;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;

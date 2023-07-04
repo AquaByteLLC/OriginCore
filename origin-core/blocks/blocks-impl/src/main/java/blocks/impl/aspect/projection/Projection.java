@@ -3,14 +3,13 @@ package blocks.impl.aspect.projection;
 import blocks.BlocksAPI;
 import blocks.block.aspects.AspectType;
 import blocks.block.aspects.BlockAspect;
-import blocks.block.util.ClickCallback;
 import blocks.block.aspects.projection.Projectable;
 import blocks.block.builder.AspectHolder;
 import blocks.block.illusions.FakeBlock;
+import blocks.block.util.ClickCallback;
 import blocks.impl.aspect.BaseAspect;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
 /**
@@ -58,7 +57,11 @@ public class Projection extends BaseAspect implements Projectable {
 
 	@Override
 	public FakeBlock toFakeBlock(Location location) {
-		return BlocksAPI.getInstance().getIllusions().factory().newCustomBlock(location, getProjectedBlockData(), getHighlightColor(), Material.GLASS.createBlockData(), null);
+		return BlocksAPI.getInstance().getIllusions().newIllusionBuilder()
+				.fakeProjectedBlockData(fakeData)
+				.overlayHighlightColor(highlight)
+				.overlayClickCallback(callback)
+				.build(location);
 	}
 
 	@Override

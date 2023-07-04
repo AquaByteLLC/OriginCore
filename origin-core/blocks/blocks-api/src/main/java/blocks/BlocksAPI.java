@@ -103,6 +103,10 @@ public final class BlocksAPI {
 		return null;
 	}
 
+	public static void resetBlock(Location loc) {
+		instance.locationRegistry.deleteBlock(loc);
+	}
+
 	public static boolean inRegion(Location loc) {
 		RegionManager wgCurrWorldRM = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(loc.getWorld()));
 		if (wgCurrWorldRM == null) return false;

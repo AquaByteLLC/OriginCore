@@ -1,4 +1,4 @@
-package blocks.impl.event;
+package blocks.impl.events;
 
 import blocks.BlocksAPI;
 import blocks.block.aspects.regeneration.Regenable;
@@ -12,18 +12,22 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-@Getter
-public class OriginRegenerationEvent extends Event {
+public class AbstractRegenEvent extends Event {
 	private static final HandlerList HANDLERS_LIST = new HandlerList();
 	private final EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
 	private boolean isCancelled;
+	@Getter
 	private final Regenable regenable;
+	@Getter
 	private final Player player;
+	@Getter
 	private final Block block;
+	@Getter
 	private final IllusionsAPI illusionsAPI;
+	@Getter
 	private final long end;
 
-	public OriginRegenerationEvent(Regenable regenable, Player player, Block block, long end) {
+	public AbstractRegenEvent(Regenable regenable, Player player, Block block, long end) {
 		this.regenable = regenable;
 		this.player = player;
 		this.block = block;
