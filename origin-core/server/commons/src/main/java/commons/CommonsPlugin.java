@@ -1,13 +1,16 @@
 package commons;
 
+import co.aikar.commands.PaperCommandManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.logger.Level;
+import commons.cmd.EconCommand;
 import commons.data.AccountStorage;
 import commons.data.AccountStorageHandler;
 import commons.data.SessionProvider;
 import commons.data.impl.LocationPersister;
 import commons.data.impl.SQLiteSession;
+import commons.econ.BankAccount;
 import commons.entity.registry.EntityRegistry;
 import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
@@ -15,6 +18,7 @@ import commons.events.api.Subscribe;
 import commons.events.impl.PluginEventWrapper;
 import commons.impl.account.PlayerDefaultAccount;
 import commons.impl.account.PlayerDefaultAccountStorage;
+import commons.impl.account.ServerAccount;
 import commons.sched.SchedulerManager;
 import commons.sched.impl.Scheduler4Plugin;
 import lombok.Getter;
@@ -81,6 +85,12 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return scheduler;
 	}
 
+	private final BankAccount bank = new ServerAccount();
+
+	public BankAccount getBank() {
+		return bank;
+	}
+
 	@Override
 	protected void load() {
 		instance = this;
@@ -107,8 +117,10 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		}
 		System.setOut(new gayness_remover(System.out));
 		System.setErr(new gayness_remover(System.err));
-		System.out.println("If this message is not prepended by [STDOUT], then the gay-ass paper logger has been disabled.");
+		System.out.println("If this message is not prepended by [STDOUT], then the gayass paper logger has been disabled.");
 	}
+
+	private PaperCommandManager commands;
 
 	@Override
 	public void enable() {
@@ -124,6 +136,9 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		getEventRegistry().subscribeAll(this);
 
 		scheduler = new Scheduler4Plugin(this);
+
+		commands = new PaperCommandManager(this);
+		commands.registerCommand(new EconCommand(dataStorage));
 	}
 
 	@Override

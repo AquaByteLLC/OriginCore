@@ -12,7 +12,10 @@ import enderchests.LinkedChest;
 import enderchests.impl.data.EnderChestAccount;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockAction;
 import org.bukkit.*;
-import org.bukkit.block.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.FaceAttachable;
@@ -32,6 +35,9 @@ import java.util.UUID;
  * @author vadim
  */
 public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChest {
+
+	public static final Sound open = Sound.BLOCK_ENDER_CHEST_OPEN;
+	public static final Sound close = Sound.BLOCK_END_PORTAL_SPAWN;
 
 	private static org.bukkit.Color awt2bukkit(Color color) {
 		return org.bukkit.Color.fromRGB(color.getRed(), color.getGreen(), color.getBlue());
@@ -70,11 +76,8 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 			// manage menu
 		} else {
 			// break
-			Location   loc = getBlockLocation().add(.5, .5, .5);
-			SoundGroup sg  = Material.ENDER_CHEST.createBlockData().getSoundGroup();
+			Location loc = getBlockLocation().add(.5, .5, .5);
 			player.playEffect(loc, Effect.STEP_SOUND, Material.ENDER_CHEST);
-//					player.playSound(getBlockLocation(), sg.getBreakSound(), sg.getVolume(), sg.getPitch());
-//					player.spawnParticle(Particle.BLOCK_CRACK, loc, 75, 0.3, 0.3, 0.3, 0.6, Material.ENDER_CHEST.createBlockData());
 			Color net = getNetwork().getColor().toColor();
 			player.spawnParticle(Particle.DUST_COLOR_TRANSITION, loc, 1, new Particle.DustTransition(awt2bukkit(net.brighter()), awt2bukkit(net.darker()), 2));
 			CommonsPlugin.scheduler().getBukkitSync().runTask(() -> {
@@ -153,15 +156,16 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 
 	@Override
 	public void setOpen(boolean isOpen) {
-		System.out.println("setOpen("+isOpen+")");
-		float vol = .8f;
+		float vol;
 		float pitch;
 		Sound sound;
 		if (isOpen) {
-			sound = Sound.BLOCK_ENDER_CHEST_OPEN;
+			vol   = .8f;
+			sound = open;
 			pitch = .01f;
 		} else {
-			sound = Sound.BLOCK_END_PORTAL_SPAWN;
+			vol   = .5f;
+			sound = close;
 			pitch = 1.01f;
 		}
 		getBlock().getWorld().playSound(getBlockLocation().add(.5, .5, .5), sound, vol, pitch);

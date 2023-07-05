@@ -24,6 +24,7 @@ import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftFallingBlock;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftShulker;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftSlime;
+import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
@@ -129,6 +130,7 @@ public class FallingBlockOverlay extends BlockAdapter implements BlockOverlay {
 			craft.setAI(false);
 			craft.setSize(2);
 			craft.setInvisible(true);
+			craft.setCollidable(false);
 			the = craft;
 		}
 

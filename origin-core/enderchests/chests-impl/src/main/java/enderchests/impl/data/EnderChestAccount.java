@@ -7,6 +7,7 @@ import commons.data.AbstractAccount;
 import enderchests.NetworkColor;
 import enderchests.impl.LinkedEnderChest;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -49,11 +50,19 @@ public class EnderChestAccount extends AbstractAccount {
 	}
 
 	/**
-	 * This method <i>atomically</i> sets the currently linked inventory.
-	 *
-	 * @param newInventory the new inventory to open, or {@code null} to indicate that the player has closed any linked inventory
+	 * @see #openNewLinkedInventory(LinkedEnderChest, boolean)
 	 */
 	public void openNewLinkedInventory(LinkedEnderChest newInventory) {
+		openNewLinkedInventory(newInventory, false);
+	}
+
+	/**
+	 * This method <i>atomically</i> sets the currently linked inventory.
+	 *
+	 * @param newInventory  the new inventory to open, or {@code null} to indicate that the player has closed any linked inventory
+	 * @param delayedEffect whether or not to delay the opening animation (this is necessary under some circumstances)
+	 */
+	public void openNewLinkedInventory(LinkedEnderChest newInventory, boolean delayedEffect) {
 		Player player = getOfflineOwner().getPlayer();
 		if (player != null) {
 			if (newInventory != null) {
@@ -67,14 +76,17 @@ public class EnderChestAccount extends AbstractAccount {
 			if (currentLinkedInventory != null)
 				currentLinkedInventory.setOpen(currentLinkedInventory.getInventory().getViewers().size() > 1);
 			currentLinkedInventory = newInventory;
-			if (currentLinkedInventory != null)
-				currentLinkedInventory.setOpen(true);
-			// for some reason, 6L is the shortest amount of time that this will still run
-			// when clicking on the bottom of the chest... so let's just do it twice
-			CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
+			if (delayedEffect) {
+				// for some reason, 6L is the shortest amount of time that this will still run
+				// when clicking on the bottom of the chest... so let's just do it twice
+				CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
+					if (currentLinkedInventory != null)
+						currentLinkedInventory.setOpen(true);
+				}, 6L);
+			} else {
 				if (currentLinkedInventory != null)
 					currentLinkedInventory.setOpen(true);
-			}, 6L);
+			}
 		}
 	}
 

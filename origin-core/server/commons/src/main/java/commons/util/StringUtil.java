@@ -3,6 +3,9 @@ package commons.util;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,22 +16,34 @@ import static org.bukkit.ChatColor.COLOR_CHAR;
  */
 public class StringUtil {
 
-	// todo: big numbers
+	public static String formatNumber(Number number) {
+		return NumberFormat.getCompactNumberInstance(Locale.US, NumberFormat.Style.SHORT).format(number);
+	}
+
+	// stupidass autoboxing doesn't work
+
+	public static String formatNumber(byte num) {
+		return formatNumber(Byte.valueOf(num));
+	}
+
+	public static String formatNumber(short num) {
+		return formatNumber(Short.valueOf(num));
+	}
 
 	public static String formatNumber(int num) {
-		return String.format("%d", num);
+		return formatNumber(Integer.valueOf(num));
 	}
 
 	public static String formatNumber(long num) {
-		return String.format("%d", num);
+		return formatNumber(Long.valueOf(num));
 	}
 
 	public static String formatNumber(float num) {
-		return String.format("%.2f", num);
+		return formatNumber(Float.valueOf(num));
 	}
 
 	public static String formatNumber(double num) {
-		return String.format("%.2f", num);
+		return formatNumber(Double.valueOf(num));
 	}
 
 	public static String convertToUserFriendlyCase(String input) {
