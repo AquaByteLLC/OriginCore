@@ -15,6 +15,8 @@ import commons.events.api.Subscribe;
 import commons.events.impl.PluginEventWrapper;
 import commons.impl.account.PlayerDefaultAccount;
 import commons.impl.account.PlayerDefaultAccountStorage;
+import commons.sched.SchedulerManager;
+import commons.sched.impl.Scheduler4Plugin;
 import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.menu.Menus;
@@ -22,13 +24,10 @@ import me.vadim.util.menu.MenusKt;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.concurrent.*;
 
 /**
@@ -44,6 +43,10 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		if (instance == null)
 			throw new NullPointerException("Not initialized! Did you accidentally shade in the entire commons lib?");
 		return instance;
+	}
+
+	public static SchedulerManager scheduler() {
+		return commons().getScheduler();
 	}
 
 	private final ExecutorService pool = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("[AccountStorage]").build());
@@ -70,6 +73,12 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		// todo
 //		return PostgreSQLSession::new;
 		return () -> new SQLiteSession(getDataFolder());
+	}
+
+	private Scheduler4Plugin scheduler;
+
+	public SchedulerManager getScheduler() {
+		return scheduler;
 	}
 
 	@Override
@@ -101,35 +110,6 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		System.out.println("If this message is not prepended by [STDOUT], then the gay-ass paper logger has been disabled.");
 	}
 
-	// we do a little bit of syncronization =P
-
-	private BukkitTask syncer;
-	private final Queue<FutureTask<?>> futures = new ArrayDeque<>();
-
-	public Future<?> sync(Runnable runnable) {
-		FutureTask<?> future = new FutureTask<>(runnable, null);
-		futures.add(future);
-		return future;
-	}
-
-	public <T> Future<T> sync(Callable<T> callable) {
-		FutureTask<T> future = new FutureTask<>(callable);
-		futures.add(future);
-		return future;
-	}
-
-	private void await() {
-		FutureTask<?> future;
-		while((future = futures.poll()) != null) {
-			try {
-				future.run();
-			}  catch (Exception e) {
-				System.err.println("WARN: Problem executing future task:");
-				e.printStackTrace();
-			}
-		}
-	}
-
 	@Override
 	public void enable() {
 		Menus.enable();
@@ -143,7 +123,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 		getEventRegistry().subscribeAll(this);
 
-		syncer = getServer().getScheduler().runTaskTimer(this, this::await, 1L, 1L);
+		scheduler = new Scheduler4Plugin(this);
 	}
 
 	@Override
@@ -153,8 +133,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		storage.saveAll();
 		pool.shutdownNow();
 		events.disable();
-		syncer.cancel();
-		await();
+		scheduler.shutdown();
 	}
 
 	@Subscribe

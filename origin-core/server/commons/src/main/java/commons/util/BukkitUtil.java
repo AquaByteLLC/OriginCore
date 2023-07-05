@@ -65,22 +65,25 @@ public class BukkitUtil {
 		};
 	}
 
+	@Deprecated
 	public static BukkitTask sync(Exceptional exceptional) {
 		return Bukkit.getScheduler().runTask(CommonsPlugin.commons(), wrap(exceptional));
 	}
 
+	@Deprecated
 	public static BukkitTask sync(Exceptional exceptional, long ticks) {
 		return Bukkit.getScheduler().runTaskLater(CommonsPlugin.commons(), wrap(exceptional), ticks);
 	}
 
+	@Deprecated
 	public static BukkitTask async(Exceptional exceptional) {
 		return Bukkit.getScheduler().runTaskAsynchronously(CommonsPlugin.commons(), wrap(exceptional));
 	}
 
+	@Deprecated
 	public static BukkitTask async(Exceptional exceptional, long ticks) {
 		return Bukkit.getScheduler().runTaskLaterAsynchronously(CommonsPlugin.commons(), wrap(exceptional), ticks);
 	}
-
 
 	/*
 	 * These are useful methods, so I'm leaving them here.

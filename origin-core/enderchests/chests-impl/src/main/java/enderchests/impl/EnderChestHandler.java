@@ -2,6 +2,7 @@ package enderchests.impl;
 
 import blocks.BlocksAPI;
 import blocks.block.illusions.IllusionsAPI;
+import commons.CommonsPlugin;
 import commons.data.AccountProvider;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
@@ -26,6 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -66,7 +68,7 @@ public class EnderChestHandler implements Listener {
 		event.setCancelled(true);
 		ItemStack item = event.getItem().clone();
 
-		Bukkit.getScheduler().runTaskLater(EnderChestsPlugin.singletonCringe(), () -> {
+		CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
 			// remove single item
 			from.removeItem(item);
 			chest.getInventory().addItem(item);
@@ -91,7 +93,7 @@ public class EnderChestHandler implements Listener {
 
 		if(cI.isEmpty()) return;
 
-		Bukkit.getScheduler().runTaskLater(EnderChestsPlugin.singletonCringe(), () -> {
+		CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
 			// remove single item
 			ItemStack item = null;
 			ItemStack[] contents = cI.getContents();
@@ -123,8 +125,7 @@ public class EnderChestHandler implements Listener {
 		EnderChestAccount account = accounts.getAccount(player);
 		if (!account.isViewingLinkedInventory()) return;
 
-		account.currentLinkedInventory.close(player);
-		account.currentLinkedInventory = null;
+		account.openNewLinkedInventory(null);
 	}
 
 	@Subscribe
@@ -139,15 +140,45 @@ public class EnderChestHandler implements Listener {
 			ChestNetwork net   = registry.getNetwork(account.temp, player);
 			LinkedChest  chest = registry.createChest(net, block.getLocation(), ((Directional) data).getFacing());
 			illusions.globalRegistry().register(chest);
-			block.setType(Material.CHEST);
-			((Chest) block.getState()).getBlockInventory().addItem(new ItemStack(Material.STONE)); // add dummy item to trigger inventory move event
-			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				player.sendBlockChange(block.getLocation(), chest.getProjectedBlockData());
+			chest.ensureHopperConnectivity();
+			CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
+//				player.sendBlockChange(block.getLocation(), chest.getProjectedBlockData());
+				System.out.println(player);
+				System.out.println(block);
+				System.out.println(chest);
 			}, 1L);
-
-//			new Chunk()
-
-//			ClientboundLevelChunkWithLightPacket
 		}
+	}
+
+	@Subscribe
+	void onLeftClick(BlockBreakEvent event) {
+		LinkedChest chest = registry.getChestAt(event.getBlock().getLocation());
+
+		if(chest == null) return;
+		((LinkedEnderChest) chest).leftClick(event.getPlayer());
+		event.setCancelled(true);
+	}
+
+	@Subscribe
+	void onLeftClick(BlockDamageEvent event) {
+		LinkedChest chest = registry.getChestAt(event.getBlock().getLocation());
+
+		if(chest == null) return;
+		((LinkedEnderChest) chest).leftClick(event.getPlayer());
+		event.setCancelled(true);
+	}
+
+	@Subscribe
+	void onRightClick(InventoryOpenEvent event) {
+		Entity entity = event.getPlayer();
+		if(!(entity instanceof Player player)) return;
+
+		InventoryHolder holder = event.getInventory().getHolder();
+		if(!(holder instanceof Chest container)) return;
+
+		LinkedChest chest = registry.getChestAt(container.getLocation());
+		if(chest == null) return;
+		event.setCancelled(true);
+		((LinkedEnderChest) chest).rightClick(player);
 	}
 }

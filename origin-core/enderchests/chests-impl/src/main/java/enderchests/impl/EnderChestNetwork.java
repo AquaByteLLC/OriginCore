@@ -1,11 +1,13 @@
 package enderchests.impl;
 
+import commons.data.AccountProvider;
 import commons.impl.PlayerOwned;
 import commons.util.StringUtil;
 import enderchests.ChestNetwork;
 import enderchests.LinkedChest;
 import enderchests.NetworkColor;
 import enderchests.impl.conf.Config;
+import enderchests.impl.data.EnderChestAccount;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.Bukkit;
@@ -26,8 +28,9 @@ public class EnderChestNetwork extends PlayerOwned implements ChestNetwork {
 	private final NetworkColor color;
 	private final Inventory inventory;
 	private final List<LinkedChest> chests = new ArrayList<>();
+	private final AccountProvider<EnderChestAccount> accounts;
 
-	public EnderChestNetwork(UUID uuid, NetworkColor color, ConfigurationProvider conf) {
+	public EnderChestNetwork(UUID uuid, NetworkColor color, ConfigurationProvider conf, AccountProvider<EnderChestAccount> accounts) {
 		super(uuid);
 		this.color = color;
 		this.inventory = Bukkit.createInventory(null, Config.CHEST_SIZE,
@@ -36,10 +39,11 @@ public class EnderChestNetwork extends PlayerOwned implements ChestNetwork {
 																									 color.chatColor.toString() +
 																									 StringUtil.convertToUserFriendlyCase(color.name()) +
 																									 "&r"))));
+		this.accounts = accounts;
 	}
 
 	public LinkedChest newChest(Location location, BlockFace face) {
-		LinkedChest chest = new LinkedEnderChest(location, face, this);
+		LinkedChest chest = new LinkedEnderChest(location, accounts, face, this);
 		chests.add(chest);
 		return chest;
 	}

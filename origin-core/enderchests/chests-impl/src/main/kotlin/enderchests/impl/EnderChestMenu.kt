@@ -44,7 +44,7 @@ class EnderChestMenu(plugin: EnderChestsPlugin, private val chest: LinkedEnderCh
 		}
 
 		close = {
-			chest.close(it.player as Player)
+//			chest.close(it.player as Player)
 		}
 	}
 

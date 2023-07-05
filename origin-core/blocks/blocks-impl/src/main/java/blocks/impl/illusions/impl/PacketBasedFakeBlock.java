@@ -1,6 +1,5 @@
 package blocks.impl.illusions.impl;
 
-import blocks.block.illusions.BlockOverlay;
 import blocks.block.illusions.FakeBlock;
 import blocks.block.util.PacketReceiver;
 import blocks.impl.illusions.BlockAdapter;
@@ -17,21 +16,6 @@ public class PacketBasedFakeBlock extends BlockAdapter implements FakeBlock {
 
 	private final BlockData fakeData;
 	private final FallingBlockOverlay overlay;
-
-	@Deprecated(forRemoval = true)
-	public PacketBasedFakeBlock(Location location) {
-		this(location, null, null);
-	}
-
-	@Deprecated(forRemoval = true)
-	public PacketBasedFakeBlock(Location location, BlockData fakeData) {
-		this(location, fakeData, null);
-	}
-
-	@Deprecated(forRemoval = true)
-	public PacketBasedFakeBlock(Location location, BlockOverlay overlay) {
-		this(location, null, (FallingBlockOverlay) overlay);
-	}
 
 	public PacketBasedFakeBlock(Location location, BlockData fakeData, FallingBlockOverlay overlay) {
 		super(location);

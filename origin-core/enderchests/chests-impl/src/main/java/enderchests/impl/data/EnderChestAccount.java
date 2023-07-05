@@ -2,11 +2,11 @@ package enderchests.impl.data;
 
 
 import com.j256.ormlite.table.DatabaseTable;
+import commons.CommonsPlugin;
 import commons.data.AbstractAccount;
-import enderchests.ChestRegistry;
 import enderchests.NetworkColor;
 import enderchests.impl.LinkedEnderChest;
-import me.vadim.util.conf.ConfigurationProvider;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -17,24 +17,73 @@ import java.util.UUID;
 @DatabaseTable
 public class EnderChestAccount extends AbstractAccount {
 
-	ChestRegistry registry;
-
 	private EnderChestAccount() { // ORMLite
 		super(null);
 	}
 
-	EnderChestAccount(UUID uuid, ChestRegistry registry, ConfigurationProvider conf) {
+	EnderChestAccount(UUID uuid) {
 		super(uuid);
-
-		this.registry = registry;
 	}
 
-	public NetworkColor temp = NetworkColor.AQUA;
+	public NetworkColor temp = NetworkColor.WHITE;
 
-	public LinkedEnderChest currentLinkedInventory;
+	private LinkedEnderChest currentLinkedInventory;
+	private final Object invLock = new Object();
 
-	public boolean isViewingLinkedInventory(){
+	/**
+	 * Note that this method is <i>not</i> atomic.
+	 *
+	 * @return {@code true} if the player is viewing a linked chest inventory
+	 */
+	public boolean isViewingLinkedInventory() {
 		return currentLinkedInventory != null;
+	}
+
+	/**
+	 * Note that this method is <i>not</i> atomic.
+	 *
+	 * @return the current linked chest that is being viewed, or {@code null}
+	 */
+	public LinkedEnderChest getOpenLinkedInventory() {
+		return currentLinkedInventory;
+	}
+
+	/**
+	 * This method <i>atomically</i> sets the currently linked inventory.
+	 *
+	 * @param newInventory the new inventory to open, or {@code null} to indicate that the player has closed any linked inventory
+	 */
+	public void openNewLinkedInventory(LinkedEnderChest newInventory) {
+		Player player = getOfflineOwner().getPlayer();
+		if (player != null) {
+			if (newInventory != null) {
+				player.swingMainHand();
+				CommonsPlugin.scheduler().getBukkitSync().runTask(this::openInventory0);
+			}
+			// do not call player.closeInventory() due to recursive event invokation
+		}
+
+		synchronized (invLock) { // updateAnimation does not work here due to the update order of getViewers()
+			if (currentLinkedInventory != null)
+				currentLinkedInventory.setOpen(currentLinkedInventory.getInventory().getViewers().size() > 1);
+			currentLinkedInventory = newInventory;
+			if (currentLinkedInventory != null)
+				currentLinkedInventory.setOpen(true);
+			// for some reason, 6L is the shortest amount of time that this will still run
+			// when clicking on the bottom of the chest... so let's just do it twice
+			CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
+				if (currentLinkedInventory != null)
+					currentLinkedInventory.setOpen(true);
+			}, 6L);
+		}
+	}
+
+	private void openInventory0() {
+		OfflinePlayer player = getOfflineOwner();
+		synchronized (invLock) {
+			if (player.getPlayer() != null && player.isOnline() && currentLinkedInventory != null)
+				player.getPlayer().openInventory(currentLinkedInventory.getInventory());
+		}
 	}
 
 }

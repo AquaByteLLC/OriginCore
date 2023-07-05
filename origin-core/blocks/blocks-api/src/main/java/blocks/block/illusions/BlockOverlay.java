@@ -19,6 +19,8 @@ public interface BlockOverlay extends BlockLike, Illusion {
 
 	BlockData getOverlayData();
 
+	boolean hasOverlayData();
+
 	ClickCallback getCallback();
 
 }

@@ -56,8 +56,8 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider {
 		lfc.register(Config.class, Config::new);
 		lfc.reload();
 
-		chestRegistry = new EnderChestRegistry(lfc);
-		accountStorage = new EChestAccountStorage(chestRegistry, lfc, CommonsPlugin.commons().getDatabase());
+		accountStorage = new EChestAccountStorage(lfc, CommonsPlugin.commons().getDatabase());
+		chestRegistry = new EnderChestRegistry(lfc, accountStorage);
 		chestHandler  = new EnderChestHandler(this, chestRegistry, accountStorage, CommonsPlugin.commons().getEventRegistry());
 
 		commands = new PaperCommandManager(this);

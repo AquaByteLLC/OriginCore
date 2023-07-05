@@ -2,6 +2,7 @@ package generators.impl.cmd;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import commons.CommonsPlugin;
 import commons.util.StringUtil;
 import commons.data.AccountProvider;
 import commons.data.AccountStorage;
@@ -53,7 +54,7 @@ public class GenCommand extends BaseCommand {
 
 	@Subcommand("save-all")
 	public void flushAndSave(Player sender) {
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+		CommonsPlugin.scheduler().getAsyncExecutor().submit(() -> {
 			((AccountStorage<GenAccount>) accounts).flushAndSave();
 			genStorage.save();
 			StringUtil.send(sender, "&ddone xP");

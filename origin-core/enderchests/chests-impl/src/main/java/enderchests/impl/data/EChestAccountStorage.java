@@ -3,7 +3,6 @@ package enderchests.impl.data;
 import com.j256.ormlite.dao.Dao;
 import commons.data.ORMLiteAccountStorage;
 import commons.data.SessionProvider;
-import enderchests.ChestRegistry;
 import me.vadim.util.conf.ConfigurationProvider;
 
 import java.sql.SQLException;
@@ -14,11 +13,8 @@ import java.util.UUID;
  */
 public class EChestAccountStorage extends ORMLiteAccountStorage<EnderChestAccount> {
 
-	private final ChestRegistry registry;
-
-	public EChestAccountStorage(ChestRegistry registry, ConfigurationProvider conf, SessionProvider provider) {
-		super(uuid -> new EnderChestAccount(uuid, registry, conf), provider, EnderChestAccount.class);
-		this.registry = registry;
+	public EChestAccountStorage(ConfigurationProvider conf, SessionProvider provider) {
+		super(EnderChestAccount::new, provider, EnderChestAccount.class);
 	}
 
 	@Override
@@ -31,7 +27,6 @@ public class EChestAccountStorage extends ORMLiteAccountStorage<EnderChestAccoun
 		EnderChestAccount account = dao.queryForId(uuid);
 		if(account == null)
 			account = factory.create(uuid);
-		account.registry = registry;
 		return account;
 	}
 

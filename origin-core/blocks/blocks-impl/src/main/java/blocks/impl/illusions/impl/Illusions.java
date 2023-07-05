@@ -24,21 +24,19 @@ public class Illusions implements IllusionsAPI {
 	private final JavaPlugin plugin;
 	private final EventRegistry events;
 	@Deprecated
-	private final IllusionFactory $;
 	private final IllusionRegistry global;
 	private final Map<UUID, IllusionRegistry> local = new HashMap<>();
 
 	public Illusions(JavaPlugin plugin, EventRegistry events) {
 		this.plugin = plugin;
 		this.events = events;
-		this.$      = new IllusionFactoryImpl();
 		this.global = new BlockIllusionRegistry(plugin, new ServerPacketReceiver(), events);
 		events.subscribeAll(this);
 	}
 
 	@Override
 	public IllusionFactory factory() {
-		return $;
+		throw new UnsupportedOperationException("Deprecated method will be removed in the next version.");
 	}
 
 	@Override

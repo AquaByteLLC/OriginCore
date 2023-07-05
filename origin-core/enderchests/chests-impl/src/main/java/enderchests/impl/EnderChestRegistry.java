@@ -1,10 +1,12 @@
 package enderchests.impl;
 
+import commons.data.AccountProvider;
 import commons.util.PackUtil;
 import enderchests.ChestNetwork;
 import enderchests.ChestRegistry;
 import enderchests.LinkedChest;
 import enderchests.NetworkColor;
+import enderchests.impl.data.EnderChestAccount;
 import me.vadim.util.conf.ConfigurationProvider;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -25,9 +27,11 @@ public class EnderChestRegistry implements ChestRegistry {
 	private final Map<Location, LinkedChest> chests = new HashMap<>();
 	private final Map<UUID, Map<NetworkColor, ChestNetwork>> networks = new HashMap<>();
 	private final ConfigurationProvider conf;
+	private final AccountProvider<EnderChestAccount> accounts;
 
-	public EnderChestRegistry(ConfigurationProvider conf) {
+	public EnderChestRegistry(ConfigurationProvider conf, AccountProvider<EnderChestAccount> accounts) {
 		this.conf = conf;
+		this.accounts = accounts;
 	}
 
 	@Override
@@ -37,7 +41,7 @@ public class EnderChestRegistry implements ChestRegistry {
 
 	@Override
 	public @NotNull ChestNetwork getNetwork(NetworkColor color, Player player) {
-		return networks.computeIfAbsent(player.getUniqueId(), x -> new HashMap<>()).computeIfAbsent(color, c -> new EnderChestNetwork(player.getUniqueId(), c, conf));
+		return networks.computeIfAbsent(player.getUniqueId(), x -> new HashMap<>()).computeIfAbsent(color, c -> new EnderChestNetwork(player.getUniqueId(), c, conf, accounts));
 	}
 
 	@Override

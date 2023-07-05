@@ -51,11 +51,8 @@ class IllusionBuilderImpl implements IllusionBuilder {
 	@Override
 	public FakeBlock build(Location location) {
 		FallingBlockOverlay olay = null;
-		if(has) {
-			if (overlay == null)
-				overlay = Material.GLASS.createBlockData();
+		if(has)
 			olay = new FallingBlockOverlay(location, highlight, overlay, click);
-		}
 		return new PacketBasedFakeBlock(location, projected, olay);
 	}
 
