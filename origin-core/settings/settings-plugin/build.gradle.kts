@@ -1,8 +1,9 @@
-group = "farming.impl"
-sharedProjectData.main_cls = "$group.FarmingPlugin"
+group = "settings.impl"
+sharedProjectData.main_cls = "$group.SettingsPlugin"
 
 setupShadowJar()
 copyToPluginsFolder()
+setupKotlin()
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)
@@ -18,9 +19,8 @@ dependencies {
     compileOnly(Dependencies.ITEMS)
     compileOnly(Dependencies.MENUS)
     compileOnly(Dependencies.WORLD_GUARD)
+    compileOnly(Dependencies.ORMLITE_CORE)
+    compileOnly(Dependencies.ORMLITE_JDBC)
     compileOnly(project(":commons"))
-    compileOnly(project(":enchants-api"))
-    compileOnly(project(":enchants-impl"))
-    compileOnly(project(":blocks-api"))
-    compileOnly(project(":blocks-impl"))
+    compileOnly(project(":settings-api"))
 }

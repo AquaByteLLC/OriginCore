@@ -20,9 +20,11 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
+import enchants.impl.EnchantPlugin;
 import farming.impl.commands.RegionCommands;
 import farming.impl.conf.BlocksConfig;
 import farming.impl.conf.GeneralConfig;
+import farming.impl.enchants.EnchantTypes;
 import farming.impl.events.FarmingEvents;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
@@ -51,6 +53,7 @@ public class FarmingPlugin extends ExtendedJavaPlugin implements ResourceProvide
 	@Override
 	protected void enable() {
 		eventRegistry = CommonsPlugin.commons().getEventRegistry();
+
 		lfc = new LiteConfig(this);
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.register(BlocksConfig.class, BlocksConfig::new);
@@ -61,6 +64,8 @@ public class FarmingPlugin extends ExtendedJavaPlugin implements ResourceProvide
 
 		injector = Guice.createInjector(new FarmingModule(this, lfc, blocksAPI));
 
+		EnchantPlugin enchantPlugin = EnchantPlugin.get().getInstance(EnchantPlugin.class);
+		EnchantTypes.init(enchantPlugin.getRegistry(), enchantPlugin.getFactory());
 		FarmingEvents.init(eventRegistry);
 		setup();
 	}

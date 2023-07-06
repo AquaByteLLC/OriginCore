@@ -1,3 +1,4 @@
+
 package farming.impl.conf;
 
 import me.vadim.util.conf.ResourceProvider;

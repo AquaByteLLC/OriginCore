@@ -5,7 +5,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.CommonsPlugin;
-import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import enchants.EnchantAPI;
@@ -51,7 +50,7 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 
 		events.subscribeAll(this);
 
-		injector = Guice.createInjector(new EnchantPluginModule(this, registry, factory));
+		injector = Guice.createInjector(new EnchantPluginModule(this, registry, factory, this));
 
 		lfc = new LiteConfig(this);
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
@@ -112,15 +111,18 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 	static class EnchantPluginModule extends AbstractModule {
 		private final JavaPlugin plugin;
 		private final EnchantAPI enchantAPI;
+		private final EnchantPlugin enchantPlugin;
 
-		EnchantPluginModule(JavaPlugin plugin, EnchantRegistry registry, EnchantFactory factory) {
+		EnchantPluginModule(JavaPlugin plugin, EnchantRegistry registry, EnchantFactory factory, EnchantPlugin enchantPlugin) {
 			this.plugin = plugin;
+			this.enchantPlugin = enchantPlugin;
 			this.enchantAPI = new EnchantAPI(plugin, registry, factory);
 		}
 
 		protected void configure() {
 			this.bind(JavaPlugin.class).toInstance(plugin);
 			this.bind(EnchantAPI.class).toInstance(enchantAPI);
+			this.bind(EnchantPlugin.class).toInstance(enchantPlugin);
 		}
 	}
 }

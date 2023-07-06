@@ -1,50 +1,45 @@
 package mining.impl.util;
 
 import blocks.BlocksAPI;
-import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.block.builder.FixedAspectHolder;
-import blocks.impl.BlocksPlugin;
-import blocks.impl.data.account.BlockAccount;
-import net.minecraft.core.BlockPosition;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.util.NumberConversions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LocationUtil {
-	public static List<FixedAspectHolder> fracture(Player player, Block block, BlockPosition position) {
-		List<FixedAspectHolder> blocks = new ArrayList<>();
+	public static List<FixedAspectHolder> getSphereHolders(Player player, Location location, int sphereRadius) {
+		final List<FixedAspectHolder> holders = new ArrayList<>();
 
-		BlockAccount blockAccount = BlocksPlugin.get().getInstance(BlocksPlugin.class).getAccountStorage().getAccount(player);
-		RegenerationRegistry regenerationRegistry = blockAccount.getRegenerationRegistry();
+		final double centerX = location.getBlockX() + 0.5;
+		final double centerY = location.getBlockY() + 0.5;
+		final double centerZ = location.getBlockZ() + 0.5;
+		final double radiusSquared = NumberConversions.square(sphereRadius);
+		final World world = location.getWorld();
 
-		Location blockEast = block.getRelative(BlockFace.EAST).getLocation();
-		Location blockWest = block.getRelative(BlockFace.WEST).getLocation();
-		Location blockNorth = block.getRelative(BlockFace.NORTH).getLocation();
-		Location blockSouth = block.getRelative(BlockFace.SOUTH).getLocation();
+		for (double x = centerX - sphereRadius; x <= centerX + sphereRadius; x++) {
+			for (double y = centerY - sphereRadius; y <= centerY + sphereRadius; y++) {
+				for (double z = centerZ - sphereRadius; z <= centerZ - sphereRadius; z++) {
 
-		BlockPosition positionEast = new BlockPosition(blockEast.getBlockX(), blockEast.getBlockY(), blockEast.getBlockZ());
-		BlockPosition positionWest = new BlockPosition(blockWest.getBlockX(), blockWest.getBlockY(), blockWest.getBlockZ());
-		BlockPosition positionSouth = new BlockPosition(blockSouth.getBlockX(), blockSouth.getBlockY(), blockSouth.getBlockZ());
-		BlockPosition positionNorth = new BlockPosition(blockNorth.getBlockX(), blockNorth.getBlockY(), blockNorth.getBlockZ());
+					final double distanceSquared = NumberConversions.square(x - centerX) + NumberConversions.square(y - centerY) + NumberConversions.square(z - centerZ);
 
-		FixedAspectHolder fixedAspectHolderEast = BlocksAPI.getBlock(blockEast);
-		FixedAspectHolder fixedAspectHolderWest = BlocksAPI.getBlock(blockWest);
-		FixedAspectHolder fixedAspectHolderNorth = BlocksAPI.getBlock(blockNorth);
-		FixedAspectHolder fixedAspectHolderSouth = BlocksAPI.getBlock(blockSouth);
-
-		if (!(fixedAspectHolderEast == null && blockAccount.getRegenerationRegistry().getRegenerations().containsKey(positionEast)))
-			blocks.add(fixedAspectHolderEast);
-		else if (!(fixedAspectHolderWest == null && blockAccount.getRegenerationRegistry().getRegenerations().containsKey(positionWest)))
-			blocks.add(fixedAspectHolderWest);
-		else if (!(fixedAspectHolderNorth == null && blockAccount.getRegenerationRegistry().getRegenerations().containsKey(positionNorth)))
-			blocks.add(fixedAspectHolderNorth);
-		else if (!(fixedAspectHolderSouth == null && blockAccount.getRegenerationRegistry().getRegenerations().containsKey(positionSouth)))
-			blocks.add(fixedAspectHolderSouth);
-
-		return blocks;
+					if (distanceSquared < radiusSquared) {
+						final Block block = world.getBlockAt((int) x, (int) y, (int) z);
+						final FixedAspectHolder fah = BlocksAPI.getBlock(block.getLocation());
+						if (fah != null) {
+							if (BlocksAPI.inRegion(block.getLocation())) {
+								holders.add(fah);
+							}
+						}
+					}
+				}
+			}
+		}
+		return holders;
 	}
+
 }
