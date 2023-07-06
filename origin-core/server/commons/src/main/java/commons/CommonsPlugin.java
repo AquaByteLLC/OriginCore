@@ -6,7 +6,7 @@ import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.logger.Level;
 import commons.cmd.EconCommand;
 import commons.data.AccountStorage;
-import commons.data.AccountStorageHandler;
+import commons.impl.account.AccountStorageHandler;
 import commons.data.SessionProvider;
 import commons.data.impl.LocationPersister;
 import commons.data.impl.SQLiteSession;

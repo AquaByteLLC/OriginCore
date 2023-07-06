@@ -1,7 +1,7 @@
 package commons.impl.account;
 
 import com.j256.ormlite.dao.Dao;
-import commons.data.ORMLiteAccountStorage;
+import commons.data.impl.ORMLiteAccountStorage;
 import commons.data.SessionProvider;
 
 import java.sql.SQLException;

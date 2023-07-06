@@ -4,7 +4,7 @@ package blocks.impl.data.account;
 import blocks.impl.registry.ProgressRegistryImpl;
 import blocks.impl.registry.RegenerationRegistryImpl;
 import com.j256.ormlite.table.DatabaseTable;
-import commons.data.AbstractAccount;
+import commons.data.impl.AbstractAccount;
 import me.lucko.helper.bossbar.BossBar;
 import me.lucko.helper.bossbar.BossBarColor;
 import me.lucko.helper.bossbar.BossBarStyle;

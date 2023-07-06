@@ -35,6 +35,11 @@ public class EnderChestRegistry implements ChestRegistry {
 	}
 
 	@Override
+	public LinkedChest[] getAllChests() {
+		return chests.values().toArray(LinkedChest[]::new);
+	}
+
+	@Override
 	public @Nullable LinkedChest getChestAt(Location location) {
 		return chests.get(location.getBlock().getLocation());
 	}

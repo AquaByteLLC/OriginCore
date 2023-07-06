@@ -3,7 +3,7 @@ package generators.impl.data;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import commons.data.AbstractAccount;
+import commons.data.impl.AbstractAccount;
 import generators.GeneratorRegistry;
 import generators.impl.conf.Config;
 import me.vadim.util.conf.ConfigurationProvider;

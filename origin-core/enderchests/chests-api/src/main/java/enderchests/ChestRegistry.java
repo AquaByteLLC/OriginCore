@@ -11,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface ChestRegistry {
 
+	LinkedChest[] getAllChests();
+
 	@Nullable LinkedChest getChestAt(Location location);
 
 	@NotNull ChestNetwork getNetwork(NetworkColor color, Player player);

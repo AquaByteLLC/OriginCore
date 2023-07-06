@@ -3,7 +3,7 @@ package commons.impl.account;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import commons.data.AbstractAccount;
+import commons.data.impl.AbstractAccount;
 import commons.econ.BankAccount;
 import commons.econ.Currency;
 import commons.econ.Transaction;
@@ -16,9 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
