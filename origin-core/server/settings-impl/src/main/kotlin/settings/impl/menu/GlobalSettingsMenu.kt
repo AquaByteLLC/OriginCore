@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.ClickType
 import settings.Setting
 import settings.Settings
 import settings.impl.SettingsPlugin
+import settings.option.SettingsOption
 import settings.registry.SettingsHolder
 import settings.section.SettingSection
 
@@ -21,7 +22,6 @@ class GlobalSettingsMenu(plugin: SettingsPlugin, private val holder: SettingsHol
 	private fun getSection(section: SettingSection): MenuList<Setting> =
 		template.toList(holder.getLocalSettings(section), transformer = { it.menuItem }) {
 			title = config().title.format(StringPlaceholder.of("section", section.name))
-
 			next = buttons[NEXT_SLOT]!! to NEXT_SLOT
 			back = buttons[BACK_SLOT]!! to BACK_SLOT
 
@@ -35,6 +35,7 @@ class GlobalSettingsMenu(plugin: SettingsPlugin, private val holder: SettingsHol
 					ClickType.MIDDLE                       -> SettingsHolder.SettingAction.DEFAULT
 					else                                   -> null
 				}
+
 				if (action != null) {
 					holder.updateOption(setting, action)
 					regen()

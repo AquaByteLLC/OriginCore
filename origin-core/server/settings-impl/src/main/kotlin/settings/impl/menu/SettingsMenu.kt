@@ -14,9 +14,6 @@ import settings.impl.conf.Config
 import settings.registry.SectionRegistry
 import settings.registry.SettingsRegistry
 
-/**
- * @author vadim
- */
 abstract class SettingsMenu<T>(protected val plugin: SettingsPlugin) {
 
 	companion object {

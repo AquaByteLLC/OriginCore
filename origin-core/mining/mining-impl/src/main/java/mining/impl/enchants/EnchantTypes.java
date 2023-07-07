@@ -2,7 +2,6 @@ package mining.impl.enchants;
 
 import blocks.BlocksAPI;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
-import blocks.block.builder.FixedAspectHolder;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.impl.BlocksPlugin;
 import blocks.impl.data.account.BlockAccount;
@@ -20,16 +19,11 @@ import enchants.item.EnchantedItem;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.protocol.game.PacketPlayInBlockDig;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
-import static mining.impl.util.LocationUtil.fracture;
 
 public enum EnchantTypes implements EnchantKey {
 
@@ -55,19 +49,7 @@ public enum EnchantTypes implements EnchantKey {
 					final BlockPosition blockPos = a.get(event);
 
 					if (item.activate(key)) {
-						List<FixedAspectHolder> aspectList = fracture(player, block, blockPos);
-						aspectList.forEach(holder -> {
-							final Block holderBlock = holder.getBlock();
-							final Location holderLoc = holderBlock.getLocation();
-							final BlockPosition position = new BlockPosition(holderLoc.getBlockX(), holderLoc.getBlockY(), holderLoc.getBlockZ());
 
-							if (BlocksAPI.inRegion(holderLoc)) {
-								double current = progressRegistry.getBlockProgress().get(position) != null ? progressRegistry.getBlockProgress().get(position) : 0.0;
-								double newProg = current + 20;
-								progressRegistry.getBlocksBreaking().put(position, true);
-								progressRegistry.getBlockProgress().put(position, newProg);
-							}
-						});
 					}
 				}
 			}), EnchantTarget.tools());

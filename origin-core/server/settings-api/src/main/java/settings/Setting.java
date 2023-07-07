@@ -2,7 +2,6 @@ package settings;
 
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import oshi.annotation.concurrent.NotThreadSafe;
 import settings.option.SettingsOption;
 
 import java.util.List;
@@ -18,6 +17,7 @@ public interface Setting {
 	List<SettingsOption> getOptions();
 
 	SettingsOption getDefaultOption();
+
 
 	void setDefaultOption(@NotNull SettingsOption option);
 

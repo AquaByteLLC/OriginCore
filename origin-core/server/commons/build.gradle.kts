@@ -11,6 +11,7 @@ dependencies {
     compileOnly(Dependencies.SPIGOT)
     implementation(Dependencies.LUCKO_HELPER)
     implementation(Dependencies.LUCKO_SQL)
+    implementation(Dependencies.LUCKO_REDIS)
     implementation(Dependencies.LUCKO_PROFILES)
     implementation(Dependencies.GUICE)
     implementation(Dependencies.ORMLITE_CORE)

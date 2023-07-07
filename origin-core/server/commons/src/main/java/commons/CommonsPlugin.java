@@ -22,6 +22,8 @@ import commons.impl.account.ServerAccount;
 import commons.sched.SchedulerManager;
 import commons.sched.impl.Scheduler4Plugin;
 import lombok.Getter;
+import me.lucko.helper.messaging.bungee.BungeeCord;
+import me.lucko.helper.messaging.bungee.BungeeCordImpl;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.menu.Menus;
 import me.vadim.util.menu.MenusKt;
@@ -40,6 +42,8 @@ import java.util.concurrent.*;
 public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	private static CommonsPlugin instance;
+	@Getter private BungeeCord bungeeCord;
+
 	@Getter
 	private final EntityRegistry entityRegistry = new EntityRegistry();
 
@@ -99,6 +103,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		com.j256.ormlite.logger.Logger.setGlobalLogLevel(Level.WARNING); // supress spam from TableUtils class
 		DataPersisterManager.registerDataPersisters(new LocationPersister());
 		getDataFolder().mkdirs();
+		this.bungeeCord = new BungeeCordImpl(this);
 
 		// 'FUCK YOU' LIST:
 		// Fuck you, underscore11code, inventor of this GAY SHIT: https://github.com/PaperMC/Paper/commit/ed1dc272e65a367cf1e405f9208a42911e4e19ba
