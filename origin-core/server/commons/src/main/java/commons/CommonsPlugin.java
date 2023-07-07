@@ -24,6 +24,8 @@ import commons.impl.account.ServerAccount;
 import commons.sched.SchedulerManager;
 import commons.sched.impl.Scheduler4Plugin;
 import lombok.Getter;
+import me.lucko.helper.messaging.bungee.BungeeCord;
+import me.lucko.helper.messaging.bungee.BungeeCordImpl;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
@@ -133,6 +135,12 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return bank;
 	}
 
+	private BungeeCord bungeeCord;
+
+	public BungeeCord getBungeeCord() {
+		return bungeeCord;
+	}
+
 	@Override
 	protected void load() {
 		instance = this;
@@ -181,6 +189,8 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		getEventRegistry().subscribeAll(this);
 
 		scheduler = new Scheduler4Plugin(this);
+
+		bungeeCord = new BungeeCordImpl(this);
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new EconCommand(accounts));
