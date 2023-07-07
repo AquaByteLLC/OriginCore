@@ -2,7 +2,7 @@ group = "blocks.impl"
 sharedProjectData.main_cls = "$group.BlocksPlugin"
 
 setupShadowJar()
-copyToPluginsFolder()
+copyToPluginsFolder("commons")
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)

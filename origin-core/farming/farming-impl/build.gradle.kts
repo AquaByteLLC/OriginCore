@@ -2,7 +2,7 @@ group = "farming.impl"
 sharedProjectData.main_cls = "$group.FarmingPlugin"
 
 setupShadowJar()
-copyToPluginsFolder()
+copyToPluginsFolder("commons", "settings-impl", "blocks-impl")
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)

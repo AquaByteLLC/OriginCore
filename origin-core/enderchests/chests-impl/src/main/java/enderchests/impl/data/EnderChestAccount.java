@@ -2,6 +2,7 @@ package enderchests.impl.data;
 
 
 import com.j256.ormlite.table.DatabaseTable;
+import commons.Commons;
 import commons.CommonsPlugin;
 import commons.data.impl.AbstractAccount;
 import enderchests.NetworkColor;
@@ -66,7 +67,7 @@ public class EnderChestAccount extends AbstractAccount {
 		if (player != null) {
 			if (newInventory != null) {
 				player.swingMainHand();
-				CommonsPlugin.scheduler().getBukkitSync().runTask(this::openInventory0);
+				Commons.scheduler().getBukkitSync().runTask(this::openInventory0);
 			}
 			// do not call player.closeInventory() due to recursive event invokation
 		}
@@ -78,7 +79,7 @@ public class EnderChestAccount extends AbstractAccount {
 			if (delayedEffect) {
 				// for some reason, 6L is the shortest amount of time that this will still run
 				// when clicking on the bottom of the chest... so let's just do it twice
-				CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
+				Commons.scheduler().getBukkitSync().runLater(() -> {
 					if (currentLinkedInventory != null)
 						currentLinkedInventory.setOpen(true);
 				}, 6L);

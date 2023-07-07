@@ -5,6 +5,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.logger.Level;
 import commons.cmd.EconCommand;
+import commons.cmd.SaveCommand;
+import commons.conf.CommonsConfig;
 import commons.data.AccountStorage;
 import commons.impl.account.AccountStorageHandler;
 import commons.data.SessionProvider;
@@ -23,6 +25,8 @@ import commons.sched.SchedulerManager;
 import commons.sched.impl.Scheduler4Plugin;
 import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import me.vadim.util.conf.LiteConfig;
+import me.vadim.util.conf.ResourceProvider;
 import me.vadim.util.menu.Menus;
 import me.vadim.util.menu.MenusKt;
 import org.bukkit.event.Listener;
@@ -30,9 +34,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.concurrent.*;
+import java.util.logging.Logger;
 
 /**
  * @author vadim
@@ -40,8 +47,36 @@ import java.util.concurrent.*;
 public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 	private static CommonsPlugin instance;
-	@Getter
+
+	/**
+	 * Avoid implementing ResourceProvider so that CommonsPlugins class remains visible to subprojects that do not have the LiteConfig dependency.
+	 */
+	private final LiteConfig lfc = new LiteConfig(new ResourceProvider() {
+		@Override
+		public File getDataFolder() {
+			return CommonsPlugin.this.getDataFolder();
+		}
+
+		@Override
+		public InputStream getResource(String name) {
+			return CommonsPlugin.this.getResource(name);
+		}
+
+		@Override
+		public Logger getLogger() {
+			return CommonsPlugin.this.getLogger();
+		}
+	});
+
+	public CommonsConfig config() {
+		return lfc.open(CommonsConfig.class);
+	}
+
 	private final EntityRegistry entityRegistry = new EntityRegistry();
+
+	public EntityRegistry getEntityRegistry() {
+		return entityRegistry;
+	}
 
 	public static CommonsPlugin commons() {
 		if (instance == null)
@@ -49,6 +84,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return instance;
 	}
 
+	@Deprecated(forRemoval = true)
 	public static SchedulerManager scheduler() {
 		return commons().getScheduler();
 	}
@@ -58,13 +94,19 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 	private final AccountStorageHandler storage = new AccountStorageHandler();
 
 	public void registerAccountLoader(AccountStorage<?> accounts) {
+		getLogger().info("Registering account loader for "+accounts.getAccountClass().getCanonicalName());
 		storage.track(accounts);
 	}
 
-	private AccountStorage<PlayerDefaultAccount> dataStorage;
+	private AccountStorage<PlayerDefaultAccount> accounts;
 
+	@Deprecated
 	public AccountStorage<PlayerDefaultAccount> getDataStorage() {
-		return dataStorage;
+		return accounts;
+	}
+
+	public AccountStorage<PlayerDefaultAccount> getAccounts() {
+		return accounts;
 	}
 
 	private PluginEventWrapper events;
@@ -127,8 +169,11 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		Menus.enable();
 		getLogger().info("(enable) commons plugin hello");
 
-		dataStorage = new PlayerDefaultAccountStorage(getDatabase());
-		registerAccountLoader(dataStorage);
+		lfc.register(CommonsConfig.class, CommonsConfig::new);
+		lfc.reload();
+
+		accounts = new PlayerDefaultAccountStorage(getDatabase());
+		registerAccountLoader(accounts);
 
 		events = new PluginEventWrapper(this);
 		events.enable();
@@ -138,7 +183,8 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		scheduler = new Scheduler4Plugin(this);
 
 		commands = new PaperCommandManager(this);
-		commands.registerCommand(new EconCommand(dataStorage));
+		commands.registerCommand(new EconCommand(accounts));
+		commands.registerCommand(new SaveCommand(storage));
 	}
 
 	@Override
@@ -152,7 +198,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 	}
 
 	@Subscribe
-	private void onJoin(EventContext context, PlayerJoinEvent event) {
+	private void onJoin(PlayerJoinEvent event) {
 		pool.submit(() -> {
 			try {
 				storage.loadOne(event.getPlayer().getUniqueId());
@@ -164,7 +210,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 	}
 
 	@Subscribe
-	private void onQuit(EventContext context, PlayerQuitEvent event) {
+	private void onQuit(PlayerQuitEvent event) {
 		pool.submit(() -> {
 			try {
 				storage.saveOne(event.getPlayer().getUniqueId());

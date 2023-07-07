@@ -14,7 +14,7 @@ class SyncSchedulerBukkit implements SchedulerBukkit {
 
 	private final JavaPlugin plugin;
 
-	public SyncSchedulerBukkit(JavaPlugin plugin) {
+	SyncSchedulerBukkit(JavaPlugin plugin) {
 		this.plugin = plugin;
 	}
 

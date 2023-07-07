@@ -3,6 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocatio
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.jvm.tasks.ProcessResources
 
@@ -44,8 +45,16 @@ fun Project.setupShadowJar(mini: Boolean = true) {
     }
 }
 
+private fun ShadowJar.relocate(group: Any, vararg dependencies: String) {
+    dependencies.forEach {
+        val split = it.split(".")
+        val name = split.last()
+        relocate(it, "$group.dependencies.$name")
+    }
+}
+
 @Suppress("UnstableApiUsage")
-fun Project.copyToPluginsFolder() {
+fun Project.copyToPluginsFolder(vararg depends: String) {
     tasks {
         register("serverCopy", Copy::class) {
             dependsOn(withType<ShadowJar>())
@@ -62,7 +71,13 @@ fun Project.copyToPluginsFolder() {
             val shared = project.extensions.getByType(SharedProjectData::class.java)
             if(shared.main_cls != null)
                 filesMatching("plugin.yml") {
-                    expand(mapOf("version" to project.version, "name" to project.name, "main" to shared.main_cls))
+                    expand(mapOf(
+                        "version" to project.version,
+                        "name" to project.name,
+                        "main" to shared.main_cls,
+                        "depends" to '[' + depends.joinToString(",") + ']',
+                        "api" to Regex("(\\d\\.\\d+)").find(Versions.MINECRFAFT_VERSION)!!.groupValues.first()
+                                ))
             }
         }
 	}
@@ -82,10 +97,8 @@ fun Project.setupKotlin() {
     }
 }
 
-private fun ShadowJar.relocate(group: Any, vararg dependencies: String) {
-    dependencies.forEach {
-        val split = it.split(".")
-        val name = split.last()
-        relocate(it, "$group.dependencies.$name")
+fun Project.setupJUnit() {
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 }

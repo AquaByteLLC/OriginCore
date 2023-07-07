@@ -3,7 +3,7 @@ sharedProjectData.main_cls = "$group.EnchantPlugin"
 
 setupKotlin()
 setupShadowJar()
-copyToPluginsFolder()
+copyToPluginsFolder("commons", "settings-impl")
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)

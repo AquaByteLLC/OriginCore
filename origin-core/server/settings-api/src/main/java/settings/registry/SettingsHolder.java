@@ -1,8 +1,8 @@
 package settings.registry;
 
-import settings.Setting;
-import settings.option.SettingsOption;
-import settings.section.SettingSection;
+import settings.setting.Setting;
+import settings.setting.SettingOption;
+import settings.setting.SettingSection;
 
 import java.util.List;
 
@@ -12,9 +12,9 @@ public interface SettingsHolder {
 
 	void updateOption(Setting setting, SettingAction action);
 
-	void setOption(Setting setting, SettingsOption option);
+	void setOption(Setting setting, SettingOption option);
 
-	SettingsOption getOption(Setting setting);
+	SettingOption getOption(Setting setting);
 
 	enum SettingAction {
 		PREV,

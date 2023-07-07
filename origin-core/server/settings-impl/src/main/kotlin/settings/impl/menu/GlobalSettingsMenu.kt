@@ -1,25 +1,34 @@
 package settings.impl.menu
 
+import commons.menu.MenuAdapter
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder
 import me.vadim.util.menu.MenuList
 import me.vadim.util.menu.frame
 import me.vadim.util.menu.frameWith
 import me.vadim.util.menu.toList
 import org.bukkit.event.inventory.ClickType
-import settings.Setting
+import settings.setting.Setting
 import settings.Settings
 import settings.impl.SettingsPlugin
+import settings.impl.conf.Config
 import settings.registry.SettingsHolder
-import settings.section.SettingSection
+import settings.setting.SettingSection
 
 /**
  * @author vadim
  */
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
-class GlobalSettingsMenu(plugin: SettingsPlugin, private val holder: SettingsHolder) : SettingsMenu<SettingSection>(plugin) {
+class GlobalSettingsMenu(private val plugin: SettingsPlugin, private val holder: SettingsHolder) : MenuAdapter<SettingSection>() {
+
+	override val MENU_SIZE = 9 * 5
+	override val BACK_SLOT = 39
+	override val DONE_SLOT = 40
+	override val NEXT_SLOT = 41
+
+	private fun config(): Config = plugin.configuration.open(Config::class.java)
 
 	private fun getSection(section: SettingSection): MenuList<Setting> =
-		template.toList(holder.getLocalSettings(section), transformer = { it.menuItem }) {
+		template.toList(holder.getLocalSettings(section), transformer = { it.getMenuItem(holder.getOption(it)) }) {
 			title = config().title.format(StringPlaceholder.of("section", section.name))
 
 			next = buttons[NEXT_SLOT]!! to NEXT_SLOT
@@ -58,6 +67,6 @@ class GlobalSettingsMenu(plugin: SettingsPlugin, private val holder: SettingsHol
 		}
 	}
 
-	override fun queryItems(): MutableList<SettingSection> = Settings.api().sections.allSections.toMutableList()
+	override fun queryItems(): MutableList<SettingSection> = Settings.api().sections.sections.toMutableList()
 
 }

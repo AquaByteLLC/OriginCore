@@ -2,6 +2,13 @@ drop_rate_seconds: 5
 default_slots: 10
 autosave_interval_minutes: 20
 
+effects:
+  # see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html for a list of sounds
+  upgrade_sound:
+    volume: 1f
+    pitch: 1f
+    sound: ENTITY_ARROW_HIT
+
 drop_item:
   name: "&f{drop_name}"
   lore:
@@ -77,22 +84,3 @@ manage_menu:
         - "{drop_price}"
         - "{gen_tier}"
         - "{buy_price}"
-
-menu:
-  button:
-    next:
-      type: ARROW
-      name: "Next page"
-      lore:
-        - "Click me!"
-    back:
-      type: ARROW
-      name: "Previous page"
-      lore:
-        - "Click me!"
-    done:
-      type: BARRIER
-      name: "Done"
-      lore:
-        - "Goes back to last menu,"
-        - "or closes the current menu."

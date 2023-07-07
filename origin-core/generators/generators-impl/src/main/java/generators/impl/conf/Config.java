@@ -1,16 +1,15 @@
 package generators.impl.conf;
 
+import commons.conf.BukkitConfig;
 import commons.util.StringUtil;
 import generators.wrapper.Upgrade;
-import me.vadim.util.conf.ConfigurationAccessor;
 import me.vadim.util.conf.ResourceProvider;
-import me.vadim.util.conf.bukkit.YamlFile;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
-import me.vadim.util.conf.wrapper.impl.UnformattedMessage;
 import me.vadim.util.item.ItemBuilder;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -19,11 +18,12 @@ import java.util.List;
 /**
  * @author vadim
  */
-public class Config extends YamlFile {
+public class Config extends BukkitConfig {
 
 	public Config(ResourceProvider resourceProvider) {
 		super("config.yml", resourceProvider);
 		setDefaultTemplate();
+		setUnformattedItemFactory(GensItem::new);
 	}
 
 	public long getDropRateTicks() {
@@ -38,15 +38,15 @@ public class Config extends YamlFile {
 		return getConfigurationAccessor().getInt("autosave_interval_minutes") * 60 * 20;
 	}
 
-	public UnformattedItem getGeneratorDrop() {
+	public GensItem getGeneratorDrop() {
 		return getUnformatted("drop_item");
 	}
 
-	public UnformattedItem getGeneratorItem() {
+	public GensItem getGeneratorItem() {
 		return getUnformatted("gen_item");
 	}
 
-	public UnformattedItem getBuyMenuTierItem() {
+	public GensItem getBuyMenuTierItem() {
 		return getUnformatted("buy_menu.tier_item");
 	}
 
@@ -70,12 +70,16 @@ public class Config extends YamlFile {
 		return Arrays.asList(getConfigurationAccessor().getObject("manage_menu").getObject("list_view").getStringArray("bulk_upgrade_ad"));
 	}
 
-	public UnformattedItem getManageMenuIndividualUpgrade() {
+	public GensItem getManageMenuIndividualUpgrade() {
 		return getUnformatted("manage_menu.individual_view.upgrade");
 	}
 
-	public UnformattedItem getManageMenuIndividualDelete() {
+	public GensItem getManageMenuIndividualDelete() {
 		return getUnformatted("manage_menu.individual_view.delete");
+	}
+
+	public UnplayedSound getUpgradeSound() {
+		return getSound("effects.upgrade_sound");
 	}
 
 	private String getGenMenuItemMaxLevel() {
@@ -86,78 +90,29 @@ public class Config extends YamlFile {
 		return getConfigurationAccessor().getObject("gen_item").getString("price_symbol");
 	}
 
-	private UnformattedItem getUnformatted(String path) {
-		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
-		Material type = null;
-		if (conf.has("type")) {
-			type = Material.matchMaterial(conf.getString("type"));
-			if (type == null)
-				logError(resourceProvider.getLogger(), path + ".type", "item type");
-		}
-		return new UnformattedItem(type, conf.getPlaceholder("name"), Arrays.stream(conf.getStringArray("lore")).map(UnformattedMessage::new).map(PlaceholderMessage.class::cast).toList());
-	}
+	public final class GensItem extends UnformattedItem {
 
-	private ItemStack getItem(String path) {
-		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
-
-		String name = conf.getString("name");
-		String[] lore = conf.getStringArray("lore");
-		Material type = Material.matchMaterial(conf.getString("type"));
-
-		if (name == null || lore == null || type == null)
-			logError(resourceProvider.getLogger(), path, "item element");
-		assert type != null;
-
-		return ItemBuilder.create(type).displayName(name).lore(lore).build();
-	}
-
-	public ItemStack getMenuNext() {
-		return getItem("menu.button.next");
-	}
-
-	public ItemStack getMenuBack() {
-		return getItem("menu.button.back");
-	}
-
-	public ItemStack getMenuDone() {
-		return getItem("menu.button.done");
-	}
-
-	public final class UnformattedItem {
-
-		private final Material material;
-		private final PlaceholderMessage name;
-		private final List<PlaceholderMessage> lore;
-
-		private UnformattedItem(Material material, PlaceholderMessage name, List<PlaceholderMessage> lore) {
-			this.material = material;
-			this.name = name;
-			this.lore = lore;
+		public GensItem(Material material, PlaceholderMessage name, List<PlaceholderMessage> lore) {
+			super(material, name, lore);
 		}
 
 		private double upgradePrice;
 
-		public UnformattedItem asMaxLevel() {
+		public GensItem asMaxLevel() {
 			upgradePrice = Double.NaN;
 			return this;
 		}
 
-		public UnformattedItem withUpgradePrice(double price) {
+		public GensItem withUpgradePrice(double price) {
 			upgradePrice = price;
 			return this;
 		}
 
-		public UnformattedItem upgrade(Upgrade upgrade) {
+		public GensItem upgrade(Upgrade upgrade) {
 			if (upgrade == null)
 				return asMaxLevel();
 			else
 				return withUpgradePrice(upgrade.getPrice());
-		}
-
-		public ItemBuilder format(Placeholder placeholder) {
-			if (material == null)
-				throw new UnsupportedOperationException("type unset, call #format(Material, Placeholder)");
-			return format(material, placeholder);
 		}
 
 		public ItemBuilder format(Material material, Placeholder placeholder) {

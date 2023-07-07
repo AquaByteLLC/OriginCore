@@ -1,6 +1,7 @@
 package commons.util;
 
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -98,6 +99,14 @@ public class ReflectUtil {
 
 	public static void sneaky(Throwable throwable) {
 		ReflectUtil.<RuntimeException>fuckUncheckedExceptions(throwable);
+	}
+
+	public static <E extends Enum<E>> @Nullable E getEnum(Class<E> clazz, String name) {
+		try {
+			return Enum.valueOf(clazz, name);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
 	}
 
 }

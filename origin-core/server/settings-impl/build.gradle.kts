@@ -2,8 +2,9 @@ group = "settings.impl"
 sharedProjectData.main_cls = "$group.SettingsPlugin"
 
 setupShadowJar()
-copyToPluginsFolder()
+copyToPluginsFolder("commons")
 setupKotlin()
+setupJUnit()
 
 dependencies {
 	compileOnly(Dependencies.LOMBOK)
@@ -24,4 +25,5 @@ dependencies {
 	compileOnly(Dependencies.ORMLITE_JDBC)
 	compileOnly(project(":commons"))
 	implementation(project(":settings-api"))
+	testImplementation(Dependencies.JUNIT)
 }

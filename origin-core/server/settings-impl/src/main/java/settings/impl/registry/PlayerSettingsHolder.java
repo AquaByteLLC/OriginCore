@@ -1,18 +1,17 @@
 package settings.impl.registry;
 
 import commons.impl.PlayerOwned;
-import settings.Setting;
-import settings.Settings;
-import settings.option.SettingsOption;
+import settings.setting.Setting;
+import settings.setting.SettingOption;
 import settings.registry.SettingsHolder;
-import settings.section.SettingSection;
+import settings.setting.SettingSection;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class PlayerSettingsHolder extends PlayerOwned implements SettingsHolder {
 
-	private final Map<Setting, SettingsOption> playerSettings = new HashMap<>();
+	private final Map<Setting, SettingOption> playerSettings = new HashMap<>();
 
 	public PlayerSettingsHolder(UUID uuid) {
 		super(uuid);
@@ -26,8 +25,8 @@ public class PlayerSettingsHolder extends PlayerOwned implements SettingsHolder 
 
 	@Override
 	public void updateOption(Setting setting, SettingAction action) {
-		final List<SettingsOption> options = setting.getOptions();
-		final SettingsOption currentOption = playerSettings.get(setting);
+		final List<SettingOption> options       = setting.getOptions();
+		final SettingOption       currentOption = playerSettings.get(setting);
 
 		int c = options.indexOf(currentOption);
 		int i = -1;
@@ -49,12 +48,12 @@ public class PlayerSettingsHolder extends PlayerOwned implements SettingsHolder 
 	}
 
 	@Override
-	public void setOption(Setting setting, SettingsOption option) {
+	public void setOption(Setting setting, SettingOption option) {
 		playerSettings.put(setting, option);
 	}
 
 	@Override
-	public SettingsOption getOption(Setting setting) {
+	public SettingOption getOption(Setting setting) {
 		return playerSettings.get(setting);
 	}
 

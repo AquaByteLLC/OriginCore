@@ -3,7 +3,7 @@ sharedProjectData.main_cls = "$group.GensPlugin"
 
 setupKotlin()
 setupShadowJar()
-copyToPluginsFolder()
+copyToPluginsFolder("commons", "settings-impl", "blocks-impl")
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)
@@ -22,5 +22,6 @@ dependencies {
     compileOnly(Dependencies.ORMLITE_CORE)
     compileOnly(Dependencies.ORMLITE_JDBC)
     compileOnly(project(":commons"))
+    compileOnly(project(":settings-api"))
     implementation(project(":generators-api"))
 }

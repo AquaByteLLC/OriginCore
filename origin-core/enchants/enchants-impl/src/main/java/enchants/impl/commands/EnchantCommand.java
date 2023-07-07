@@ -6,7 +6,7 @@ import enchants.EnchantKey;
 import enchants.EnchantRegistry;
 import enchants.impl.EnchantPlugin;
 import enchants.impl.Messages;
-import enchants.impl.menu.EnchantMenuImpl;
+import enchants.impl.menu.EnchantMenu;
 import enchants.item.Enchant;
 import enchants.item.EnchantFactory;
 import enchants.item.EnchantedItem;
@@ -76,7 +76,7 @@ public class EnchantCommand extends BaseCommand {
 		EnchantedItem item = arg2item(player);
 		if (item == null) return;
 
-		Menu menu = new EnchantMenuImpl(plugin, item).getMenu();
+		Menu menu = new EnchantMenu(plugin, item).getMenu();
 		menu.regen();
 		menu.open(player);
 	}

@@ -2,7 +2,7 @@ package generators.impl.cmd;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import commons.CommonsPlugin;
+import commons.Commons;
 import commons.util.StringUtil;
 import commons.data.AccountProvider;
 import commons.data.AccountStorage;
@@ -11,12 +11,11 @@ import generators.impl.GensPlugin;
 import generators.impl.conf.Tiers;
 import generators.impl.data.GenAccount;
 import generators.impl.data.GenStorage;
-import generators.impl.menu.ManageGensMenu;
+import generators.impl.menu.ManageMenu;
 import generators.impl.menu.BuyMenu;
 import generators.wrapper.Tier;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.menu.Menu;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -54,7 +53,7 @@ public class GenCommand extends BaseCommand {
 
 	@Subcommand("save-all")
 	public void flushAndSave(Player sender) {
-		CommonsPlugin.scheduler().getAsyncExecutor().submit(() -> {
+		Commons.scheduler().getAsyncExecutor().submit(() -> {
 			((AccountStorage<GenAccount>) accounts).flushAndSave();
 			genStorage.save();
 			StringUtil.send(sender, "&ddone xP");
@@ -106,7 +105,7 @@ public class GenCommand extends BaseCommand {
 	@Subcommand("manage")
 	@CommandAlias("managegens")
 	public void manage(Player sender) {
-		Menu menu = new ManageGensMenu(plugin, sender).getMenu();
+		Menu menu = new ManageMenu(plugin, sender).getMenu();
 		menu.regen();
 		menu.open(sender);
 	}
@@ -114,7 +113,7 @@ public class GenCommand extends BaseCommand {
 	@Subcommand("manage")
 	@CommandPermission("*")
 	public void manage(Player sender, @Flags("other") Player target) {
-		Menu menu = new ManageGensMenu(plugin, target).getMenu();
+		Menu menu = new ManageMenu(plugin, target).getMenu();
 		menu.regen();
 		menu.open(sender);
 	}

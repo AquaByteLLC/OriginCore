@@ -2,6 +2,7 @@ package enderchests.impl;
 
 import blocks.BlocksAPI;
 import blocks.block.illusions.IllusionsAPI;
+import commons.Commons;
 import commons.CommonsPlugin;
 import commons.data.AccountProvider;
 import commons.events.api.EventContext;
@@ -73,7 +74,7 @@ public class EnderChestHandler implements Listener {
 		event.setCancelled(true);
 		ItemStack item = event.getItem().clone();
 
-		CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
+		Commons.scheduler().getBukkitSync().runLater(() -> {
 			// remove single item
 			from.removeItem(item);
 			chest.getInventory().addItem(item);
@@ -98,7 +99,7 @@ public class EnderChestHandler implements Listener {
 
 		if (cI.isEmpty()) return;
 
-		CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
+		Commons.scheduler().getBukkitSync().runLater(() -> {
 			// remove single item
 			ItemStack   item     = null;
 			ItemStack[] contents = cI.getContents();
@@ -146,7 +147,7 @@ public class EnderChestHandler implements Listener {
 			LinkedChest  chest = registry.createChest(net, block.getLocation(), ((Directional) data).getFacing());
 			illusions.globalRegistry().register(chest);
 			chest.ensureHopperConnectivity();
-			CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
+			Commons.scheduler().getBukkitSync().runLater(() -> {
 //				player.sendBlockChange(block.getLocation(), chest.getProjectedBlockData());
 				System.out.println(player);
 				System.out.println(block);

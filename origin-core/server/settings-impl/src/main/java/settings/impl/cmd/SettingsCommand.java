@@ -5,7 +5,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import commons.data.AccountProvider;
 import org.bukkit.entity.Player;
-import settings.impl.account.SettingsAccount;
+import settings.impl.data.SettingsAccount;
 
 /**
  * @author vadim

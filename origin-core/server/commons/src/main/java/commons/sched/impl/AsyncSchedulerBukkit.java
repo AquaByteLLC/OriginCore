@@ -14,7 +14,7 @@ class AsyncSchedulerBukkit implements SchedulerBukkit {
 
 	private final JavaPlugin plugin;
 
-	public AsyncSchedulerBukkit(JavaPlugin plugin) {
+	AsyncSchedulerBukkit(JavaPlugin plugin) {
 		this.plugin = plugin;
 	}
 

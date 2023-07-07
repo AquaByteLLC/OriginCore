@@ -1,24 +1,31 @@
 package settings.impl.setting;
 
+import me.vadim.util.item.ItemBuilder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import settings.Setting;
-import settings.option.SettingsOption;
+import org.jetbrains.annotations.Nullable;
+import settings.impl.SettingsPlugin;
+import settings.impl.conf.Config;
+import settings.setting.Setting;
+import settings.setting.SettingOption;
+import settings.setting.key.GlobalKey;
+import settings.setting.key.LocalKey;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("ConstantValue")
-public class MenuSetting implements Setting {
+public class MenuSetting extends Keyed<GlobalKey> implements Setting {
 
 	private final String settingName;
 	private final ItemStack menuItem;
-	private final List<SettingsOption> options;
+	private final List<SettingOption> options;
 	private final List<String> description;
 
-	public MenuSetting(String settingName, ItemStack menuItem, List<String> description) {
+	public MenuSetting(GlobalKey key, String settingName, ItemStack menuItem, List<String> description) {
+		super(key);
 		this.settingName = settingName;
-		this.menuItem    = menuItem;
+		this.menuItem    = ItemBuilder.copy(menuItem).displayName(settingName).lore(description).build();
 		this.description = description;
 		this.options     = new ArrayList<>();
 	}
@@ -29,8 +36,19 @@ public class MenuSetting implements Setting {
 	}
 
 	@Override
-	public ItemStack getMenuItem() {
-		return this.menuItem;
+	public ItemStack getMenuItem(SettingOption selectedOption) {
+		Config config = SettingsPlugin.singletonCringe().config();
+
+		List<String> footer = new ArrayList<>();
+		for (SettingOption option : options)
+			if (option.equals(selectedOption))
+				footer.add(config.getSelectedOptionPrefix() + option.getDescription());
+			else
+				footer.add(config.getOtherOptionPrefix() + option.getDescription());
+
+		List<String> lore = new ArrayList<>(description);
+		lore.addAll(footer);
+		return ItemBuilder.copy(menuItem).displayName(String.format("%s: &r%s", settingName, selectedOption.getName())).lore(lore).build();
 	}
 
 	@Override
@@ -39,20 +57,25 @@ public class MenuSetting implements Setting {
 	}
 
 	@Override
-	public List<SettingsOption> getOptions() {
+	public List<SettingOption> getOptions() {
 		return this.options;
 	}
 
-	private SettingsOption defaultOption;
+	@Override
+	public @Nullable SettingOption getOption(LocalKey key) {
+		return options.stream().filter(it -> it.getKey().equals(key)).findFirst().orElse(null);
+	}
+
+	private SettingOption defaultOption;
 
 	@Override
-	public SettingsOption getDefaultOption() {
+	public SettingOption getDefaultOption() {
 		return this.defaultOption;
 	}
 
 	@Override
-	public void setDefaultOption(@NotNull SettingsOption option) {
-		if(option == null)
+	public void setDefaultOption(@NotNull SettingOption option) {
+		if (option == null)
 			throw new NullPointerException("option");
 		this.defaultOption = option;
 	}

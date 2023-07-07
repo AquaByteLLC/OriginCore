@@ -7,7 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author vadim
@@ -16,16 +17,19 @@ public class Scheduler4Plugin implements SchedulerManager {
 
 	private final SchedulerBukkit basync, bsync;
 	private final ExecutorService easync;
-	private final SyncedExecutorService esync;
+	private final SyncExecutorService esync;
 
 	private final BukkitTask esynct;
 
 	public Scheduler4Plugin(JavaPlugin plugin) {
 		this.basync = new AsyncSchedulerBukkit(plugin);
-		this.bsync = new SyncSchedulerBukkit(plugin);
+		this.bsync  = new SyncSchedulerBukkit(plugin);
 
-		this.easync = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("scheduler-async-worker %d").setDaemon(false).build());
-		this.esync = new SyncedExecutorService(-1);
+		this.easync = new AsyncExecutorService(0, Integer.MAX_VALUE,
+											   60L, TimeUnit.SECONDS,
+											   new SynchronousQueue<>(),
+											   new ThreadFactoryBuilder().setNameFormat("scheduler-async-worker %d").setDaemon(false).build());
+		this.esync  = new SyncExecutorService(-1);
 
 		esynct = bsync.runTimer(esync::executeBatch, 1);
 	}
@@ -63,6 +67,7 @@ public class Scheduler4Plugin implements SchedulerManager {
 
 	private boolean isShutdown = false;
 	private final Object lock = new Object();
+
 	public void shutdown() {
 		synchronized (lock) {
 			if (!isShutdown) {

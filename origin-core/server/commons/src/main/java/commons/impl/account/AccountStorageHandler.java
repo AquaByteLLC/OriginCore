@@ -25,6 +25,10 @@ public class AccountStorageHandler {
 		storages.forEach(AccountStorage::flushAndSave);
 	}
 
+	public Set<AccountStorage<?>> getStorages() {
+		return new HashSet<>(storages);
+	}
+
 	public void saveOne(UUID player) {
 		storages.forEach(s -> s.savePlayer(player));
 	}

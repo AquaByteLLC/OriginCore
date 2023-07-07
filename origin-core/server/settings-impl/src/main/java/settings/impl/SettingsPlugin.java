@@ -11,14 +11,19 @@ import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.Material;
 import settings.Settings;
-import settings.builder.SettingsFactory;
-import settings.impl.account.SettingsAccount;
-import settings.impl.account.SettingsAccountStorage;
-import settings.impl.builder.SettingsFactoryImpl;
 import settings.impl.cmd.SettingsCommand;
 import settings.impl.conf.Config;
+import settings.impl.data.SettingsAccount;
+import settings.impl.data.SettingsAccountStorage;
 import settings.impl.registry.GlobalSettingsRegistry;
 import settings.impl.registry.PluginSectionRegistry;
+import settings.impl.setting.builder.SettingsFactoryImpl;
+import settings.impl.setting.key.GKey;
+import settings.impl.setting.key.LKey;
+import settings.registry.SectionRegistry;
+import settings.registry.SettingsRegistry;
+import settings.setting.builder.SettingsFactory;
+import settings.setting.key.LocalKey;
 
 public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvider {
 
@@ -33,6 +38,10 @@ public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvid
 
 	public ConfigurationProvider getConfiguration() {
 		return lfc;
+	}
+
+	public Config config() {
+		return lfc.open(Config.class);
 	}
 
 	public AccountProvider<SettingsAccount> getAccounts() {
@@ -50,15 +59,17 @@ public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvid
 	protected void enable() {
 		lfc = new LiteConfig(this);
 		lfc.register(Config.class, Config::new);
-		accounts = new SettingsAccountStorage(CommonsPlugin.commons().getDatabase());
 
+		SectionRegistry sectionRegistry = new PluginSectionRegistry();
+		SettingsRegistry settingsRegistry = new GlobalSettingsRegistry();
+		SettingsFactory settingsFactory = new SettingsFactoryImpl();
+		new Settings(sectionRegistry, settingsRegistry, settingsFactory, (player) -> accounts.getAccount(player).getSettings(), LKey::convert, GKey::convert);
+
+		accounts = new SettingsAccountStorage(CommonsPlugin.commons().getDatabase(), sectionRegistry);
 		CommonsPlugin.commons().registerAccountLoader(accounts);
-
-		new Settings(new PluginSectionRegistry(), new GlobalSettingsRegistry(), new SettingsFactoryImpl()); // sadge
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new SettingsCommand(accounts));
-
 
 		// temp
 
@@ -68,21 +79,25 @@ public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvid
 		Settings.api().getSections().createSection(this,
 												   factory.newSectionBuilder()
 														  .setName("Mining")
-														  .setMenuItem(ItemStackBuilder.of(Material.WOODEN_AXE).build())
+														  .setMenuItem(ItemStackBuilder.of(Material.IRON_PICKAXE).build())
 														  .setDescription("Mining Settings")
-														  .addSetting(factory.newSettingsBuilder()
-																			 .setName("Particle")
+														  .addSetting(factory.newSettingBuilder()
+																			 .setName("Particles")
 																			 .setDescription("Particle Settings")
-																			 .addOptions(factory.newOptionsBuilder()
+																			 .addOptions(factory.newOptionBuilder()
 																								.setName("ON")
 																								.setDescription("Particles will show!")
 																								.build())
-																			 .addOptions(factory.newOptionsBuilder()
+																			 .addOptions(factory.newOptionBuilder()
+																								.setName("MINIMAL")
+																								.setDescription("Particles are reduced!")
+																								.build())
+																			 .addOptions(factory.newOptionBuilder()
 																								.setName("OFF")
 																								.setDescription("Particles won't show!")
 																								.build())
 																			 .setDefaultOption(0)
-																			 .setMenuItem(ItemStackBuilder.of(Material.STONE_AXE).build())
+																			 .setMenuItem(ItemStackBuilder.of(Material.NETHER_STAR).build())
 																			 .build())
 														  .build());
 	}

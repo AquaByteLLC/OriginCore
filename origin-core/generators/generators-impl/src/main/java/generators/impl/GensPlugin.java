@@ -6,10 +6,11 @@ import commons.CommonsPlugin;
 import commons.data.AccountStorage;
 import commons.events.api.EventRegistry;
 import generators.GeneratorRegistry;
-import generators.impl.conf.Tiers;
 import generators.impl.cmd.GenCommand;
 import generators.impl.conf.Config;
+import generators.impl.conf.GensSettings;
 import generators.impl.conf.Messages;
+import generators.impl.conf.Tiers;
 import generators.impl.data.GenAccount;
 import generators.impl.data.GenAccountStorage;
 import generators.impl.data.GenStorage;
@@ -24,12 +25,12 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class GensPlugin extends JavaPlugin implements ResourceProvider {
 
-	private LiteConfig          lfc;
+	private LiteConfig lfc;
 	private PaperCommandManager commands;
-	private GenRegistry         registry;
-	private GenHandler          handler;
-	private GenAccountStorage   accountStorage;
-	private GenStorage          genStorage;
+	private GenRegistry registry;
+	private GenHandler handler;
+	private GenAccountStorage accountStorage;
+	private GenStorage genStorage;
 
 	public ConfigurationProvider getConfiguration() {
 		return lfc;
@@ -68,6 +69,8 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider {
 		commands.registerCommand(new GenCommand(this, genStorage));
 
 		commons.registerAccountLoader(accountStorage);
+
+		GensSettings.init(this);
 
 		genStorage.load();
 

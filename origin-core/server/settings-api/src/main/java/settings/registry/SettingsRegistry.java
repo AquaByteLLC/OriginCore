@@ -1,6 +1,6 @@
 package settings.registry;
 
-import settings.Setting;
+import settings.setting.Setting;
 
 public interface SettingsRegistry {
 

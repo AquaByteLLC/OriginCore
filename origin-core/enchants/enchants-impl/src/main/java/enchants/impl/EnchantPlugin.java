@@ -14,7 +14,7 @@ import enchants.conf.EnchantmentConfiguration;
 import enchants.impl.commands.EnchantCommand;
 import enchants.impl.conf.GeneralConfig;
 import enchants.impl.item.OriginEnchantFactory;
-import enchants.impl.menu.EnchantMenuImpl;
+import enchants.impl.menu.EnchantMenu;
 import enchants.item.Enchant;
 import enchants.item.EnchantFactory;
 import enchants.item.EnchantedItem;
@@ -88,7 +88,7 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 		EnchantedItem item = factory.wrapItemStack(event.getItem());
 		if (item == null || !item.isEnchantable()) return;
 
-		Menu menu = new EnchantMenuImpl(this, item).getMenu();
+		Menu menu = new EnchantMenu(this, item).getMenu();
 		menu.regen();
 		menu.open(event.getPlayer());
 	}

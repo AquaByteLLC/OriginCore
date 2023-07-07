@@ -9,6 +9,8 @@ import java.util.UUID;
  */
 public interface AccountStorage<T extends Account> extends AccountProvider<T> {
 
+	Class<T> getAccountClass();
+
 	void flushAndSave();
 
 	void savePlayer(OfflinePlayer player);

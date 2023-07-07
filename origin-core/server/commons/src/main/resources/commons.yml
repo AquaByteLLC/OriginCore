@@ -1,0 +1,23 @@
+global_settings_menu:
+  gens:
+    item:
+    
+
+generic_paged_menu:
+  button:
+    next:
+      type: ARROW
+      name: "Next page"
+      lore:
+        - "Click me!"
+    back:
+      type: ARROW
+      name: "Previous page"
+      lore:
+        - "Click me!"
+    done:
+      type: BARRIER
+      name: "Done"
+      lore:
+        - "Goes back to last menu,"
+        - "or closes the current menu."

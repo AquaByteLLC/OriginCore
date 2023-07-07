@@ -4,6 +4,7 @@ import blocks.BlocksAPI;
 import blocks.block.util.PlayerInteraction;
 import blocks.impl.illusions.impl.FallingBlockOverlay;
 import blocks.impl.illusions.impl.PacketBasedFakeBlock;
+import commons.Commons;
 import commons.CommonsPlugin;
 import commons.data.AccountProvider;
 import commons.util.BukkitUtil;
@@ -80,7 +81,7 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 			player.playEffect(loc, Effect.STEP_SOUND, Material.ENDER_CHEST);
 			Color net = getNetwork().getColor().toColor();
 			player.spawnParticle(Particle.DUST_COLOR_TRANSITION, loc, 1, new Particle.DustTransition(awt2bukkit(net.brighter()), awt2bukkit(net.darker()), 2));
-			CommonsPlugin.scheduler().getBukkitSync().runTask(() -> {
+			Commons.scheduler().getBukkitSync().runTask(() -> {
 				getBlock().setType(Material.AIR);
 				if (player.getGameMode() != GameMode.CREATIVE)
 					player.getInventory().addItem(new ItemStack(Material.ENDER_CHEST));
@@ -124,7 +125,7 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 					}
 				}
 
-				CommonsPlugin.scheduler().getBukkitSync().runLater(() -> {
+				Commons.scheduler().getBukkitSync().runLater(() -> {
 					BlockState ogState = place.getState(true);
 					BlockData  ogData  = place.getBlockData().clone();
 

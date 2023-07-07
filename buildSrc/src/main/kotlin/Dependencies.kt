@@ -18,6 +18,7 @@ object Versions {
     const val FASTUTIL_VERSION = "8.5.6"
     const val ORMLITE_VERSION = "6.1"
     const val WORLD_GUARD_VERSION = "7.0.8"
+    const val JUPITER_VERSION = "5.9.3"
 }
 
 object Dependencies {
@@ -43,4 +44,5 @@ object Dependencies {
     const val FASTUTIL = "it.unimi.dsi:fastutil:${Versions.FASTUTIL_VERSION}"
     const val ORMLITE_CORE = "com.j256.ormlite:ormlite-core:${Versions.ORMLITE_VERSION}"
     const val ORMLITE_JDBC = "com.j256.ormlite:ormlite-jdbc:${Versions.ORMLITE_VERSION}"
+    const val JUNIT = "org.junit.jupiter:junit-jupiter:${Versions.JUPITER_VERSION}"
 }

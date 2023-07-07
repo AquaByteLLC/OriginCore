@@ -4,6 +4,7 @@ import commons.data.AccountProvider;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import generators.impl.conf.Config;
+import generators.impl.conf.GensSettings;
 import generators.impl.conf.Tiers;
 import generators.impl.data.GenAccount;
 import generators.impl.wrapper.PDCUtil;
@@ -23,6 +24,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import settings.Settings;
+import settings.setting.key.LocalKey;
 
 import java.util.UUID;
 
@@ -46,6 +49,10 @@ public class GenHandler {
 		events.subscribeAll(this);
 
 		drops = Schedulers.sync().runRepeating(this::drop, config.getDropRateTicks(), config.getDropRateTicks());
+	}
+
+	private Config config() {
+		return conf.open(Config.class);
 	}
 
 	void drop() {
@@ -128,6 +135,9 @@ public class GenHandler {
 		if (!generator.isOwnedBy(player)) return; // do not allow upgrading other's gens
 
 		generator.upgrade(reg);
+
+		if(GensSettings.SOUNDS.isEnabled(player))
+			config().getUpgradeSound().playTo(player, location);
 	}
 
 	@Subscribe

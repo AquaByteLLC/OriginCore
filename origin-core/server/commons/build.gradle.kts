@@ -3,6 +3,7 @@ sharedProjectData.main_cls = "$group.CommonsPlugin"
 
 setupShadowJar(mini = false)
 copyToPluginsFolder()
+setupKotlin()
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)

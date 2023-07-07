@@ -1,8 +1,6 @@
 name: ${name}
 version: ${version}
 main: ${main}
-api-version: 1.19
+api-version: ${api}
 
-depend:
-  - commons
-  - blocks-impl
+depend: ${depends}

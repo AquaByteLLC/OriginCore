@@ -29,13 +29,8 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 	}
 
 	@Override
-	public T getAccount(OfflinePlayer player) {
-		return getAccount(player.getUniqueId());
-	}
-
-	@Override
-	public T getAccount(UUID uuid) {
-		return cache.computeIfAbsent(uuid, factory::create);
+	public Class<T> getAccountClass() {
+		return clazz;
 	}
 
 	@Override
@@ -55,6 +50,16 @@ public abstract class ORMLiteAccountStorage<T extends Account> implements Accoun
 					iter.remove();
 			}
 		}
+	}
+
+	@Override
+	public T getAccount(OfflinePlayer player) {
+		return getAccount(player.getUniqueId());
+	}
+
+	@Override
+	public T getAccount(UUID uuid) {
+		return cache.computeIfAbsent(uuid, factory::create);
 	}
 
 	protected abstract void save(T account, Dao<T, UUID> dao) throws SQLException;
