@@ -48,6 +48,7 @@ public enum EnchantTypes implements EnchantKey {
 						List<FixedAspectHolder> aspectList = LocationUtil.getBlocks(block, 4);
 						aspectList.forEach(holder -> {
 							new BlockBreakEvent(holder.getBlock(), player).callEvent();
+
 						});
 
 					}

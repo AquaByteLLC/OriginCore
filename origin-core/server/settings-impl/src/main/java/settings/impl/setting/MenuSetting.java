@@ -1,15 +1,9 @@
 package settings.impl.setting;
 
-import me.vadim.util.item.ItemBuilder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import settings.impl.SettingsPlugin;
-import settings.impl.conf.Config;
-import settings.setting.Setting;
-import settings.setting.SettingOption;
-import settings.setting.key.GlobalKey;
-import settings.setting.key.LocalKey;
+import settings.Setting;
+import settings.option.SettingsOption;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,4 +74,20 @@ public class MenuSetting extends Keyed<GlobalKey> implements Setting {
 		this.defaultOption = option;
 	}
 
+	public static class OptionPlaceholder extends StringPlaceholder {
+
+		private static final String format = "%%%s%%";
+
+		public OptionPlaceholder(String format, Map<String, String> placeholders) {
+			super(format, placeholders);
+		}
+
+		public static Builder builder() {
+			return StringPlaceholder.builder().setFormat(format);
+		}
+
+		public static StringPlaceholder of(String key, String value) {
+			return builder().set(key, value).build();
+		}
+	}
 }
