@@ -6,6 +6,7 @@ import enchants.conf.EnchantmentConfiguration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -25,15 +26,15 @@ public interface Enchant {
 
 	ItemStack getMenuItem();
 
-	int getMaxLevel();
+	long getMaxLevel();
 
-	double getStartCost();
+	BigDecimal getStartCost();
 
-	double getMaxCost();
+	BigDecimal getMaxCost();
 
-	double getStartChance();
+	BigDecimal getStartChance();
 
-	double getMaxChance();
+	BigDecimal getMaxChance();
 
 	ProgressionType getChanceType();
 

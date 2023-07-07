@@ -1,7 +1,7 @@
 package enderchests.impl;
 
-import commons.data.AccountProvider;
-import commons.impl.PlayerOwned;
+import commons.data.account.AccountProvider;
+import commons.impl.data.PlayerOwned;
 import commons.util.StringUtil;
 import enderchests.ChestNetwork;
 import enderchests.LinkedChest;
@@ -13,7 +13,6 @@ import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;

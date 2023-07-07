@@ -66,7 +66,7 @@ public enum GensSettings implements EnumeratedSetting {
 		for (GensSettings value : values())
 			builder.addSetting(value.setting);
 
-		builder.setName("Generator").setDescription("Settings for Gens").setMenuItem(Commons.config().getGensSettingsIcon());
+		builder.setMenuItem(Commons.config().getGensSettingsIcon());
 
 		section = builder.build();
 	}

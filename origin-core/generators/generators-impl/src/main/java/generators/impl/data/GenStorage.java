@@ -2,11 +2,9 @@ package generators.impl.data;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.table.TableUtils;
-import commons.data.DatabaseSession;
-import commons.data.SessionProvider;
-import commons.impl.PlayerOwned;
+import commons.data.sql.DatabaseSession;
+import commons.data.sql.SessionProvider;
 import generators.GeneratorRegistry;
-import generators.impl.GenRegistry;
 import generators.impl.wrapper.Gen;
 import generators.wrapper.Generator;
 import lombok.SneakyThrows;

@@ -126,14 +126,22 @@ class KeyTest {
 
 	@Test
 	void append() {
-		GlobalKey test = GKey.of("a.b.c");
+		GlobalKey test = GKey.of("a.b.c.d:e");
 
 		GlobalKey a = new GKey("a");
 		GlobalKey b = new GKey("b");
 		GlobalKey c = new GKey("c");
+		GlobalKey d = new GKey("d");
+		LocalKey e = new LKey("e");
 
-		assertEquals(test, a.append(b, c));
-		assertEquals(test, a.append(b.append(c)));
+		assertEquals(test, a.append(b, c, d).withTail(e));
+		assertEquals(test, a.append(b, c, d.withTail(e)));
+
+		assertEquals(test, a.append(b).append(c).append(d).withTail(e));
+		assertEquals(test, a.append(b).append(c).append(d.withTail(e)));
+
+		assertEquals(test, a.append(b.append(c.append(d).withTail(e))));
+		assertEquals(test, a.append(b.append(c.append(d))).withTail(e));
 	}
 
 	@Test

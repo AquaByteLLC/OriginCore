@@ -1,7 +1,6 @@
 package enderchests.impl;
 
-import commons.data.AccountProvider;
-import commons.util.PackUtil;
+import commons.data.account.AccountProvider;
 import enderchests.ChestNetwork;
 import enderchests.ChestRegistry;
 import enderchests.LinkedChest;
@@ -10,7 +9,6 @@ import enderchests.impl.data.EnderChestAccount;
 import me.vadim.util.conf.ConfigurationProvider;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

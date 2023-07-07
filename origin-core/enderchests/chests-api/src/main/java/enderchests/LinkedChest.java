@@ -1,7 +1,7 @@
 package enderchests;
 
 import blocks.block.illusions.FakeBlock;
-import commons.Owned;
+import commons.data.Owned;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 

@@ -3,6 +3,7 @@ package enchants.item;
 import enchants.EnchantKey;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 /**
@@ -14,7 +15,7 @@ public interface EnchantedItem {
 
 	ItemStack formatMenuItemFor(EnchantKey key);
 
-	void addEnchant(EnchantKey enchantKey, int level);
+	void addEnchant(EnchantKey enchantKey, long level);
 
 	void removeEnchant(EnchantKey enchantKey);
 
@@ -28,11 +29,11 @@ public interface EnchantedItem {
 
 	Set<EnchantKey> getAllEnchants();
 
-	double getChance(EnchantKey enchantKey);
+	BigDecimal getChance(EnchantKey enchantKey);
 
-	double getCost(EnchantKey enchantKey);
+	BigDecimal getCost(EnchantKey enchantKey);
 
-	int getLevel(EnchantKey enchantKey);
+	long getLevel(EnchantKey enchantKey);
 
 	boolean activate(EnchantKey enchantKey);
 

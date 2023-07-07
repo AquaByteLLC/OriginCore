@@ -1,4 +1,4 @@
-package commons.data.impl;
+package commons.data.sql.impl;
 
 import me.vadim.util.conf.ConfigurationProvider;
 

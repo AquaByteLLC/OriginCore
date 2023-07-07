@@ -2,7 +2,7 @@ package generators.impl.wrapper;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import commons.impl.PlayerOwned;
+import commons.impl.data.PlayerOwned;
 import generators.GeneratorRegistry;
 import generators.wrapper.Generator;
 import generators.wrapper.Tier;

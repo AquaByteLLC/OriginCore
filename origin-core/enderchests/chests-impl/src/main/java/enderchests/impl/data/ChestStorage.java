@@ -2,8 +2,8 @@ package enderchests.impl.data;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.table.TableUtils;
-import commons.data.DatabaseSession;
-import commons.data.SessionProvider;
+import commons.data.sql.DatabaseSession;
+import commons.data.sql.SessionProvider;
 import enderchests.ChestRegistry;
 import enderchests.impl.LinkedEnderChest;
 import lombok.SneakyThrows;

@@ -1,12 +1,20 @@
 package settings.impl.setting;
 
+import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
+import me.vadim.util.item.ItemBuilder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import settings.Setting;
-import settings.option.SettingsOption;
+import org.jetbrains.annotations.Nullable;
+import settings.setting.Setting;
+import settings.impl.SettingsPlugin;
+import settings.impl.conf.Config;
+import settings.setting.SettingOption;
+import settings.setting.key.GlobalKey;
+import settings.setting.key.LocalKey;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("ConstantValue")
 public class MenuSetting extends Keyed<GlobalKey> implements Setting {

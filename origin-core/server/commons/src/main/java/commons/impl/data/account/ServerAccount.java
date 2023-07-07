@@ -1,4 +1,4 @@
-package commons.impl.account;
+package commons.impl.data.account;
 
 import commons.econ.BankAccount;
 import commons.econ.Currency;

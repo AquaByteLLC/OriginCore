@@ -3,7 +3,7 @@ package settings.impl.cmd;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
-import commons.data.AccountProvider;
+import commons.data.account.AccountProvider;
 import org.bukkit.entity.Player;
 import settings.impl.data.SettingsAccount;
 

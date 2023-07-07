@@ -1,7 +1,10 @@
 global_settings_menu:
   gens:
     item:
-    
+      type: PISTON
+      name: "&eGenerators"
+      lore:
+        - "&fClick for Gens Settings"
 
 generic_paged_menu:
   button:

@@ -2,10 +2,9 @@ package enderchests.impl;
 
 import blocks.BlocksAPI;
 import co.aikar.commands.PaperCommandManager;
+import commons.Commons;
 import commons.CommonsPlugin;
-import commons.data.AccountProvider;
-import commons.data.AccountStorage;
-import commons.events.api.EventRegistry;
+import commons.data.account.AccountProvider;
 import enderchests.ChestRegistry;
 import enderchests.impl.cmd.EnderChestCommand;
 import enderchests.impl.cmd.IllusionCommand;
@@ -14,7 +13,6 @@ import enderchests.impl.data.EChestAccountStorage;
 import enderchests.impl.data.EnderChestAccount;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
-import net.minecraft.network.protocol.game.PacketPlayInEntityAction;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -55,6 +53,8 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider {
 	public void onEnable() {
 		lfc.register(Config.class, Config::new);
 		lfc.reload();
+
+		Commons.commons().registerReloadHook(this, lfc);
 
 		accountStorage = new EChestAccountStorage(lfc, CommonsPlugin.commons().getDatabase());
 		chestRegistry = new EnderChestRegistry(lfc, accountStorage);

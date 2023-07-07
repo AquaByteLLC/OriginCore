@@ -1,7 +1,7 @@
 group = "commons"
 sharedProjectData.main_cls = "$group.CommonsPlugin"
 
-setupShadowJar(mini = false)
+setupShadowJar(fat = true)
 copyToPluginsFolder()
 setupKotlin()
 

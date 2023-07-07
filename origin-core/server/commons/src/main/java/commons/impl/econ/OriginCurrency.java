@@ -1,4 +1,4 @@
-package commons.impl;
+package commons.impl.econ;
 
 import commons.econ.Currency;
 import commons.util.StringUtil;

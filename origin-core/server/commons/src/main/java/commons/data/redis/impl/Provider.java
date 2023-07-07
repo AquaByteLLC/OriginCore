@@ -13,11 +13,8 @@ public class Provider implements RedisProvider {
 	private final RedisCredentials redisCreds;
 	private final Redis redis;
 
-	public Provider(CommonsPlugin plugin, YamlConfiguration configuration) {
-		this.redisCreds = RedisCredentials.of(
-				configuration.getString("address"),
-				Integer.parseInt(configuration.getString("port")),
-				configuration.getString("password"));
+	public Provider(CommonsPlugin plugin, RedisCredentials redisCreds) {
+		this.redisCreds = redisCreds;
 		this.redis = getRedis(redisCreds);
 		this.redis.bindWith(plugin);
 		plugin.provideService(RedisProvider.class, this);

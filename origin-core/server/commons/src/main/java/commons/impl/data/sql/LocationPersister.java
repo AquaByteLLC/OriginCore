@@ -1,4 +1,4 @@
-package commons.data.impl;
+package commons.impl.data.sql;
 
 import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;

@@ -1,6 +1,6 @@
 package enderchests;
 
-import commons.Owned;
+import commons.data.Owned;
 import org.bukkit.inventory.Inventory;
 
 /**

@@ -4,6 +4,7 @@ import co.aikar.commands.PaperCommandManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import commons.Commons;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
@@ -11,7 +12,7 @@ import enchants.EnchantAPI;
 import enchants.EnchantKey;
 import enchants.EnchantRegistry;
 import enchants.conf.EnchantmentConfiguration;
-import enchants.impl.commands.EnchantCommand;
+import enchants.impl.cmd.EnchantCommand;
 import enchants.impl.conf.GeneralConfig;
 import enchants.impl.item.OriginEnchantFactory;
 import enchants.impl.menu.EnchantMenu;
@@ -55,6 +56,8 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 		lfc = new LiteConfig(this);
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.reload();
+
+		Commons.commons().registerReloadHook(this, lfc);
 
 		EnchantTypes.init(registry, factory);
 

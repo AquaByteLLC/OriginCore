@@ -61,15 +61,15 @@ public class StringUtil {
 		return result.toString().trim();
 	}
 
+	private static final Pattern HEX = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
 	@SuppressWarnings("deprecation")
 	public static String colorize(String string) {
-		return string == null ? null : ChatColor.translateAlternateColorCodes('&', translateHexColorCodes("&#", "", string));
+		return string == null ? null : ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(string));
 	}
 
-	private static String translateHexColorCodes(String startTag, String endTag, String message) {
-		final Pattern hexPattern = Pattern.compile(startTag + "([A-Fa-f0-9]{6})" + endTag);
-		Matcher matcher = hexPattern.matcher(message);
+	private static String translateHexColorCodes(String message) {
+		Matcher matcher = HEX.matcher(message);
 		StringBuilder builder = new StringBuilder(message.length() + 4 * 8);
 		while (matcher.find()) {
 			String group = matcher.group(1);
@@ -80,6 +80,16 @@ public class StringUtil {
 			);
 		}
 		return matcher.appendTail(builder).toString();
+	}
+
+	private static final Pattern STRIP_AMP = Pattern.compile("(?i)[&" + COLOR_CHAR + "][0-9A-FK-ORX]");
+	private static final Pattern STRIP_HEX = Pattern.compile("(?i)&#([A-Fa-f0-9]{6})");
+
+	public static String stripColor(String string) {
+		if (string == null) return null;
+		string = STRIP_HEX.matcher(string).replaceAll("");
+		string = STRIP_AMP.matcher(string).replaceAll("");
+		return string;
 	}
 
 	public static void send(CommandSender sender, String... messages) {

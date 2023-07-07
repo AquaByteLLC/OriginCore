@@ -129,6 +129,7 @@ public abstract class BukkitConfig extends YamlFile {
 		}
 
 		public void playTo(Player player, Location location) {
+			System.out.println("Playign "+sound+ " @ " + location + ", v:"+volume+",p:"+pitch);
 			player.playSound(location, sound, volume, pitch);
 		}
 

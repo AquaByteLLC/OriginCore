@@ -1,8 +1,8 @@
 package generators.impl.data;
 
 import com.j256.ormlite.dao.Dao;
-import commons.data.impl.ORMLiteAccountStorage;
-import commons.data.SessionProvider;
+import commons.data.account.impl.ORMLiteAccountStorage;
+import commons.data.sql.SessionProvider;
 import generators.GeneratorRegistry;
 import me.vadim.util.conf.ConfigurationProvider;
 

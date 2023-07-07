@@ -1,6 +1,6 @@
-package commons.impl.account;
+package commons.impl.data.account;
 
-import commons.data.AccountStorage;
+import commons.data.account.AccountStorage;
 
 import java.util.HashSet;
 import java.util.Set;

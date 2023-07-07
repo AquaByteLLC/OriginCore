@@ -1,5 +1,7 @@
 package settings.impl.setting.key;
 
+import commons.util.StringUtil;
+import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.Nullable;
 import settings.setting.key.GlobalKey;
 import settings.setting.key.LocalKey;
@@ -48,10 +50,13 @@ public class GKey implements GlobalKey {
 	}
 
 	public static GlobalKey of(String path) {
+		if(path == null) throw new NullPointerException();
 		return new GKey(path.split("\\" + DELIM));
 	}
 
 	public static GlobalKey convert(String illegal) {
+		if(illegal == null) throw new NullPointerException();
+		illegal = StringUtil.stripColor(illegal);
 		illegal = illegal.toLowerCase().replace(' ', '_');
 		illegal = ILLEGAL.matcher(illegal).replaceAll("");
 		return of(illegal);

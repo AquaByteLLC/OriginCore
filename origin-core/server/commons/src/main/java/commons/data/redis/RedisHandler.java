@@ -1,5 +1,6 @@
 package commons.data.redis;
 
+import commons.Commons;
 import commons.CommonsPlugin;
 import me.lucko.helper.messaging.Channel;
 import me.lucko.helper.messaging.ChannelAgent;
@@ -12,7 +13,7 @@ public class RedisHandler {
 	private final Messenger messenger;
 
 	public RedisHandler() {
-		this.messenger = CommonsPlugin.commons().getService(Messenger.class);
+		this.messenger = Commons.commons().getService(Messenger.class);
 	}
 
 	public <T extends RedisData> ChannelAgent<T> getAgent(Class<T> channelClazz, String channel) {

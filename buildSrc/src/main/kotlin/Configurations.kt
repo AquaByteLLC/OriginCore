@@ -4,10 +4,11 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.testing.Test
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.*
 import org.gradle.language.jvm.tasks.ProcessResources
 
-fun Project.setupShadowJar(mini: Boolean = true) {
+fun Project.setupShadowJar(fat: Boolean = false) {
     apply<ShadowPlugin>()
 
     tasks {
@@ -19,7 +20,7 @@ fun Project.setupShadowJar(mini: Boolean = true) {
 
             doLast {
                 synchronized(System.out) {
-                    println(">> Relocating shaded packages to " + prefix + ".*")
+                    println(">> Relocating shaded packages to $prefix.*")
                 }
             }
         }
@@ -28,10 +29,8 @@ fun Project.setupShadowJar(mini: Boolean = true) {
             if(System.getProperty("relocate") != null)//run with "-Drelocate" (jvm arg) to relocate for release, but don't do it for debug since it breaks hot-swap and takes longer
                 dependsOn(getByName("relocate"))
             archiveFileName.set(project.name + ".jar")
-            if(mini) {
-                minimize()
+            if(!fat)
                 exclude("kotlin/**")
-            }
             val shared = project.extensions.getByType(SharedProjectData::class.java)
             if(shared.main_cls != null)
                 manifest {
@@ -58,8 +57,9 @@ fun Project.copyToPluginsFolder(vararg depends: String) {
     tasks {
         register("serverCopy", Copy::class) {
             dependsOn(withType<ShadowJar>())
+            dependsOn(withType<Jar>()) // suppress Gradle warning
 
-            from(fileTree("build/libs").include("*.jar"))
+            from(fileTree("build/libs").include("*.jar").exclude("*-sources.jar"))
             into(rootProject.file(".server/plugins"))
         }
 

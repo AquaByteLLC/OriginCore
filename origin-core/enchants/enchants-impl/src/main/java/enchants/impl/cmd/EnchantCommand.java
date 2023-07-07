@@ -1,4 +1,4 @@
-package enchants.impl.commands;
+package enchants.impl.cmd;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;

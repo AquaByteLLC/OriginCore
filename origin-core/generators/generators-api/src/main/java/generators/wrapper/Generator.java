@@ -1,6 +1,6 @@
 package generators.wrapper;
 
-import commons.Owned;
+import commons.data.Owned;
 import generators.GeneratorRegistry;
 import generators.wrapper.result.DestroyResult;
 import generators.wrapper.result.UpgradeResult;

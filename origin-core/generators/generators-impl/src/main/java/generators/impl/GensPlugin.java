@@ -2,8 +2,9 @@ package generators.impl;
 
 import co.aikar.commands.PaperCommandManager;
 import com.j256.ormlite.field.DataPersisterManager;
+import commons.Commons;
 import commons.CommonsPlugin;
-import commons.data.AccountStorage;
+import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
 import generators.GeneratorRegistry;
 import generators.impl.cmd.GenCommand;
@@ -56,6 +57,8 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider {
 		lfc.register(Messages.class, Messages::new);
 		lfc.register(Tiers.class, (rp) -> new Tiers(rp, lfc));
 		lfc.reload();
+
+		Commons.commons().registerReloadHook(this, lfc);
 
 		CommonsPlugin commons = CommonsPlugin.commons();
 		EventRegistry events  = commons.getEventRegistry();

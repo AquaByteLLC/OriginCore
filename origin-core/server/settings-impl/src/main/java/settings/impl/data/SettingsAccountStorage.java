@@ -1,12 +1,10 @@
 package settings.impl.data;
 
 import com.j256.ormlite.dao.Dao;
-import commons.data.SessionProvider;
-import commons.data.impl.ORMLiteAccountStorage;
-import commons.data.impl.SQLiteSession;
+import commons.data.sql.SessionProvider;
+import commons.data.account.impl.ORMLiteAccountStorage;
 import settings.impl.setting.key.GKey;
 import settings.registry.SectionRegistry;
-import settings.registry.SettingsHolder;
 import settings.setting.Setting;
 import settings.setting.SettingOption;
 import settings.setting.SettingSection;
@@ -14,6 +12,7 @@ import settings.setting.key.GlobalKey;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -40,7 +39,6 @@ public class SettingsAccountStorage extends ORMLiteAccountStorage<SettingsAccoun
 				builder.append(path).append(DELIM);
 			}
 		}
-		System.out.println(builder);
 		account.serialized = Base64.getEncoder().encode(builder.toString().getBytes(StandardCharsets.UTF_8));
 		dao.createOrUpdate(account);
 	}
@@ -71,7 +69,7 @@ public class SettingsAccountStorage extends ORMLiteAccountStorage<SettingsAccoun
 				if (sec == null) continue;
 				SettingSection section = registry.getByKey(sec);
 				if(section == null) {
-					System.err.println("W: Unknown setting section key " + sec);
+					System.err.println("[settings] W: Removing unknown setting section key " + sec);
 					continue;
 				}
 
@@ -86,11 +84,12 @@ public class SettingsAccountStorage extends ORMLiteAccountStorage<SettingsAccoun
 				if(set == null) continue;
 				Setting setting = section.querySetting(set);
 				if(setting == null) {
-					System.err.println("W: Unknown setting key "+set);
+					System.err.println("[settings] W: Removing unknown setting key "+set);
 					continue;
 				}
+				set = set.withTail(key.getTail()); // #parts() does not return tail
 
-				System.out.println("I: Setting "+set+" on account "+uuid);
+				System.out.println("[settings] I: Setting "+sec.append(set).withTail(set.getTail())+" on account "+uuid);
 				account.holder.setOption(setting, set.hasTail() ? setting.getOption(set.getTail()) : setting.getDefaultOption());
 			}
 		return account;

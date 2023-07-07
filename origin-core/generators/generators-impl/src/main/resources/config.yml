@@ -5,9 +5,9 @@ autosave_interval_minutes: 20
 effects:
   # see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html for a list of sounds
   upgrade_sound:
-    volume: 1f
-    pitch: 1f
-    sound: ENTITY_ARROW_HIT
+    volume: 1.0
+    pitch: 1.0
+    sound: ENTITY_ARROW_HIT_PLAYER
 
 drop_item:
   name: "&f{drop_name}"

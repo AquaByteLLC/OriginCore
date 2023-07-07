@@ -1,5 +1,6 @@
 package settings.impl.setting.key;
 
+import commons.util.StringUtil;
 import settings.setting.key.LocalKey;
 
 import java.util.Objects;
@@ -20,10 +21,13 @@ public class LKey implements LocalKey {
 	}
 
 	public static LocalKey of(String identifier) {
+		if(identifier == null) throw new NullPointerException();
 		return new LKey(identifier);
 	}
 
 	public static LocalKey convert(String illegal) {
+		if(illegal == null) throw new NullPointerException();
+		illegal = StringUtil.stripColor(illegal);
 		illegal = illegal.toLowerCase().replace(' ', '_');
 		illegal = ILLEGAL.matcher(illegal).replaceAll("");
 		return of(illegal);

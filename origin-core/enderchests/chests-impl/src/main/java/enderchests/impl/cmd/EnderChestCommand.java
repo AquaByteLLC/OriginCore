@@ -3,7 +3,7 @@ package enderchests.impl.cmd;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Subcommand;
-import commons.data.AccountProvider;
+import commons.data.account.AccountProvider;
 import enderchests.ChestRegistry;
 import enderchests.NetworkColor;
 import enderchests.impl.data.EnderChestAccount;

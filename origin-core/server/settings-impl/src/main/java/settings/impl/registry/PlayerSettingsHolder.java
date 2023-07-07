@@ -1,6 +1,6 @@
 package settings.impl.registry;
 
-import commons.impl.PlayerOwned;
+import commons.impl.data.PlayerOwned;
 import settings.setting.Setting;
 import settings.setting.SettingOption;
 import settings.registry.SettingsHolder;

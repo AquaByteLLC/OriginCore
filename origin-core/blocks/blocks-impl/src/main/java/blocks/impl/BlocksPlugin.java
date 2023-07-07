@@ -18,7 +18,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.CommonsPlugin;
-import commons.data.AccountStorage;
+import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
 import lombok.Getter;
 import me.vadim.util.conf.ResourceProvider;

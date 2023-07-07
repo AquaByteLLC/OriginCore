@@ -4,7 +4,7 @@ package settings.impl.data;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import commons.data.impl.AbstractAccount;
+import commons.data.account.impl.AbstractAccount;
 import me.vadim.util.menu.Menu;
 import org.bukkit.entity.Player;
 import settings.Settings;

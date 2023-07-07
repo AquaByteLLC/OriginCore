@@ -1,15 +1,15 @@
-package commons.impl.account;
+package commons.impl.data.account;
 
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import commons.data.impl.AbstractAccount;
+import commons.data.account.impl.AbstractAccount;
 import commons.econ.BankAccount;
 import commons.econ.Currency;
 import commons.econ.Transaction;
 import commons.econ.TransactionResponse;
 import commons.econ.impl.Txn;
-import commons.impl.OriginCurrency;
+import commons.impl.econ.OriginCurrency;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

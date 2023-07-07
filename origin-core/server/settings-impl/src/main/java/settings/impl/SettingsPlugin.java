@@ -1,9 +1,10 @@
 package settings.impl;
 
 import co.aikar.commands.PaperCommandManager;
+import commons.Commons;
 import commons.CommonsPlugin;
-import commons.data.AccountProvider;
-import commons.data.AccountStorage;
+import commons.data.account.AccountProvider;
+import commons.data.account.AccountStorage;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.conf.ConfigurationProvider;
@@ -23,7 +24,6 @@ import settings.impl.setting.key.LKey;
 import settings.registry.SectionRegistry;
 import settings.registry.SettingsRegistry;
 import settings.setting.builder.SettingsFactory;
-import settings.setting.key.LocalKey;
 
 public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvider {
 
@@ -59,6 +59,9 @@ public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvid
 	protected void enable() {
 		lfc = new LiteConfig(this);
 		lfc.register(Config.class, Config::new);
+		lfc.reload();
+
+		Commons.commons().registerReloadHook(this, lfc);
 
 		SectionRegistry sectionRegistry = new PluginSectionRegistry();
 		SettingsRegistry settingsRegistry = new GlobalSettingsRegistry();

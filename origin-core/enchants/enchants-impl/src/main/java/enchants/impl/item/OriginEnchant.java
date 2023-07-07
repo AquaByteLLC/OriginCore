@@ -8,6 +8,7 @@ import enchants.item.EnchantTarget;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class OriginEnchant implements Enchant {
@@ -17,11 +18,11 @@ public class OriginEnchant implements Enchant {
 	private final List<String> information;
 	private final String lore;
 	private final ItemStack menuItem;
-	private final int maxLevel;
-	private final double startCost;
-	private final double maxCost;
-	private final double startChance;
-	private final double maxChance;
+	private final long maxLevel;
+	private final BigDecimal startCost;
+	private final BigDecimal maxCost;
+	private final BigDecimal startChance;
+	private final BigDecimal maxChance;
 	private final ProgressionType chanceType;
 	private final ProgressionType costType;
 	private final EventSubscriber handleEnchant;
@@ -29,7 +30,7 @@ public class OriginEnchant implements Enchant {
 
 	public OriginEnchant(EnchantKey key, List<EnchantTarget> targets,
 	                     List<String> information, String lore, ItemStack menuItem,
-	                     int maxLevel, double startCost, double maxCost, double startChance, double maxChance,
+	                     long maxLevel, BigDecimal startCost, BigDecimal maxCost, BigDecimal startChance, BigDecimal maxChance,
 	                     ProgressionType chanceType, ProgressionType costType,
 	                     EventSubscriber handleEnchant, EnchantmentConfiguration config) {
 		this.key = key;
@@ -82,27 +83,27 @@ public class OriginEnchant implements Enchant {
 	}
 
 	@Override
-	public int getMaxLevel() {
+	public long getMaxLevel() {
 		return maxLevel;
 	}
 
 	@Override
-	public double getStartCost() {
+	public BigDecimal getStartCost() {
 		return startCost;
 	}
 
 	@Override
-	public double getMaxCost() {
+	public BigDecimal getMaxCost() {
 		return maxCost;
 	}
 
 	@Override
-	public double getStartChance() {
+	public BigDecimal getStartChance() {
 		return startChance;
 	}
 
 	@Override
-	public double getMaxChance() {
+	public BigDecimal getMaxChance() {
 		return maxChance;
 	}
 

@@ -1,4 +1,4 @@
-package commons;
+package commons.data;
 
 import org.bukkit.OfflinePlayer;
 

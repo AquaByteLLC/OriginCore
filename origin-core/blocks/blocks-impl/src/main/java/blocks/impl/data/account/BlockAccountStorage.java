@@ -1,8 +1,8 @@
 package blocks.impl.data.account;
 
 import com.j256.ormlite.dao.Dao;
-import commons.data.impl.ORMLiteAccountStorage;
-import commons.data.SessionProvider;
+import commons.data.account.impl.ORMLiteAccountStorage;
+import commons.data.sql.SessionProvider;
 
 import java.sql.SQLException;
 import java.util.UUID;

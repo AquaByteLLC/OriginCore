@@ -1,6 +1,6 @@
-package commons.data;
+package commons.data.account;
 
-import commons.Owned;
+import commons.data.Owned;
 
 /**
  * @author vadim

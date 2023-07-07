@@ -2,10 +2,11 @@ package generators.impl.cmd;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import com.google.common.collect.Multimap;
 import commons.Commons;
 import commons.util.StringUtil;
-import commons.data.AccountProvider;
-import commons.data.AccountStorage;
+import commons.data.account.AccountProvider;
+import commons.data.account.AccountStorage;
 import generators.GeneratorRegistry;
 import generators.impl.GensPlugin;
 import generators.impl.conf.Tiers;
@@ -19,12 +20,13 @@ import me.vadim.util.menu.Menu;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Field;
+
 /**
  * @author vadim
  */
 @CommandAlias("gen")
 public class GenCommand extends BaseCommand {
-
 
 	private final GensPlugin plugin;
 	private final GenStorage genStorage;
@@ -39,6 +41,17 @@ public class GenCommand extends BaseCommand {
 		this.reg = plugin.getRegistry();
 		this.conf = plugin.getConfiguration();
 		this.accounts = plugin.getAccounts();
+	}
+
+	@Subcommand("listsubcommands")
+	@SuppressWarnings("ALL")
+	public void reflect(Player player) throws Throwable {
+		Field f = BaseCommand.class.getDeclaredField("subCommands");
+		f.setAccessible(true);
+		Multimap<String, ?> map = (Multimap) f.get(this);
+		for (String s : map.keySet()) {
+			System.out.println("SUBCOMMAND: " + s);
+		}
 	}
 
 	@Subcommand("setmaxslots")

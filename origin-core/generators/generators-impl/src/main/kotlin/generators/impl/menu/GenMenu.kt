@@ -1,20 +1,12 @@
 package generators.impl.menu
 
-import commons.CommonsPlugin
-import commons.data.AccountStorage
+import commons.data.account.AccountStorage
 import commons.menu.MenuAdapter
 import generators.GeneratorRegistry
 import generators.impl.GensPlugin
 import generators.impl.conf.Config
 import generators.impl.data.GenAccount
 import me.vadim.util.conf.ConfigurationProvider
-import me.vadim.util.item.createItem
-import me.vadim.util.menu.*
-import me.vadim.util.menu.builder.MenuBuilder
-import me.vadim.util.menu.button.Button
-import org.bukkit.Material
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemFlag
 
 /**
  * @author vadim

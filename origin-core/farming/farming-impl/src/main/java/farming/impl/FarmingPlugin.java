@@ -18,6 +18,7 @@ import co.aikar.commands.PaperCommandManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import commons.Commons;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import enchants.impl.EnchantPlugin;
@@ -58,6 +59,8 @@ public class FarmingPlugin extends ExtendedJavaPlugin implements ResourceProvide
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.register(BlocksConfig.class, BlocksConfig::new);
 		lfc.reload();
+
+		Commons.commons().registerReloadHook(this, lfc);
 
 		this.blocksAPI = BlocksAPI.getInstance();
 		this.blocksPlugin = BlocksPlugin.get().getInstance(BlocksPlugin.class);

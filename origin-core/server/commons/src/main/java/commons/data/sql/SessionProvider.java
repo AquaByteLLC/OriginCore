@@ -1,4 +1,4 @@
-package commons.data;
+package commons.data.sql;
 
 import java.sql.SQLException;
 

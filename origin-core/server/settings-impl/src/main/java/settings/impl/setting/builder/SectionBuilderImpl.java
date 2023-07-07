@@ -1,5 +1,7 @@
 package settings.impl.setting.builder;
 
+import me.vadim.util.item.ItemBuilder;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import settings.impl.setting.key.GKey;
 import settings.setting.Setting;
@@ -46,6 +48,15 @@ public class SectionBuilderImpl implements SectionBuilder {
 
 	@Override
 	public SettingSection build() {
+		if(menuItem == null && name == null && description == null)
+			throw new IllegalStateException("Call some of the builder methods first.");
+		if(menuItem == null)
+			menuItem = ItemBuilder.create(Material.STONE).build();
+		if(name == null)
+			name = menuItem.getItemMeta().getDisplayName();
+		if(description == null)
+			description = menuItem.getLore();
+
 		SettingSection section = new MenuSection(GKey.convert(name), name, menuItem, description);
 		inital.forEach(section::createSetting);
 		return section;

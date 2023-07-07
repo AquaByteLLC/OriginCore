@@ -1,5 +1,6 @@
 package enchants.impl.item;
 
+import commons.util.BigMath;
 import commons.util.BukkitUtil;
 import commons.util.StringUtil;
 import enchants.EnchantAPI;
@@ -19,6 +20,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -76,13 +81,13 @@ public class EnchantedItemImpl implements EnchantedItem {
 	}
 
 	@Override
-	public void addEnchant(EnchantKey enchantKey, int level) {
+	public void addEnchant(EnchantKey enchantKey, long level) {
 		final Enchant enchant = getRegistry().getByKey(enchantKey);
 		if(!enchant.targetsItem(itemStack.getType()))
 			return;
 		writeContainer(pdc -> {
 			if (canEnchant(pdc))
-				pdc.set(enchantKey.getNamespacedKey(), PersistentDataType.INTEGER, Math.min(enchant.getMaxLevel(), level));
+				pdc.set(enchantKey.getNamespacedKey(), PersistentDataType.LONG, Math.min(enchant.getMaxLevel(), level));
 		});
 		updateMeta();
 	}
@@ -107,7 +112,7 @@ public class EnchantedItemImpl implements EnchantedItem {
 
 	@Override
 	public boolean hasEnchant(EnchantKey enchantKey) {
-		return readContainer().has(enchantKey.getNamespacedKey(), PersistentDataType.INTEGER);
+		return readContainer().has(enchantKey.getNamespacedKey(), PersistentDataType.LONG);
 	}
 
 	@Override
@@ -131,36 +136,37 @@ public class EnchantedItemImpl implements EnchantedItem {
 		return enchants;
 	}
 
-	public static double calc(Enchant holder, Enchant.ProgressionType type, int lvl, double start, double max) {
-		final int maxLvl = holder.getMaxLevel();
+	public BigDecimal calc(Enchant holder, Enchant.ProgressionType type, long lvl, BigDecimal start, BigDecimal max) {
+		long maxLvl = holder.getMaxLevel();
 
 		if (maxLvl == 1)
 			return max;
 		else {
 			switch (type) {
 				case EXPONENTIAL -> {
-					return start * Math.pow(max / start, (double) (lvl - 1) / (maxLvl - 1));
+					//start * Math.pow(max / start, (double) (lvl - 1) / (maxLvl - 1))
+					return start.multiply(max.divide(start, RoundingMode.HALF_EVEN).pow(Math.toIntExact((lvl - 1) / (maxLvl - 1))));
 				}
 				case LOGARITHMIC -> {
 					return handleLog(start, max, lvl, maxLvl);
 				}
 			}
-			return 0.0;
+			return BigDecimal.ZERO;
 		}
 	}
 
 	@SneakyThrows
 	@Override
-	public double getChance(EnchantKey enchantKey) {
-		if (!hasEnchant(enchantKey)) return 0.0;
+	public BigDecimal getChance(EnchantKey enchantKey) {
+		if (!hasEnchant(enchantKey)) return BigDecimal.ZERO;
 		Enchant holder = getRegistry().getByKey(enchantKey);
 		return calc(holder, holder.getChanceType(), getLevel(enchantKey), holder.getStartChance(), holder.getMaxChance());
 	}
 
 	@SneakyThrows
 	@Override
-	public double getCost(EnchantKey enchantKey) {
-		if (!hasEnchant(enchantKey)) return 0.0;
+	public BigDecimal getCost(EnchantKey enchantKey) {
+		if (!hasEnchant(enchantKey)) return BigDecimal.ZERO;
 		Enchant holder = getRegistry().getByKey(enchantKey);
 		return calc(holder, holder.getCostType(), getLevel(enchantKey), holder.getStartCost(), holder.getMaxCost());
 	}
@@ -168,9 +174,9 @@ public class EnchantedItemImpl implements EnchantedItem {
 	@SuppressWarnings("all")
 	@SneakyThrows
 	@Override
-	public int getLevel(EnchantKey enchantKey) {
-		if (!hasEnchant(enchantKey)) return 0;
-		return readContainer().get(enchantKey.getNamespacedKey(), PersistentDataType.INTEGER);
+	public long getLevel(EnchantKey enchantKey) {
+		if (!hasEnchant(enchantKey)) return 0L;
+		return readContainer().get(enchantKey.getNamespacedKey(), PersistentDataType.LONG);
 	}
 
 	private void updateMeta() {
@@ -197,10 +203,10 @@ public class EnchantedItemImpl implements EnchantedItem {
 
 			for (EnchantKey key : keys) {
 				final Enchant enchant = getRegistry().getByKey(key);
-				final int level = getLevel(key);
+				final long level = getLevel(key);
 
 				lore.add(Text.colorize(enchant.getLore())
-							 .replaceAll("%level%", Integer.toString(level))
+							 .replaceAll("%level%", StringUtil.formatNumber(level))
 							 .replaceAll("%name%", enchant.getKey().getName()));
 			}
 
@@ -213,8 +219,8 @@ public class EnchantedItemImpl implements EnchantedItem {
 		if (!hasEnchant(enchantKey)) return false;
 		final Random random = new Random();
 		final int randomNumber = random.nextInt(100);
-		final double chance = getChance(enchantKey);
-		return randomNumber <= chance;
+		final BigDecimal chance = getChance(enchantKey);
+		return chance.compareTo(BigDecimal.valueOf(randomNumber)) <= 0; // randomNumber <= chance;
 	}
 
 	/**
@@ -224,12 +230,10 @@ public class EnchantedItemImpl implements EnchantedItem {
 	 * @param max     This will be the maximum level of the players enchant.
 	 * @return The return value will be the calculated chance of the enchantment.
 	 */
-	private static double handleLog(double startC, double maxC, int current, int max) {
+	private static BigDecimal handleLog(BigDecimal startC, BigDecimal maxC, long current, long max) {
 		final double logValue = Math.log(current) / Math.log(max);
-		double currentChance = startC + (maxC - startC) * logValue;
-		currentChance = Math.max(startC, currentChance);
-		currentChance = Math.min(maxC, currentChance);
-		return currentChance;
+		BigDecimal currentChance = startC.add(maxC.subtract(startC)).multiply(BigDecimal.valueOf(logValue)); // startC + (maxC - startC) * logValue;
+		return currentChance.max(startC).min(maxC);
 	}
 
 	public static boolean canEnchant(ItemStack item) {

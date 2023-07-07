@@ -5,28 +5,28 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.logger.Level;
 import commons.cmd.EconCommand;
+import commons.cmd.ReloadModuleCommand;
 import commons.cmd.SaveCommand;
 import commons.conf.CommonsConfig;
-import commons.data.AccountStorage;
-import commons.impl.account.AccountStorageHandler;
-import commons.data.SessionProvider;
-import commons.data.impl.LocationPersister;
-import commons.data.impl.SQLiteSession;
+import commons.data.account.AccountStorage;
+import commons.impl.data.account.AccountStorageHandler;
+import commons.data.sql.SessionProvider;
+import commons.impl.data.sql.LocationPersister;
+import commons.data.sql.impl.SQLiteSession;
 import commons.econ.BankAccount;
 import commons.entity.registry.EntityRegistry;
-import commons.events.api.EventContext;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import commons.events.impl.PluginEventWrapper;
-import commons.impl.account.PlayerDefaultAccount;
-import commons.impl.account.PlayerDefaultAccountStorage;
-import commons.impl.account.ServerAccount;
+import commons.impl.data.account.PlayerDefaultAccount;
+import commons.impl.data.account.PlayerDefaultAccountStorage;
+import commons.impl.data.account.ServerAccount;
 import commons.sched.SchedulerManager;
 import commons.sched.impl.Scheduler4Plugin;
-import lombok.Getter;
 import me.lucko.helper.messaging.bungee.BungeeCord;
 import me.lucko.helper.messaging.bungee.BungeeCordImpl;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import me.vadim.util.menu.Menus;
@@ -34,12 +34,14 @@ import me.vadim.util.menu.MenusKt;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
@@ -141,6 +143,12 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return bungeeCord;
 	}
 
+	private ReloadModuleCommand reload;
+
+	public void registerReloadHook(JavaPlugin plugin, ConfigurationManager manager) {
+		reload.managers.put(plugin.getName().split("-")[0], manager);
+	}
+
 	@Override
 	protected void load() {
 		instance = this;
@@ -150,16 +158,15 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		DataPersisterManager.registerDataPersisters(new LocationPersister());
 		getDataFolder().mkdirs();
 
-		// 'FUCK YOU' LIST:
-		// Fuck you, underscore11code, inventor of this GAY SHIT: https://github.com/PaperMC/Paper/commit/ed1dc272e65a367cf1e405f9208a42911e4e19ba
-		// Fuck anyone who contributed to this obscenity:
+		// Fuck you, underscore11code, inventor of this gay shit: https://github.com/PaperMC/Paper/commit/ed1dc272e65a367cf1e405f9208a42911e4e19ba
+		// Additionaly, fuck anyone who contributed to this obscenity:
 		//  - Proximyst
 		//	- TheLukeGuy
 		//	- electronicboy
 		//	- jpenilla
 		//	- Machine-Maker
 		//	- kennytv
-		// == Complete list of motherfuckers as of 2023-07-02
+		// == Complete list of motherfuckers as of 2023-07-07
 		class gayness_remover extends PrintStream {
 			gayness_remover(@NotNull OutputStream out) {
 				super(out);
@@ -192,9 +199,16 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 
 		bungeeCord = new BungeeCordImpl(this);
 
+		reload = new ReloadModuleCommand();
+
+		registerReloadHook(this, lfc);
+
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new EconCommand(accounts));
 		commands.registerCommand(new SaveCommand(storage));
+		commands.registerCommand(reload);
+
+		commands.getCommandCompletions().registerCompletion("modules", c -> new ArrayList<>(reload.managers.keySet()));
 	}
 
 	@Override

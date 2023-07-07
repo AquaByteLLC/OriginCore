@@ -1,11 +1,11 @@
-package commons.data.impl;
+package commons.data.sql.impl;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.table.TableUtils;
-import commons.data.DatabaseSession;
+import commons.data.sql.DatabaseSession;
 import lombok.SneakyThrows;
 
 import java.sql.SQLException;
