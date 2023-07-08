@@ -10,6 +10,8 @@ import commons.impl.data.account.AccountStorageHandler;
 import commons.util.StringUtil;
 import org.bukkit.command.CommandSender;
 
+import static commons.cmd.Prefix.MODULES;
+
 /**
  * @author vadim
  */
@@ -30,20 +32,20 @@ public class SaveCommand extends BaseCommand {
 			StringUtil.send(sender, "&ePlease wait...");
 			int err = 0;
 			for (AccountStorage<?> storage : handler.getStorages()) {
-				StringUtil.send(sender, String.format("&b> &eSaving &b[&7%s&b]", storage.getAccountClass().getSimpleName()));
+				StringUtil.send(sender, MODULES + String.format("&b> &eSaving &b[&7%s&b]", storage.getAccountClass().getSimpleName()));
 				try {
 					storage.flushAndSave();
 				} catch (Exception e) {
 					err++;
 					String msg = e.getMessage();
 					if(msg == null || "null".equals(msg)) msg = "";
-					StringUtil.send(sender, String.format("&4[&c!&4] &c&l%s&4(&d%s&4)", e.getClass().getSimpleName(), msg));
+					StringUtil.send(sender, MODULES + String.format("&4[&c!&4] &c&l%s&4(&d%s&4)", e.getClass().getSimpleName(), msg));
 				}
 			}
 			if(err == 0)
-				StringUtil.send(sender, "&2All accounts saved!");
+				StringUtil.send(sender, MODULES + "&2All accounts saved!");
 			else
-				StringUtil.send(sender, "&eCompleted with errors: some accounts not saved.");
+				StringUtil.send(sender, MODULES + "&eCompleted with errors: some accounts not saved.");
 		});
 	}
 

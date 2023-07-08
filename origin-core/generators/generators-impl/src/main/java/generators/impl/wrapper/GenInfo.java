@@ -14,6 +14,8 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Optional;
+
 /**
  * @author vadim
  */
@@ -26,6 +28,7 @@ public class GenInfo implements Tier {
 				.set("drop_price", StringUtil.formatNumber(drop.getSellPrice()))
 				.set("buy_price", StringUtil.formatNumber(tier.getBuyPrice()))
 				.set("gen_tier", StringUtil.formatNumber(tier.getIndex() + 1))
+				.set("upgrade_price", StringUtil.formatNumber(Optional.ofNullable(tier.getNextUpgrade()).map(Upgrade::getPrice).orElse(0.0)))
 				.build();
 	}
 

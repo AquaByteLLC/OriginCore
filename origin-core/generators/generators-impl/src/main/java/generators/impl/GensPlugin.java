@@ -19,6 +19,7 @@ import generators.impl.data.TierPersister;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
+import org.bukkit.Sound;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -66,7 +67,7 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider {
 		registry       = new GenRegistry(lfc);
 		accountStorage = new GenAccountStorage(registry, lfc, commons.getDatabase());
 		handler        = new GenHandler(lfc, events, registry, accountStorage);
-		genStorage     = new GenStorage(commons.getDatabase(), registry);
+		genStorage     = new GenStorage(commons.getDatabase(), registry, lfc);
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new GenCommand(this, genStorage));

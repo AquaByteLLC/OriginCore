@@ -1,5 +1,9 @@
 package commons.conf;
 
+import commons.conf.wrapper.EffectGroup;
+import commons.conf.wrapper.EffectParticle;
+import commons.conf.wrapper.EffectSound;
+import commons.conf.wrapper.OptionalMessage;
 import commons.util.ReflectUtil;
 import me.vadim.util.conf.ConfigurationAccessor;
 import me.vadim.util.conf.ResourceProvider;
@@ -8,12 +12,9 @@ import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import me.vadim.util.conf.wrapper.impl.UnformattedMessage;
 import me.vadim.util.item.ItemBuilder;
-import org.apache.commons.lang.enums.EnumUtils;
-import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -63,15 +64,15 @@ public abstract class BukkitConfig extends YamlFile {
 		return (U) ufif.newUnformattedItem(type, conf.getPlaceholder("name"), Arrays.stream(conf.getStringArray("lore")).map(UnformattedMessage::new).map(PlaceholderMessage.class::cast).toList());
 	}
 
-	protected UnplayedSound getSound(String path) {
+	protected EffectSound getSound(String path) {
 		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
 
 		float volume = 1.0f;
-		if(conf.has("volume"))
+		if (conf.has("volume"))
 			volume = conf.getFloat("volume");
 
 		float pitch = 1.0f;
-		if(conf.has("pitch"))
+		if (conf.has("pitch"))
 			pitch = conf.getFloat("pitch");
 
 		Sound sound = null;
@@ -80,8 +81,47 @@ public abstract class BukkitConfig extends YamlFile {
 			if (sound == null)
 				logError(resourceProvider.getLogger(), path + ".sound", "sound");
 		}
-		return new UnplayedSound(volume, pitch, sound);
+		return new EffectSound(sound, volume, pitch);
+	}
 
+	protected EffectParticle getParticle(String path) {
+		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
+
+		int count = 1;
+		if (conf.has("count"))
+			count = conf.getInt("count");
+
+		Particle particle = null;
+		if (conf.has("sound")) {
+			particle = ReflectUtil.getEnum(Particle.class, conf.getString("particle"));
+			if (particle == null)
+				logError(resourceProvider.getLogger(), path + ".particle", "particle");
+		}
+		return new EffectParticle(particle, count);
+	}
+
+	protected EffectGroup getEffect(String path) {
+		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
+
+		EffectSound sound = EffectSound.EMPTY;
+		if (conf.has("sound"))
+			sound = getSound(path);
+
+		EffectParticle particle = EffectParticle.EMPTY;
+		if (conf.has("particle"))
+			particle = getParticle(path);
+
+		return new EffectGroup(sound, particle);
+	}
+
+	protected OptionalMessage getOptional(String path) {
+		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
+
+		PlaceholderMessage msg = null;
+		if(conf.has(path))
+			msg = conf.getPlaceholder(path);
+
+		return new OptionalMessage(msg);
 	}
 
 	protected interface UnformattedItemFactory {
@@ -112,29 +152,6 @@ public abstract class BukkitConfig extends YamlFile {
 			return ItemBuilder.create(material)
 							  .displayName(name.format(placeholder))
 							  .lore(lore.stream().map(msg -> msg.format(placeholder)).toList());
-		}
-
-	}
-
-	public static class UnplayedSound {
-
-		public final float volume;
-		public final float pitch;
-		public final Sound sound;
-
-		public UnplayedSound(float volume, float pitch, Sound sound) {
-			this.volume = volume;
-			this.pitch  = pitch;
-			this.sound  = sound;
-		}
-
-		public void playTo(Player player, Location location) {
-			System.out.println("Playign "+sound+ " @ " + location + ", v:"+volume+",p:"+pitch);
-			player.playSound(location, sound, volume, pitch);
-		}
-
-		public void playAt(World world, Location location) {
-			world.playSound(location, sound, volume, pitch);
 		}
 
 	}

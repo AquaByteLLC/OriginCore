@@ -4,11 +4,14 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import commons.impl.data.PlayerOwned;
 import generators.GeneratorRegistry;
+import generators.impl.GensPlugin;
+import generators.impl.conf.Messages;
 import generators.wrapper.Generator;
 import generators.wrapper.Tier;
 import generators.wrapper.Upgrade;
 import generators.wrapper.result.DestroyResult;
 import generators.wrapper.result.UpgradeResult;
+import me.vadim.util.conf.ConfigurationProvider;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -21,6 +24,16 @@ import java.util.UUID;
  */
 @DatabaseTable
 public class Gen extends PlayerOwned implements Generator {
+
+	private transient ConfigurationProvider conf;
+
+	public void injectConf(ConfigurationProvider conf) {
+		this.conf = conf;
+	}
+
+	private Messages msg() {
+		return conf.open(Messages.class);
+	}
 
 	private final @DatabaseField Tier tier;
 	private final @DatabaseField Location location;

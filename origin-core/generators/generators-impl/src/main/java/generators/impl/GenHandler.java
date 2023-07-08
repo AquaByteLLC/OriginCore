@@ -1,12 +1,15 @@
 package generators.impl;
 
+import commons.conf.wrapper.EffectGroup;
 import commons.data.account.AccountProvider;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import generators.impl.conf.Config;
 import generators.impl.conf.GensSettings;
+import generators.impl.conf.Messages;
 import generators.impl.conf.Tiers;
 import generators.impl.data.GenAccount;
+import generators.impl.wrapper.GenInfo;
 import generators.impl.wrapper.PDCUtil;
 import generators.wrapper.Generator;
 import generators.wrapper.Tier;
@@ -14,7 +17,9 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.scheduler.Task;
 import me.vadim.util.conf.ConfigurationProvider;
+import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -53,6 +58,10 @@ public class GenHandler {
 		return conf.open(Config.class);
 	}
 
+	private Messages msg() {
+		return conf.open(Messages.class);
+	}
+
 	void drop() {
 		for (Long2ObjectMap.Entry<Generator> entry : reg.iterable()) {
 			Generator gen = entry.getValue();
@@ -88,19 +97,22 @@ public class GenHandler {
 		Generator generator = reg.getGenAt(location);
 		if (generator != null) {
 			event.setCancelled(true);
-			player.sendMessage("akready a gen ther");
+			msg().getInvalidLocation().sendTo(player, StringPlaceholder.EMPTY);
 			return;
 		}
 
 		if (account.isAtSlotLimit() && !player.isOp()) {
 			event.setCancelled(true);
-			player.sendMessage("limit reached");
+			msg().getAtLimit().sendTo(player, StringPlaceholder.of("max_slots", String.valueOf(account.slotLimit)));
 			return;
 		}
 
 		Generator gen = tier.toGenerator(player, location);
 		reg.createGen(gen);
-		player.sendMessage("made a new gen ;P");
+		config().getCreateEffect().sendToIf(player,
+						location.clone(), GensSettings.SOUNDS::isEnabled,
+						location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
+		msg().getCreatedGen().sendTo(player, GenInfo.placeholdersForTier(gen.getCurrentTier()));
 	}
 
 	@Subscribe
@@ -113,7 +125,15 @@ public class GenHandler {
 
 		event.setCancelled(true);
 
-		generator.destroy(reg, player);
+		EffectGroup effect =
+				switch (generator.destroy(reg, player)) {
+					case SUCCESS -> config().getDestroyEffect();
+					case NO_PERMISSION -> config().getErrorEffect();
+				};
+		effect.sendToIf(player,
+						location.clone(), GensSettings.SOUNDS::isEnabled,
+						location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
+		msg().getDestroyedGen().sendTo(player, GenInfo.placeholdersForTier(generator.getCurrentTier()));
 	}
 
 	@Subscribe
@@ -132,10 +152,16 @@ public class GenHandler {
 
 		if (!generator.isOwnedBy(player)) return; // do not allow upgrading other's gens
 
-		generator.upgrade(reg);
-
-		if(GensSettings.SOUNDS.isEnabled(player))
-			config().getUpgradeSound().playTo(player, location);
+		EffectGroup effect =
+				switch (generator.upgrade(reg)) {
+					case SUCCESS -> config().getUpgradeEffect();
+					case MAX_LEVEL -> EffectGroup.EMPTY;
+					default -> config().getErrorEffect();
+				};
+		effect.sendToIf(player,
+						location.clone(), GensSettings.SOUNDS::isEnabled,
+						location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
+		msg().getUpgradedGen().sendTo(player, GenInfo.placeholdersForTier(generator.getCurrentTier()));
 	}
 
 	@Subscribe

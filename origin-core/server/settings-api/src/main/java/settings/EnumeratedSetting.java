@@ -12,6 +12,16 @@ import settings.setting.key.LocalKey;
  */
 public interface EnumeratedSetting {
 
+	/**
+	 * Constant predicate that returns {@code true}.
+	 */
+	static <T> boolean always(T __) { return true; }
+
+	/**
+	 * Constant predicate that returns {@code false}.
+	 */
+	static <T> boolean never(T __) { return false; }
+
 	@NotNull Setting getSetting();
 
 	static void nonBinarySetting() {

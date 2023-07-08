@@ -1,6 +1,7 @@
 package generators.impl.conf;
 
 import commons.conf.BukkitConfig;
+import commons.conf.wrapper.EffectGroup;
 import commons.util.StringUtil;
 import generators.wrapper.Upgrade;
 import me.vadim.util.conf.ResourceProvider;
@@ -9,7 +10,6 @@ import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import me.vadim.util.item.ItemBuilder;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -78,10 +78,20 @@ public class Config extends BukkitConfig {
 		return getUnformatted("manage_menu.individual_view.delete");
 	}
 
-	public UnplayedSound getUpgradeSound() {
-		return getSound("effects.upgrade_sound");
+	public EffectGroup getCreateEffect() {
+		return getEffect("effects.create");
 	}
 
+	public EffectGroup getUpgradeEffect() {
+		return getEffect("effects.upgrade");
+	}
+
+	public EffectGroup getDestroyEffect() {
+		return getEffect("effects.destroy");
+	}
+	public EffectGroup getErrorEffect() {
+		return getEffect("effects.error");
+	}
 	private String getGenMenuItemMaxLevel() {
 		return getConfigurationAccessor().getObject("gen_item").getString("upgrade_price_max");
 	}

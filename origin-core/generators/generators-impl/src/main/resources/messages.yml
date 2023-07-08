@@ -1,0 +1,7 @@
+gen:
+  # You can remove any of these messages if you want, and they will not send.
+  created: "&2Created a {gen_tier} {drop_name} (costs: {buy_price}) (upgrade: {upgrade_price}) selling for {drop_price}"
+  upgraded: "&aUpgraded to {gen_tier} {drop_name} for (just spent) {buy_price} (next upgrade: {upgrade_price}), now selling for {drop_price}"
+  destroyed: "&cDestroyed a {gen_tier} {drop_name} (costed: {buy_price}) (would have upgraded for: {upgrade_price}) that was selling for {drop_price}"
+  slot_limit_reached: "&4You have reached your limit of {max_slots} slots."
+  err_invalid_location: "&4Error: invalid location, There is already a gen there."

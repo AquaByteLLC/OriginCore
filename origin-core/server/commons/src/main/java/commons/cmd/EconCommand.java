@@ -17,13 +17,13 @@ import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 
+import static commons.cmd.Prefix.ECON;
+
 /**
  * @author vadim
  */
 @CommandAlias("econ")
 public class EconCommand extends BaseCommand {
-
-	private static final String ECON = "&r&7[&l&6econ&r&7]&r ";
 
 	private final AccountProvider<PlayerDefaultAccount> accounts;
 

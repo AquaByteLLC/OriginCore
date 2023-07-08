@@ -4,10 +4,31 @@ autosave_interval_minutes: 20
 
 effects:
   # see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html for a list of sounds
-  upgrade_sound:
+  # see https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html for a list of particles
+  # you can add/remove fields at will
+  # as I have it below:
+  #   create won't show a particle unless you add one
+  #   upgrade will show a particle unless you remove it
+  create:
+    sound: BLOCK_ANVIL_LAND
     volume: 1.0
     pitch: 1.0
-    sound: ENTITY_ARROW_HIT_PLAYER
+  upgrade:
+    sound: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 1.0
+    pitch: 1.0
+    particle: VILLAGER_HAPPY
+    count: 1
+  destroy:
+    sound: BLOCK_BEACON_DEACTIVATE
+    volume: 1.0
+    pitch: 1.0
+  error:
+    sound: ENTITY_VILLAGER_NO
+    volume: 1.0
+    pitch: 1.0
+    particle: VILLAGER_ANGRY
+    count: 1
 
 drop_item:
   name: "&f{drop_name}"

@@ -13,6 +13,8 @@ import org.bukkit.command.CommandSender;
 import java.util.HashMap;
 import java.util.Map;
 
+import static commons.cmd.Prefix.MODULES;
+
 /**
  * @author vadim
  */
@@ -27,9 +29,9 @@ public final class ReloadModuleCommand extends BaseCommand {
 	public void reload(CommandSender sender, String module) {
 		if (!sender.isOp()) return;
 		Commons.scheduler().getAsyncExecutor().submit(() -> {
-			StringUtil.send(sender, "&eReloading &b" + module + "&e...");
+			StringUtil.send(sender, MODULES + "&eReloading &b" + module + "&e...");
 			managers.get(module).reload();
-			StringUtil.send(sender, "&aDone!");
+			StringUtil.send(sender, MODULES + "&aDone!");
 		});
 	}
 
@@ -39,10 +41,10 @@ public final class ReloadModuleCommand extends BaseCommand {
 		if (!sender.isOp()) return;
 		Commons.scheduler().getAsyncExecutor().submit(() -> {
 			for (Map.Entry<String, ConfigurationManager> entry : managers.entrySet()) {
-				StringUtil.send(sender, "&eReloading &b" + entry.getKey() + "&e...");
+				StringUtil.send(sender, MODULES + "&eReloading &b" + entry.getKey() + "&e...");
 				entry.getValue().reload();
 			}
-			StringUtil.send(sender, "&aDone!");
+			StringUtil.send(sender, MODULES + "&aDone!");
 		});
 	}
 
