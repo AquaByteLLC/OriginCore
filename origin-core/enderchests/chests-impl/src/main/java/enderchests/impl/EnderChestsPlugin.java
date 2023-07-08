@@ -4,13 +4,16 @@ import blocks.BlocksAPI;
 import co.aikar.commands.PaperCommandManager;
 import commons.Commons;
 import commons.CommonsPlugin;
+import commons.OriginModule;
 import commons.data.account.AccountProvider;
+import commons.data.account.AccountStorage;
 import enderchests.ChestRegistry;
 import enderchests.impl.cmd.EnderChestCommand;
 import enderchests.impl.cmd.IllusionCommand;
 import enderchests.impl.conf.Config;
 import enderchests.impl.data.EChestAccountStorage;
 import enderchests.impl.data.EnderChestAccount;
+import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,7 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 /**
  * @author vadim
  */
-public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider {
+public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
 
 	private static EnderChestsPlugin badDesignPatterns;
 
@@ -36,11 +39,17 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider {
 		return lfc.open(Config.class);
 	}
 
+	@Override
+	public ConfigurationManager getConfigurationManager() {
+		return lfc;
+	}
+
 	public ChestRegistry getChestRegistry() {
 		return chestRegistry;
 	}
 
-	public AccountProvider<EnderChestAccount> getAccounts() {
+	@Override
+	public AccountStorage<EnderChestAccount> getAccounts() {
 		return accountStorage;
 	}
 
@@ -54,11 +63,11 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider {
 		lfc.register(Config.class, Config::new);
 		lfc.reload();
 
-		Commons.commons().registerReloadHook(this, lfc);
+		Commons.commons().registerModule(this);
 
-		accountStorage = new EChestAccountStorage(lfc, CommonsPlugin.commons().getDatabase());
+		accountStorage = new EChestAccountStorage(lfc, Commons.db());
 		chestRegistry = new EnderChestRegistry(lfc, accountStorage);
-		chestHandler  = new EnderChestHandler(this, chestRegistry, accountStorage, CommonsPlugin.commons().getEventRegistry());
+		chestHandler  = new EnderChestHandler(this, chestRegistry, accountStorage, Commons.events());
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new IllusionCommand(BlocksAPI.getInstance().getIllusions()));

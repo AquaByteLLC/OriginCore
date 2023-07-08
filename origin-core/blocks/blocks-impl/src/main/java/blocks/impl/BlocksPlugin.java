@@ -17,15 +17,19 @@ import blocks.impl.registry.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import commons.Commons;
 import commons.CommonsPlugin;
+import commons.OriginModule;
+import commons.data.account.AccountProvider;
 import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
 import lombok.Getter;
+import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
-public class BlocksPlugin extends JavaPlugin implements ResourceProvider {
+public class BlocksPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
 	private static Injector injector;
 
 	public static Injector get() {
@@ -56,7 +60,7 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider {
 
 		this.blockRegistry = new BlockRegistryImpl();
 		this.overlayLocationRegistry = new OverlayRegistryImpl();
-		this.illusions = new Illusions(this, CommonsPlugin.commons().getEventRegistry());
+		this.illusions = new Illusions(this, Commons.events());
 		this.regenerationRegistry = new RegenerationRegistryImpl();
 		this.blockLocationRegistry = new LocationRegistryImpl();
 		this.progressRegistry = new ProgressRegistryImpl();
@@ -66,11 +70,17 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider {
 		injector = Guice.createInjector(new BlockModule(new BlocksAPI(this, blockLocationRegistry, illusions, regenerationRegistry, blockRegistry, overlayLocationRegistry, progressRegistry, speedAttribute, regionRegistry), this));
 
 		accountStorage = new BlockAccountStorage(commonsPlugin.getDatabase());
-		commonsPlugin.registerAccountLoader(accountStorage);
+		commonsPlugin.registerModule(this);
 	}
 
+	@Override
 	public AccountStorage<BlockAccount> getAccounts() {
 		return accountStorage;
+	}
+
+	@Override
+	public ConfigurationManager getConfigurationManager() {
+		return null;
 	}
 
 	static class BlockModule extends AbstractModule {

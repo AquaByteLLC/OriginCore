@@ -28,6 +28,10 @@ public class Messages extends BukkitConfig {
 		return getOptional("gen.destroyed");
 	}
 
+	public OptionalMessage getDestroyedGenAdmin() {
+		return getOptional("gen.destroyed_admin");
+	}
+
 	public OptionalMessage getAtLimit() {
 		return getOptional("gen.slot_limit_reached");
 	}

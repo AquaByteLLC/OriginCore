@@ -25,16 +25,6 @@ import java.util.UUID;
 @DatabaseTable
 public class Gen extends PlayerOwned implements Generator {
 
-	private transient ConfigurationProvider conf;
-
-	public void injectConf(ConfigurationProvider conf) {
-		this.conf = conf;
-	}
-
-	private Messages msg() {
-		return conf.open(Messages.class);
-	}
-
 	private final @DatabaseField Tier tier;
 	private final @DatabaseField Location location;
 	private final @DatabaseField UUID world; // ORMLite workaround
@@ -88,23 +78,19 @@ public class Gen extends PlayerOwned implements Generator {
 		Generator upgraded = tier.toGenerator(player, location);
 		registry.createGen(upgraded);
 		block.setType(tier.getBlock());
-		player.sendMessage("upgraded <3");
 		return UpgradeResult.SUCCESS;
 	}
 
 	@Override
 	public DestroyResult destroy(GeneratorRegistry registry, Player by) {
-		if (!isOwnedBy(by) && !by.isOp()) {
-			by.sendMessage("dont break other ppl's gens >:[");
+		if (!isOwnedBy(by) && !by.isOp())
 			return DestroyResult.NO_PERMISSION;
-		}
 
 		registry.deleteGen(this);
 		location.getBlock().setType(Material.AIR);
 
 		if(by.getGameMode() != GameMode.CREATIVE)
 			by.getInventory().addItem(asItem());
-		by.sendMessage("broke " + (isOwnedBy(by) ? "ur" : getOfflineOwner().getName() + "'s") + " gen :o");
 		return DestroyResult.SUCCESS;
 	}
 

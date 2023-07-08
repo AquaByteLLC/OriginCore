@@ -20,12 +20,15 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.Commons;
 import commons.CommonsPlugin;
+import commons.OriginModule;
+import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
 import me.lucko.helper.bossbar.BossBarColor;
 import me.lucko.helper.bossbar.BossBarStyle;
 import me.lucko.helper.bossbar.BukkitBossBarFactory;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import mining.MiningAPI;
@@ -44,24 +47,31 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
-public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider {
+public class MiningPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
 
 	private static Injector injector;
-	private EventRegistry eventRegistry;
 	private BlocksAPI blocksAPI;
 	private BlocksPlugin blocksPlugin;
 	private MiningAPI miningAPI;
 	private LiteConfig lfc;
 
 	@Override
-	protected void enable() {
-		eventRegistry = CommonsPlugin.commons().getEventRegistry();
+	public ConfigurationManager getConfigurationManager() {
+		return lfc;
+	}
+
+	@Override
+	public AccountStorage<?> getAccounts() { return null; }
+
+	@Override
+	public void onEnable() {
+		EventRegistry eventRegistry = Commons.events();
 		lfc = new LiteConfig(this);
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.register(BlocksConfig.class, BlocksConfig::new);
 		lfc.reload();
 
-		Commons.commons().registerReloadHook(this, lfc);
+		Commons.commons().registerModule(this);
 
 		this.miningAPI = new MiningAPI(this);
 		this.blocksAPI = BlocksAPI.getInstance();
@@ -74,7 +84,7 @@ public class MiningPlugin extends ExtendedJavaPlugin implements ResourceProvider
 	}
 
 	@Override
-	protected void disable() {
+	public void onDisable() {
 		lfc.open(BlocksConfig.class).save();
 
 		Bukkit.getOnlinePlayers().forEach(player ->

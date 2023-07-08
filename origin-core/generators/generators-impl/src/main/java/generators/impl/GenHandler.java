@@ -1,6 +1,8 @@
 package generators.impl;
 
+import commons.Commons;
 import commons.conf.wrapper.EffectGroup;
+import commons.conf.wrapper.OptionalMessage;
 import commons.data.account.AccountProvider;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
@@ -14,12 +16,9 @@ import generators.impl.wrapper.PDCUtil;
 import generators.wrapper.Generator;
 import generators.wrapper.Tier;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import me.lucko.helper.Schedulers;
-import me.lucko.helper.scheduler.Task;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -28,6 +27,7 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.UUID;
@@ -40,18 +40,13 @@ public class GenHandler {
 	private final ConfigurationProvider conf;
 	private final AccountProvider<GenAccount> provider;
 	private final GenRegistry reg;
-	private final Task drops;
 
 	public GenHandler(ConfigurationProvider conf, EventRegistry events, GenRegistry registry, AccountProvider<GenAccount> provider) {
 		this.conf     = conf;
 		this.reg      = registry;
 		this.provider = provider;
 
-		Config config = conf.open(Config.class);
-
 		events.subscribeAll(this);
-
-		drops = Schedulers.sync().runRepeating(this::drop, config.getDropRateTicks(), config.getDropRateTicks());
 	}
 
 	private Config config() {
@@ -110,8 +105,8 @@ public class GenHandler {
 		Generator gen = tier.toGenerator(player, location);
 		reg.createGen(gen);
 		config().getCreateEffect().sendToIf(player,
-						location.clone(), GensSettings.SOUNDS::isEnabled,
-						location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
+											location.clone(), GensSettings.SOUNDS::isEnabled,
+											location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
 		msg().getCreatedGen().sendTo(player, GenInfo.placeholdersForTier(gen.getCurrentTier()));
 	}
 
@@ -127,13 +122,23 @@ public class GenHandler {
 
 		EffectGroup effect =
 				switch (generator.destroy(reg, player)) {
-					case SUCCESS -> config().getDestroyEffect();
+					case SUCCESS -> {
+						// send message upon success
+						OptionalMessage msg;
+						if (generator.isOwnedBy(player))
+							msg = msg().getDestroyedGen();
+						else
+							msg = msg().getDestroyedGenAdmin();
+						msg.sendTo(player, GenInfo.placeholdersForTier(generator.getCurrentTier()));
+
+						yield config().getDestroyEffect();
+					}
 					case NO_PERMISSION -> config().getErrorEffect();
 				};
+		// send corresponding effect if configured
 		effect.sendToIf(player,
 						location.clone(), GensSettings.SOUNDS::isEnabled,
 						location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
-		msg().getDestroyedGen().sendTo(player, GenInfo.placeholdersForTier(generator.getCurrentTier()));
 	}
 
 	@Subscribe
@@ -154,14 +159,19 @@ public class GenHandler {
 
 		EffectGroup effect =
 				switch (generator.upgrade(reg)) {
-					case SUCCESS -> config().getUpgradeEffect();
+					case SUCCESS -> {
+						// send message upon success
+						msg().getUpgradedGen().sendTo(player, GenInfo.placeholdersForTier(generator.getCurrentTier()));
+
+						yield config().getUpgradeEffect();
+					}
 					case MAX_LEVEL -> EffectGroup.EMPTY;
 					default -> config().getErrorEffect();
 				};
+		// send corresponding effect if configured
 		effect.sendToIf(player,
 						location.clone(), GensSettings.SOUNDS::isEnabled,
 						location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
-		msg().getUpgradedGen().sendTo(player, GenInfo.placeholdersForTier(generator.getCurrentTier()));
 	}
 
 	@Subscribe
@@ -179,8 +189,22 @@ public class GenHandler {
 				event.setCancelled(true); // prevent picking up other's gens
 	}
 
+	private BukkitTask drops;
+
+	public void restart() {
+		shutdown();
+		startup();
+	}
+
+	public void startup() {
+		if (drops != null)
+			return;
+		drops = Commons.scheduler().getBukkitSync().runTimer(this::drop, config().getDropRateTicks());
+	}
+
 	public void shutdown() {
-		drops.stop();
+		if (drops != null)
+			drops.cancel();
 	}
 
 }

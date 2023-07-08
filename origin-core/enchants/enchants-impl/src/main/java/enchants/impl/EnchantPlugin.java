@@ -6,6 +6,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.Commons;
 import commons.CommonsPlugin;
+import commons.OriginModule;
+import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import enchants.EnchantAPI;
@@ -20,6 +22,7 @@ import enchants.item.Enchant;
 import enchants.item.EnchantFactory;
 import enchants.item.EnchantedItem;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import me.vadim.util.menu.Menu;
@@ -28,7 +31,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvider {
+public class EnchantPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
 	private static Injector injector;
 
 	private LiteConfig lfc;
@@ -44,11 +47,24 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 	}
 
 	@Override
-	protected void enable() {
-		EventRegistry events = CommonsPlugin.commons().getEventRegistry();
+	public AccountStorage<?> getAccounts() { return null; }
+
+	@Override
+	public ConfigurationManager getConfigurationManager() {
+		return lfc;
+	}
+
+	public GeneralConfig getGeneralConfig() {
+		return lfc.open(GeneralConfig.class);
+	}
+
+	@Override
+	public void onEnable() {
+		EventRegistry events = Commons.events();
 		registry = new OriginEnchantRegistry(events);
 		factory = new OriginEnchantFactory();
 
+		Commons.commons().registerModule(this);
 		events.subscribeAll(this);
 
 		injector = Guice.createInjector(new EnchantPluginModule(this, registry, factory, this));
@@ -56,8 +72,6 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 		lfc = new LiteConfig(this);
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.reload();
-
-		Commons.commons().registerReloadHook(this, lfc);
 
 		EnchantTypes.init(registry, factory);
 
@@ -71,7 +85,7 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 	}
 
 	@Override
-	protected void disable() {
+	public void onDisable() {
 		EnchantmentConfiguration.save();
 		lfc.save();
 	}
@@ -94,10 +108,6 @@ public class EnchantPlugin extends ExtendedJavaPlugin implements ResourceProvide
 		Menu menu = new EnchantMenu(this, item).getMenu();
 		menu.regen();
 		menu.open(event.getPlayer());
-	}
-
-	public GeneralConfig getGeneralConfig() {
-		return lfc.open(GeneralConfig.class);
 	}
 
 	public static Injector get() {

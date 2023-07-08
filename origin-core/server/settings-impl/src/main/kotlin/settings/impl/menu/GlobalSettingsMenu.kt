@@ -25,7 +25,7 @@ class GlobalSettingsMenu(private val plugin: SettingsPlugin, private val holder:
 	override val DONE_SLOT = 40
 	override val NEXT_SLOT = 41
 
-	private fun config(): Config = plugin.configuration.open(Config::class.java)
+	private fun config(): Config = plugin.configurationManager.open(Config::class.java)
 
 	private fun getSection(section: SettingSection): MenuList<Setting> =
 		template.toList(holder.getLocalSettings(section), transformer = { it.getMenuItem(holder.getOption(it)) }) {

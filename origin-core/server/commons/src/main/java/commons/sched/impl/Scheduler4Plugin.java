@@ -1,6 +1,7 @@
 package commons.sched.impl;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import commons.sched.ExecutorServiceProvider;
 import commons.sched.SchedulerBukkit;
 import commons.sched.SchedulerManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,17 +19,14 @@ public class Scheduler4Plugin implements SchedulerManager {
 	private final SchedulerBukkit basync, bsync;
 	private final ExecutorService easync;
 	private final SyncExecutorService esync;
-
 	private final BukkitTask esynct;
+	private final ExecutorServiceProvider esp = new LocalExecutors();
 
 	public Scheduler4Plugin(JavaPlugin plugin) {
 		this.basync = new AsyncSchedulerBukkit(plugin);
 		this.bsync  = new SyncSchedulerBukkit(plugin);
 
-		this.easync = new AsyncExecutorService(0, Integer.MAX_VALUE,
-											   60L, TimeUnit.SECONDS,
-											   new SynchronousQueue<>(),
-											   new ThreadFactoryBuilder().setNameFormat("scheduler-async-worker %d").setDaemon(false).build());
+		this.easync = esp.newExtendedThreadPool(new ThreadFactoryBuilder().setNameFormat("scheduler-async-worker %d").setDaemon(false).build());
 		this.esync  = new SyncExecutorService(-1);
 
 		esynct = bsync.runTimer(esync::executeBatch, 1);
@@ -77,6 +75,11 @@ public class Scheduler4Plugin implements SchedulerManager {
 			}
 			isShutdown = true;
 		}
+	}
+
+	@Override
+	public ExecutorServiceProvider getServiceProvider() {
+		return esp;
 	}
 
 }

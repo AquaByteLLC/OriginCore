@@ -18,7 +18,7 @@ abstract class GenMenu<T>(plugin: GensPlugin) : MenuAdapter<T>() {
     final override val DONE_SLOT = 49
     final override val NEXT_SLOT = 50
 
-    protected val conf: ConfigurationProvider = plugin.configuration
+    protected val conf: ConfigurationProvider = plugin.configurationManager
     protected val accounts: AccountStorage<GenAccount> = plugin.accounts
     protected val reg: GeneratorRegistry = plugin.registry
 

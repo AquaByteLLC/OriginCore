@@ -38,7 +38,6 @@ public class GenStorage {
 			Gen gen;
 			while (iterator.hasNext()) {
 				gen = iterator.next();
-				gen.injectConf(conf);
 
 				// gen world is lazily set from uuid field upon getter invokation
 				registry.createGen(gen);

@@ -39,7 +39,7 @@ public class GenCommand extends BaseCommand {
 		this.plugin = plugin;
 		this.genStorage = genStorage;
 		this.reg = plugin.getRegistry();
-		this.conf = plugin.getConfiguration();
+		this.conf = plugin.getConfigurationManager();
 		this.accounts = plugin.getAccounts();
 	}
 

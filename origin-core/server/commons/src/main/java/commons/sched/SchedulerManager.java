@@ -15,4 +15,6 @@ public interface SchedulerManager {
 
 	SchedulerBukkit getBukkitAsync();
 
+	ExecutorServiceProvider getServiceProvider();
+
 }

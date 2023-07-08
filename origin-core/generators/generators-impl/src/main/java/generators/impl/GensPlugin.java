@@ -3,8 +3,9 @@ package generators.impl;
 import co.aikar.commands.PaperCommandManager;
 import com.j256.ormlite.field.DataPersisterManager;
 import commons.Commons;
-import commons.CommonsPlugin;
+import commons.OriginModule;
 import commons.data.account.AccountStorage;
+import commons.data.sql.SessionProvider;
 import commons.events.api.EventRegistry;
 import generators.GeneratorRegistry;
 import generators.impl.cmd.GenCommand;
@@ -16,16 +17,16 @@ import generators.impl.data.GenAccount;
 import generators.impl.data.GenAccountStorage;
 import generators.impl.data.GenStorage;
 import generators.impl.data.TierPersister;
+import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
-import org.bukkit.Sound;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * @author vadim
  */
-public class GensPlugin extends JavaPlugin implements ResourceProvider {
+public class GensPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
 
 	private LiteConfig lfc;
 	private PaperCommandManager commands;
@@ -34,16 +35,23 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider {
 	private GenAccountStorage accountStorage;
 	private GenStorage genStorage;
 
-	public ConfigurationProvider getConfiguration() {
-		return lfc;
-	}
-
+	@Override
 	public AccountStorage<GenAccount> getAccounts() {
 		return accountStorage;
 	}
 
 	public GeneratorRegistry getRegistry() {
 		return registry;
+	}
+
+	@Override
+	public ConfigurationManager getConfigurationManager() {
+		return lfc;
+	}
+
+	@Override
+	public void afterReload() throws Exception {
+		handler.restart();
 	}
 
 	@Override
@@ -59,24 +67,24 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider {
 		lfc.register(Tiers.class, (rp) -> new Tiers(rp, lfc));
 		lfc.reload();
 
-		Commons.commons().registerReloadHook(this, lfc);
+		Commons.commons().registerModule(this);
 
-		CommonsPlugin commons = CommonsPlugin.commons();
-		EventRegistry events  = commons.getEventRegistry();
+		SessionProvider db = Commons.db();
+		EventRegistry events  = Commons.events();
 
 		registry       = new GenRegistry(lfc);
-		accountStorage = new GenAccountStorage(registry, lfc, commons.getDatabase());
+		accountStorage = new GenAccountStorage(registry, lfc, db);
 		handler        = new GenHandler(lfc, events, registry, accountStorage);
-		genStorage     = new GenStorage(commons.getDatabase(), registry, lfc);
+		genStorage     = new GenStorage(db, registry, lfc);
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new GenCommand(this, genStorage));
 
-		commons.registerAccountLoader(accountStorage);
-
 		GensSettings.init(this);
 
 		genStorage.load();
+
+		handler.startup();
 
 		long auto = lfc.open(Config.class).getAutosaveIntervalTicks();
 		getServer().getScheduler().runTaskTimerAsynchronously(this, genStorage::save, auto, auto);

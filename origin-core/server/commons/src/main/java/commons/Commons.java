@@ -1,6 +1,8 @@
 package commons;
 
 import commons.conf.CommonsConfig;
+import commons.data.sql.SessionProvider;
+import commons.events.api.EventRegistry;
 import commons.sched.SchedulerManager;
 
 /**
@@ -18,6 +20,14 @@ public class Commons {
 
 	public static CommonsConfig config() {
 		return commons().config();
+	}
+
+	public static EventRegistry events() {
+		return commons().getEventRegistry();
+	}
+
+	public static SessionProvider db() {
+		return commons().getDatabase();
 	}
 
 }

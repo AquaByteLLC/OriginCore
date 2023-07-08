@@ -1,40 +1,81 @@
 package commons.impl.data.account;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import commons.OriginModule;
 import commons.data.account.AccountStorage;
+import commons.events.api.EventRegistry;
+import commons.events.api.Subscribe;
+import commons.sched.SchedulerManager;
+import me.vadim.util.conf.ResourceProvider;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author vadim
  */
 public class AccountStorageHandler {
 
-	private final Set<AccountStorage<?>> storages = new HashSet<>();
+	private final Map<String, OriginModule> modulesView;
+	private final Logger logger;
+	private final ExecutorService pool;
 
-	public void track(AccountStorage<?> storage) {
-		storages.add(storage);
-	}
-
-	public void untrack(AccountStorage<?> storage) {
-		storages.remove(storage);
-	}
-
-	public void saveAll() {
-		storages.forEach(AccountStorage::flushAndSave);
+	public AccountStorageHandler(Map<String, OriginModule> modulesView, SchedulerManager scheduler, EventRegistry events, ResourceProvider provider) {
+		this.modulesView = modulesView;
+		this.logger = provider.getLogger();
+		this.pool = scheduler.getServiceProvider().newExtendedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("[AccountStorage]").build());
+		events.subscribeAll(this);
 	}
 
 	public Set<AccountStorage<?>> getStorages() {
-		return new HashSet<>(storages);
+		return modulesView.values().stream().map(OriginModule::getAccounts).collect(Collectors.toSet());
+	}
+
+	public void saveAll() {
+		getStorages().forEach(AccountStorage::flushAndSave);
 	}
 
 	public void saveOne(UUID player) {
-		storages.forEach(s -> s.savePlayer(player));
+		getStorages().forEach(s -> s.savePlayer(player));
 	}
 
 	public void loadOne(UUID player) {
-		storages.forEach(s -> s.loadPlayer(player));
+		getStorages().forEach(s -> s.loadPlayer(player));
+	}
+
+	public void shutdown() {
+		saveAll();
+		pool.shutdown();
+	}
+
+	@Subscribe
+	private void onJoin(PlayerJoinEvent event) {
+		pool.submit(() -> {
+			try {
+				loadOne(event.getPlayer().getUniqueId());
+			} catch (Exception e) {
+				logger.severe("Problem loading accounts for " + event.getPlayer().getUniqueId());
+				e.printStackTrace();
+			}
+		});
+	}
+
+	@Subscribe
+	private void onQuit(PlayerQuitEvent event) {
+		pool.submit(() -> {
+			try {
+				saveOne(event.getPlayer().getUniqueId());
+			} catch (Exception e) {
+				logger.severe("Problem saving accounts for " + event.getPlayer().getUniqueId());
+				e.printStackTrace();
+			}
+		});
 	}
 
 }

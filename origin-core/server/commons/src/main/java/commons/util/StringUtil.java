@@ -1,5 +1,6 @@
 package commons.util;
 
+import commons.OriginModule;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -95,6 +96,10 @@ public class StringUtil {
 	public static void send(CommandSender sender, String... messages) {
 		for (String message : messages)
 			sender.sendMessage(colorize(message));
+	}
+
+	public static String formatModuleName(OriginModule module) {
+		return module.getName().split("-")[0];
 	}
 
 }

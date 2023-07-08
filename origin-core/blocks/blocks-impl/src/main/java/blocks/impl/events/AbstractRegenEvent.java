@@ -3,6 +3,7 @@ package blocks.impl.events;
 import blocks.BlocksAPI;
 import blocks.block.aspects.regeneration.Regenable;
 import blocks.block.illusions.IllusionsAPI;
+import commons.Commons;
 import commons.CommonsPlugin;
 import commons.events.api.EventRegistry;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class AbstractRegenEvent extends Event {
 	private static final HandlerList HANDLERS_LIST = new HandlerList();
-	private final EventRegistry registry = CommonsPlugin.commons().getEventRegistry();
+	private final EventRegistry registry = Commons.events();
 	private boolean isCancelled;
 	@Getter
 	private final Regenable regenable;

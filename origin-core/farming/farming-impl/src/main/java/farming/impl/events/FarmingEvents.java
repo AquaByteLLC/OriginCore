@@ -166,15 +166,4 @@ public class FarmingEvents {
 			}, 0, 5);
 		}));
 	}
-
-	private static VarHandle unreflect(Class<?> clazz, String name) {
-		Field field;
-		try {
-			field = clazz.getDeclaredField(name);
-			field.setAccessible(true);
-			return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflectVarHandle(field);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
 }

@@ -20,6 +20,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.Commons;
 import commons.CommonsPlugin;
+import commons.OriginModule;
+import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
 import enchants.impl.EnchantPlugin;
 import farming.impl.commands.RegionCommands;
@@ -29,6 +31,7 @@ import farming.impl.enchants.EnchantTypes;
 import farming.impl.events.FarmingEvents;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.Bukkit;
@@ -42,25 +45,36 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
-public class FarmingPlugin extends ExtendedJavaPlugin implements ResourceProvider {
+public class FarmingPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
 
 	private static Injector injector;
-	private EventRegistry eventRegistry;
 	private BlocksAPI blocksAPI;
 	private BlocksPlugin blocksPlugin;
 	// private FarmingAPI miningAPI;
 	private LiteConfig lfc;
 
+	public GeneralConfig getGeneralConfig() {
+		return lfc.open(GeneralConfig.class);
+	}
+
 	@Override
-	protected void enable() {
-		eventRegistry = CommonsPlugin.commons().getEventRegistry();
+	public ConfigurationManager getConfigurationManager() {
+		return lfc;
+	}
+
+	@Override
+	public AccountStorage<?> getAccounts() { return null; }
+
+	@Override
+	public void onEnable() {
+		EventRegistry eventRegistry = Commons.events();
 
 		lfc = new LiteConfig(this);
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.register(BlocksConfig.class, BlocksConfig::new);
 		lfc.reload();
 
-		Commons.commons().registerReloadHook(this, lfc);
+		Commons.commons().registerModule(this);
 
 		this.blocksAPI = BlocksAPI.getInstance();
 		this.blocksPlugin = BlocksPlugin.get().getInstance(BlocksPlugin.class);
@@ -74,7 +88,7 @@ public class FarmingPlugin extends ExtendedJavaPlugin implements ResourceProvide
 	}
 
 	@Override
-	protected void disable() {
+	public void onDisable() {
 		lfc.open(BlocksConfig.class).save();
 
 		Bukkit.getOnlinePlayers().forEach(player ->
@@ -83,10 +97,6 @@ public class FarmingPlugin extends ExtendedJavaPlugin implements ResourceProvide
 								.getAccount(player)
 								.getRegenerationRegistry()
 								.getRegenerations()));
-	}
-
-	public GeneralConfig getGeneralConfig() {
-		return lfc.open(GeneralConfig.class);
 	}
 
 	public static Injector get() {

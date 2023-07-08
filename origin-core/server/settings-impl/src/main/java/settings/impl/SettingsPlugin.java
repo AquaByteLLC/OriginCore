@@ -2,15 +2,16 @@ package settings.impl;
 
 import co.aikar.commands.PaperCommandManager;
 import commons.Commons;
-import commons.CommonsPlugin;
-import commons.data.account.AccountProvider;
+import commons.OriginModule;
 import commons.data.account.AccountStorage;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.Material;
+import org.bukkit.plugin.java.JavaPlugin;
 import settings.Settings;
 import settings.impl.cmd.SettingsCommand;
 import settings.impl.conf.Config;
@@ -25,7 +26,7 @@ import settings.registry.SectionRegistry;
 import settings.registry.SettingsRegistry;
 import settings.setting.builder.SettingsFactory;
 
-public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvider {
+public class SettingsPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
 
 	private static SettingsPlugin zlurpyIsCringe;
 
@@ -33,10 +34,17 @@ public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvid
 		return zlurpyIsCringe;
 	}
 
-	private LiteConfig lfc;
 	private AccountStorage<SettingsAccount> accounts;
 
-	public ConfigurationProvider getConfiguration() {
+	@Override
+	public AccountStorage<SettingsAccount> getAccounts() {
+		return accounts;
+	}
+
+	private LiteConfig lfc;
+
+	@Override
+	public ConfigurationManager getConfigurationManager() {
 		return lfc;
 	}
 
@@ -44,32 +52,27 @@ public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvid
 		return lfc.open(Config.class);
 	}
 
-	public AccountProvider<SettingsAccount> getAccounts() {
-		return accounts;
-	}
-
 	@Override
-	protected void load() {
+	public void onLoad() {
 		zlurpyIsCringe = this;
 	}
 
 	private PaperCommandManager commands;
 
 	@Override
-	protected void enable() {
+	public void onEnable() {
 		lfc = new LiteConfig(this);
 		lfc.register(Config.class, Config::new);
 		lfc.reload();
 
-		Commons.commons().registerReloadHook(this, lfc);
+		Commons.commons().registerModule(this);
 
 		SectionRegistry sectionRegistry = new PluginSectionRegistry();
 		SettingsRegistry settingsRegistry = new GlobalSettingsRegistry();
 		SettingsFactory settingsFactory = new SettingsFactoryImpl();
 		new Settings(sectionRegistry, settingsRegistry, settingsFactory, (player) -> accounts.getAccount(player).getSettings(), LKey::convert, GKey::convert);
 
-		accounts = new SettingsAccountStorage(CommonsPlugin.commons().getDatabase(), sectionRegistry);
-		CommonsPlugin.commons().registerAccountLoader(accounts);
+		accounts = new SettingsAccountStorage(Commons.db(), sectionRegistry);
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new SettingsCommand(accounts));
@@ -103,6 +106,11 @@ public class SettingsPlugin extends ExtendedJavaPlugin implements ResourceProvid
 																			 .setMenuItem(ItemStackBuilder.of(Material.NETHER_STAR).build())
 																			 .build())
 														  .build());
+	}
+
+	@Override
+	public void onDisable() {
+
 	}
 
 }

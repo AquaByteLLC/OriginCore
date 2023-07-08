@@ -1,12 +1,11 @@
 package commons;
 
 import co.aikar.commands.PaperCommandManager;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.j256.ormlite.field.DataPersisterManager;
 import com.j256.ormlite.logger.Level;
 import commons.cmd.EconCommand;
 import commons.cmd.ReloadModuleCommand;
-import commons.cmd.SaveCommand;
+import commons.cmd.SaveModuleCommand;
 import commons.conf.CommonsConfig;
 import commons.data.account.AccountStorage;
 import commons.impl.data.account.AccountStorageHandler;
@@ -16,13 +15,13 @@ import commons.data.sql.impl.SQLiteSession;
 import commons.econ.BankAccount;
 import commons.entity.registry.EntityRegistry;
 import commons.events.api.EventRegistry;
-import commons.events.api.Subscribe;
 import commons.events.impl.PluginEventWrapper;
 import commons.impl.data.account.PlayerDefaultAccount;
 import commons.impl.data.account.PlayerDefaultAccountStorage;
 import commons.impl.data.account.ServerAccount;
 import commons.sched.SchedulerManager;
 import commons.sched.impl.Scheduler4Plugin;
+import commons.util.StringUtil;
 import me.lucko.helper.messaging.bungee.BungeeCord;
 import me.lucko.helper.messaging.bungee.BungeeCordImpl;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
@@ -32,8 +31,6 @@ import me.vadim.util.conf.ResourceProvider;
 import me.vadim.util.menu.Menus;
 import me.vadim.util.menu.MenusKt;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,20 +39,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.concurrent.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
  * @author vadim
  */
-public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
+public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, Listener {
 
 	private static CommonsPlugin instance;
 
 	/**
 	 * Avoid implementing ResourceProvider so that CommonsPlugins class remains visible to subprojects that do not have the LiteConfig dependency.
 	 */
-	private final LiteConfig lfc = new LiteConfig(new ResourceProvider() {
+
+	private final ResourceProvider rp = new ResourceProvider() {
 		@Override
 		public File getDataFolder() {
 			return CommonsPlugin.this.getDataFolder();
@@ -70,10 +69,23 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		public Logger getLogger() {
 			return CommonsPlugin.this.getLogger();
 		}
-	});
+	};
+
+	private final LiteConfig lfc = new LiteConfig(rp);
+
+	public static CommonsPlugin commons() {
+		if (instance == null)
+			throw new NullPointerException("Not initialized! Did you accidentally shade in the entire commons lib?");
+		return instance;
+	}
 
 	public CommonsConfig config() {
 		return lfc.open(CommonsConfig.class);
+	}
+
+	@Override
+	public ConfigurationManager getConfigurationManager() {
+		return lfc;
 	}
 
 	private final EntityRegistry entityRegistry = new EntityRegistry();
@@ -82,33 +94,11 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return entityRegistry;
 	}
 
-	public static CommonsPlugin commons() {
-		if (instance == null)
-			throw new NullPointerException("Not initialized! Did you accidentally shade in the entire commons lib?");
-		return instance;
-	}
-
-	@Deprecated(forRemoval = true)
-	public static SchedulerManager scheduler() {
-		return commons().getScheduler();
-	}
-
-	private final ExecutorService pool = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("[AccountStorage]").build());
-
-	private final AccountStorageHandler storage = new AccountStorageHandler();
-
-	public void registerAccountLoader(AccountStorage<?> accounts) {
-		getLogger().info("Registering account loader for "+accounts.getAccountClass().getCanonicalName());
-		storage.track(accounts);
-	}
+	private AccountStorageHandler storage;
 
 	private AccountStorage<PlayerDefaultAccount> accounts;
 
-	@Deprecated
-	public AccountStorage<PlayerDefaultAccount> getDataStorage() {
-		return accounts;
-	}
-
+	@Override
 	public AccountStorage<PlayerDefaultAccount> getAccounts() {
 		return accounts;
 	}
@@ -143,10 +133,23 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		return bungeeCord;
 	}
 
-	private ReloadModuleCommand reload;
-
+	@Deprecated
 	public void registerReloadHook(JavaPlugin plugin, ConfigurationManager manager) {
-		reload.managers.put(plugin.getName().split("-")[0], manager);
+		if(plugin instanceof OriginModule module)
+			registerModule(module);
+	}
+
+	@Deprecated
+	public void registerAccountLoader(AccountStorage<?> accounts) {
+		getLogger().info("Registering account loader for "+accounts.getAccountClass().getCanonicalName());
+		throw new RuntimeException("Please use `Commons.commons().registerModule(this);`!");
+	}
+
+	private final Map<String, OriginModule> modules = new HashMap<>();
+
+	public void registerModule(OriginModule module) {
+		System.out.println("[modules] Loading module " + StringUtil.formatModuleName(module) + "...");
+		modules.put(StringUtil.formatModuleName(module), module);
 	}
 
 	@Override
@@ -188,61 +191,33 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements Listener {
 		lfc.reload();
 
 		accounts = new PlayerDefaultAccountStorage(getDatabase());
-		registerAccountLoader(accounts);
 
 		events = new PluginEventWrapper(this);
 		events.enable();
 
-		getEventRegistry().subscribeAll(this);
-
 		scheduler = new Scheduler4Plugin(this);
+		storage = new AccountStorageHandler(modules, scheduler, getEventRegistry(), rp);
 
 		bungeeCord = new BungeeCordImpl(this);
 
-		reload = new ReloadModuleCommand();
-
-		registerReloadHook(this, lfc);
-
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new EconCommand(accounts));
-		commands.registerCommand(new SaveCommand(storage));
-		commands.registerCommand(reload);
+		commands.registerCommand(new SaveModuleCommand(modules));
+		commands.registerCommand(new ReloadModuleCommand(modules));
 
-		commands.getCommandCompletions().registerCompletion("modules", c -> new ArrayList<>(reload.managers.keySet()));
+		commands.getCommandCompletions().registerCompletion("modules", c -> new ArrayList<>(modules.keySet()));
+
+		getEventRegistry().subscribeAll(this);
+		registerModule(this);
 	}
 
 	@Override
 	public void disable() {
 		Menus.disable();
 		getLogger().info("(disable) commons plugin goodbye");
-		storage.saveAll();
-		pool.shutdownNow();
+		storage.shutdown();
 		events.disable();
 		scheduler.shutdown();
-	}
-
-	@Subscribe
-	private void onJoin(PlayerJoinEvent event) {
-		pool.submit(() -> {
-			try {
-				storage.loadOne(event.getPlayer().getUniqueId());
-			} catch (Exception e) {
-				getLogger().severe("Problem loading accounts for " + event.getPlayer().getUniqueId());
-				e.printStackTrace();
-			}
-		});
-	}
-
-	@Subscribe
-	private void onQuit(PlayerQuitEvent event) {
-		pool.submit(() -> {
-			try {
-				storage.saveOne(event.getPlayer().getUniqueId());
-			} catch (Exception e) {
-				getLogger().severe("Problem saving accounts for " + event.getPlayer().getUniqueId());
-				e.printStackTrace();
-			}
-		});
 	}
 
 }
