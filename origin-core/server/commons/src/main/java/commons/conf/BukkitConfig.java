@@ -92,7 +92,7 @@ public abstract class BukkitConfig extends YamlFile {
 			count = conf.getInt("count");
 
 		Particle particle = null;
-		if (conf.has("sound")) {
+		if (conf.has("particle")) {
 			particle = ReflectUtil.getEnum(Particle.class, conf.getString("particle"));
 			if (particle == null)
 				logError(resourceProvider.getLogger(), path + ".particle", "particle");
@@ -114,11 +114,19 @@ public abstract class BukkitConfig extends YamlFile {
 		return new EffectGroup(sound, particle);
 	}
 
+	private static final String[] DISABLED_MESSAGE = { "null", "disable", "disabled", "off", "" };
+
 	protected OptionalMessage getOptional(String path) {
-		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
+		ConfigurationAccessor conf = getConfigurationAccessor();
 
 		PlaceholderMessage msg = null;
-		if(conf.has(path))
+
+		boolean disabled = false;
+		if (conf.has(path))
+			for (String m : DISABLED_MESSAGE)
+				disabled |= m.equalsIgnoreCase(conf.getString(path));
+
+		if(!disabled)
 			msg = conf.getPlaceholder(path);
 
 		return new OptionalMessage(msg);

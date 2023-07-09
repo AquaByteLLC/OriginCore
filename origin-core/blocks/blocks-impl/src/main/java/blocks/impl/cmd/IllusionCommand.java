@@ -1,4 +1,4 @@
-package enderchests.impl.cmd;
+package blocks.impl.cmd;
 
 import blocks.block.illusions.FakeBlock;
 import blocks.block.illusions.IllusionRegistry;
@@ -6,6 +6,7 @@ import blocks.block.illusions.IllusionsAPI;
 import blocks.block.util.PlayerInteraction;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 import commons.util.BukkitUtil;
@@ -25,6 +26,7 @@ import org.bukkit.entity.Player;
  * @author vadim
  */
 @CommandAlias("illusion")
+@CommandPermission("*")
 public class IllusionCommand extends BaseCommand {
 
 	private final IllusionsAPI api;

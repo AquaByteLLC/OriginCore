@@ -9,6 +9,7 @@ import blocks.block.builder.FixedAspectHolder;
 import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
+import blocks.block.protect.ProtectionRegistry;
 import blocks.block.regions.OriginRegion;
 import blocks.block.regions.registry.RegionRegistry;
 import com.google.inject.AbstractModule;
@@ -51,6 +52,7 @@ public final class BlocksAPI {
 	private final ProgressRegistry progressRegistry;
 	private final SpeedAttribute speedAttribute;
 	private final RegionRegistry regionRegistry;
+	private final ProtectionRegistry protectionRegistry;
 
 	public final ProgressRegistry getProgressRegistry() {
 		return progressRegistry;
@@ -84,6 +86,10 @@ public final class BlocksAPI {
 		return blockRegistry;
 	}
 
+	public final ProtectionRegistry getProtectionRegistry() {
+		return protectionRegistry;
+	}
+
 	public static @Nullable FixedAspectHolder getBlock(Location location) {
 		FixedAspectHolder fah = instance.locationRegistry.getBlockAt(location);
 		if (fah != null) return fah;
@@ -95,7 +101,7 @@ public final class BlocksAPI {
 			for (ProtectedRegion region : arSet) {
 				if (instance.regionRegistry.getRegions().containsKey(region.getId())) {
 					OriginRegion oRegion = instance.regionRegistry.getRegions().get(region.getId()).getRegion();
-					AspectHolder editor = instance.blockRegistry.getBlocks().get(oRegion.allowedBlock());
+					AspectHolder editor  = instance.blockRegistry.getBlocks().get(oRegion.allowedBlock());
 					return instance.locationRegistry.createBlock(editor, location);
 				}
 			}
@@ -121,22 +127,24 @@ public final class BlocksAPI {
 		return false;
 	}
 
-	public BlocksAPI(JavaPlugin javaPlugin, BlockLocationRegistry loc, IllusionsAPI illu, RegenerationRegistry regen, BlockRegistry blockReg, OverlayLocationRegistry overlayReg, ProgressRegistry progReg, SpeedAttribute speedAttr, RegionRegistry regionReg) {
+	public BlocksAPI(JavaPlugin javaPlugin, BlockLocationRegistry loc, IllusionsAPI illu, RegenerationRegistry regen, BlockRegistry blockReg, OverlayLocationRegistry overlayReg, ProgressRegistry progReg, SpeedAttribute speedAttr, RegionRegistry regionReg, ProtectionRegistry protReg) {
 		if (instance != null)
 			throw new UnsupportedOperationException("API already instantiated. Use BlocksAPI#getInstance() instead.");
 		regenerationRegistry = regen;
-		locationRegistry = loc;
-		illusions = illu;
-		blockRegistry = blockReg;
-		overlayRegistry = overlayReg;
-		progressRegistry = progReg;
-		speedAttribute = speedAttr;
-		regionRegistry = regionReg;
-		injector = Guice.createInjector(new BlocksModule(javaPlugin, locationRegistry, illusions, regenerationRegistry, blockRegistry, overlayRegistry, progressRegistry, speedAttribute, regionRegistry));
-		instance = this;
+		locationRegistry     = loc;
+		illusions            = illu;
+		blockRegistry        = blockReg;
+		overlayRegistry      = overlayReg;
+		progressRegistry     = progReg;
+		speedAttribute       = speedAttr;
+		regionRegistry       = regionReg;
+		protectionRegistry   = protReg;
+		injector             = Guice.createInjector(new BlocksModule(javaPlugin, locationRegistry, illusions, regenerationRegistry, blockRegistry, overlayRegistry, progressRegistry, speedAttribute, regionRegistry));
+		instance             = this;
 	}
 
 	private static class BlocksModule extends AbstractModule {
+
 		private final JavaPlugin plugin;
 		private final BlockLocationRegistry locationRegistry;
 		private final IllusionsAPI illusions;
@@ -148,15 +156,15 @@ public final class BlocksAPI {
 		private final RegionRegistry regionRegistry;
 
 		BlocksModule(JavaPlugin plugin, BlockLocationRegistry locationRegistry, IllusionsAPI illusions, RegenerationRegistry regenerationRegistry, BlockRegistry blockRegistry, OverlayLocationRegistry overlayRegistry, ProgressRegistry progressRegistry, SpeedAttribute speedAttribute, RegionRegistry regionRegistry) {
-			this.plugin = plugin;
-			this.locationRegistry = locationRegistry;
-			this.illusions = illusions;
-			this.regenerationRegistry = regenerationRegistry;
-			this.blockRegistry = blockRegistry;
+			this.plugin                  = plugin;
+			this.locationRegistry        = locationRegistry;
+			this.illusions               = illusions;
+			this.regenerationRegistry    = regenerationRegistry;
+			this.blockRegistry           = blockRegistry;
 			this.overlayLocationRegistry = overlayRegistry;
-			this.progressRegistry = progressRegistry;
-			this.speedAttribute = speedAttribute;
-			this.regionRegistry = regionRegistry;
+			this.progressRegistry        = progressRegistry;
+			this.speedAttribute          = speedAttribute;
+			this.regionRegistry          = regionRegistry;
 		}
 
 		protected void configure() {
@@ -170,5 +178,7 @@ public final class BlocksAPI {
 			this.bind(ProgressRegistry.class).toInstance(this.progressRegistry);
 			this.bind(RegionRegistry.class).toInstance(this.regionRegistry);
 		}
+
 	}
+
 }

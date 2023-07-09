@@ -5,6 +5,8 @@ import commons.data.sql.SessionProvider;
 import commons.events.api.EventRegistry;
 import commons.sched.SchedulerManager;
 
+import java.util.logging.Logger;
+
 /**
  * @author vadim
  */
@@ -28,6 +30,10 @@ public class Commons {
 
 	public static SessionProvider db() {
 		return commons().getDatabase();
+	}
+
+	public static Logger logger() {
+		return commons().getLogger();
 	}
 
 }

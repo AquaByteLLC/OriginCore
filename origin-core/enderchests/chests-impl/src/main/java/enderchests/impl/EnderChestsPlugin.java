@@ -3,13 +3,11 @@ package enderchests.impl;
 import blocks.BlocksAPI;
 import co.aikar.commands.PaperCommandManager;
 import commons.Commons;
-import commons.CommonsPlugin;
 import commons.OriginModule;
-import commons.data.account.AccountProvider;
 import commons.data.account.AccountStorage;
 import enderchests.ChestRegistry;
 import enderchests.impl.cmd.EnderChestCommand;
-import enderchests.impl.cmd.IllusionCommand;
+import blocks.impl.cmd.IllusionCommand;
 import enderchests.impl.conf.Config;
 import enderchests.impl.data.EChestAccountStorage;
 import enderchests.impl.data.EnderChestAccount;
@@ -70,7 +68,6 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider, O
 		chestHandler  = new EnderChestHandler(this, chestRegistry, accountStorage, Commons.events());
 
 		commands = new PaperCommandManager(this);
-		commands.registerCommand(new IllusionCommand(BlocksAPI.getInstance().getIllusions()));
 		commands.registerCommand(new EnderChestCommand(chestRegistry, accountStorage));
 	}
 

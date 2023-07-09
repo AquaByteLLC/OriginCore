@@ -44,8 +44,8 @@ public class Gen extends PlayerOwned implements Generator {
 	}
 
 	@Override
-	public Tier getCurrentTier() {
-		return tier;
+	public Block getBlock() {
+		return getBlockLocation().getBlock();
 	}
 
 	@Override
@@ -53,6 +53,11 @@ public class Gen extends PlayerOwned implements Generator {
 		if (location.getWorld() == null)
 			location.setWorld(Bukkit.getWorld(world));
 		return location.clone();
+	}
+
+	@Override
+	public Tier getCurrentTier() {
+		return tier;
 	}
 
 	@Override

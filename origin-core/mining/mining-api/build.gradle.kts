@@ -13,6 +13,6 @@ dependencies {
     compileOnly(project(":commons"))
     compileOnly(project(":blocks-api"))
     compileOnly(project(":blocks-impl"))
-    compileOnly(Dependencies.WORLD_GUARD)
+    compileOnly(Dependencies.WORLDGUARD)
     compileOnly(Dependencies.SPIGOT)
 }

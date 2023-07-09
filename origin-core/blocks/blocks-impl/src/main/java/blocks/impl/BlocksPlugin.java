@@ -8,12 +8,17 @@ import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
+import blocks.block.protect.ProtectionRegistry;
 import blocks.block.regions.registry.RegionRegistry;
+import blocks.impl.cmd.IllusionCommand;
+import blocks.impl.cmd.ProtectCommand;
 import blocks.impl.data.account.BlockAccount;
 import blocks.impl.data.account.BlockAccountStorage;
 import blocks.impl.anim.item.BreakSpeed;
 import blocks.impl.illusions.impl.Illusions;
+import blocks.impl.protect.TransientProtectionRegistry;
 import blocks.impl.registry.*;
+import co.aikar.commands.PaperCommandManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -51,7 +56,9 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider, Origin
 	private ProgressRegistry progressRegistry;
 	private SpeedAttribute speedAttribute;
 	private RegionRegistry regionRegistry;
+	private ProtectionRegistry protectionRegistry;
 	private BlockAccountStorage accountStorage;
+	private PaperCommandManager commands; // op-only debug commands
 
 	@Override
 	public void onEnable() {
@@ -66,11 +73,16 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider, Origin
 		this.progressRegistry = new ProgressRegistryImpl();
 		this.speedAttribute = new BreakSpeed();
 		this.regionRegistry = new RegionRegistryImpl();
+		this.protectionRegistry = new TransientProtectionRegistry();
 
-		injector = Guice.createInjector(new BlockModule(new BlocksAPI(this, blockLocationRegistry, illusions, regenerationRegistry, blockRegistry, overlayLocationRegistry, progressRegistry, speedAttribute, regionRegistry), this));
+		injector = Guice.createInjector(new BlockModule(new BlocksAPI(this, blockLocationRegistry, illusions, regenerationRegistry, blockRegistry, overlayLocationRegistry, progressRegistry, speedAttribute, regionRegistry, protectionRegistry), this));
 
 		accountStorage = new BlockAccountStorage(commonsPlugin.getDatabase());
 		commonsPlugin.registerModule(this);
+
+		commands = new PaperCommandManager(this);
+		commands.registerCommand(new IllusionCommand(illusions));
+		commands.registerCommand(new ProtectCommand(protectionRegistry));
 	}
 
 	@Override

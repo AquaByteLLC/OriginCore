@@ -5,6 +5,7 @@ import commons.menu.MenuAdapter
 import generators.GeneratorRegistry
 import generators.impl.GensPlugin
 import generators.impl.conf.Config
+import generators.impl.conf.Messages
 import generators.impl.data.GenAccount
 import me.vadim.util.conf.ConfigurationProvider
 
@@ -23,5 +24,6 @@ abstract class GenMenu<T>(plugin: GensPlugin) : MenuAdapter<T>() {
     protected val reg: GeneratorRegistry = plugin.registry
 
     protected fun config(): Config = conf.open(Config::class.java)
+    protected fun msg(): Messages = conf.open(Messages::class.java)
 
 }

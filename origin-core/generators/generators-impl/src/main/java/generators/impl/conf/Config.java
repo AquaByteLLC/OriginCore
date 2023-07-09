@@ -10,6 +10,7 @@ import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import me.vadim.util.item.ItemBuilder;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -20,9 +21,11 @@ import java.util.List;
  */
 public class Config extends BukkitConfig {
 
+	@SuppressWarnings("DataFlowIssue")
 	public Config(ResourceProvider resourceProvider) {
 		super("config.yml", resourceProvider);
 		setDefaultTemplate();
+		yaml.getDefaults().set("effects", null); // remove defaults for effects so it won't auto-replace deleted fields
 		setUnformattedItemFactory(GensItem::new);
 	}
 
@@ -78,6 +81,10 @@ public class Config extends BukkitConfig {
 		return getUnformatted("manage_menu.individual_view.delete");
 	}
 
+	public EffectGroup getBuyEffect() {
+		return getEffect("effects.buy");
+	}
+
 	public EffectGroup getCreateEffect() {
 		return getEffect("effects.create");
 	}
@@ -89,6 +96,7 @@ public class Config extends BukkitConfig {
 	public EffectGroup getDestroyEffect() {
 		return getEffect("effects.destroy");
 	}
+
 	public EffectGroup getErrorEffect() {
 		return getEffect("effects.error");
 	}

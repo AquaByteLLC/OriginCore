@@ -17,7 +17,8 @@ object Versions {
     const val ITEMS_VERSION = "1.0"
     const val FASTUTIL_VERSION = "8.5.6"
     const val ORMLITE_VERSION = "6.1"
-    const val WORLD_GUARD_VERSION = "7.0.8"
+    const val WORLDGUARD_VERSION = "7.0.8"
+    const val WORLDEDIT_VERSION = "7.2.15"
     const val JUPITER_VERSION = "5.9.3"
 }
 
@@ -27,7 +28,8 @@ object Dependencies {
     const val LOMBOK = "org.projectlombok:lombok:${Versions.LOMBOK_VERSION}"
     const val REFLECTIONS = "org.reflections:reflections:${Versions.REFLECTIONS_VERSION}"
     const val WORLDGUARDWRAPPER = "org.codemc.worldguardwrapper:worldguardwrapper:${Versions.WORLDGUARDWRAPPER_VERSION}"
-    const val WORLD_GUARD = "com.sk89q.worldguard:worldguard-bukkit:${Versions.WORLD_GUARD_VERSION}"
+    const val WORLDGUARD = "com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT_VERSION}"
+    const val WORLDEDIT = "com.sk89q.worldguard:worldguard-bukkit:${Versions.WORLDGUARD_VERSION}"
     const val LUCKO_HELPER = "me.lucko:helper:${Versions.LUCKO_HELPER_VERSION}"
     const val LUCKO_SQL = "me.lucko:helper-sql:${Versions.LUCKO_SQL_VERSION}"
     const val LUCKO_REDIS = "me.lucko:helper-redis:${Versions.LUCKO_REDIS_VERSION}"

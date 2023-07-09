@@ -22,6 +22,7 @@ dependencies {
     compileOnly(Dependencies.MENUS)
     compileOnly(Dependencies.ORMLITE_CORE)
     compileOnly(Dependencies.ORMLITE_JDBC)
+    compileOnly(Dependencies.WORLDEDIT) // For the /protect command
     compileOnly(project(":commons"))
     implementation(project(":blocks-api"))
 }

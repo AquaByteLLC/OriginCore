@@ -20,7 +20,7 @@ dependencies {
 	compileOnly(Dependencies.LFC_BUKKIT)
 	compileOnly(Dependencies.ITEMS)
 	compileOnly(Dependencies.MENUS)
-	compileOnly(Dependencies.WORLD_GUARD)
+	compileOnly(Dependencies.WORLDGUARD)
 	compileOnly(Dependencies.ORMLITE_CORE)
 	compileOnly(Dependencies.ORMLITE_JDBC)
 	compileOnly(project(":commons"))

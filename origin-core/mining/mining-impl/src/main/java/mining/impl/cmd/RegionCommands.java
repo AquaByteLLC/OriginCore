@@ -1,4 +1,4 @@
-package mining.impl.commands;
+package mining.impl.cmd;
 
 import blocks.block.BlockRegistry;
 import blocks.block.regions.OriginRegion;

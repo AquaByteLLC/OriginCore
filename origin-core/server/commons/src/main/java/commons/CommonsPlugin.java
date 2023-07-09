@@ -148,7 +148,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 	private final Map<String, OriginModule> modules = new HashMap<>();
 
 	public void registerModule(OriginModule module) {
-		System.out.println("[modules] Loading module " + StringUtil.formatModuleName(module) + "...");
+		System.out.println("[modules] Registered module " + StringUtil.formatModuleName(module) + ".");
 		modules.put(StringUtil.formatModuleName(module), module);
 	}
 

@@ -16,9 +16,13 @@ public class OptionalMessage extends UnformattedMessage {
 
 	private final boolean send;
 
-	public OptionalMessage(@Nullable PlaceholderMessage value) {
-		super(Optional.ofNullable(value).map(PlaceholderMessage::raw).orElse(""));
+	public OptionalMessage(@Nullable String value) {
+		super(Optional.ofNullable(value).orElse(""));
 		this.send = value != null;
+	}
+
+	public OptionalMessage(@Nullable PlaceholderMessage value) {
+		this(Optional.ofNullable(value).map(PlaceholderMessage::raw).orElse(null));
 	}
 
 	public void sendTo(CommandSender sender, Placeholder placeholder) {

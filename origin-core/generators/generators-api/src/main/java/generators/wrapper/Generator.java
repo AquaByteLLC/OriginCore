@@ -1,5 +1,6 @@
 package generators.wrapper;
 
+import blocks.block.aspects.location.BlockLike;
 import commons.data.Owned;
 import generators.GeneratorRegistry;
 import generators.wrapper.result.DestroyResult;
@@ -11,11 +12,9 @@ import org.bukkit.inventory.ItemStack;
 /**
  * @author vadim
  */
-public interface Generator extends Owned {
+public interface Generator extends Owned, BlockLike {
 
 	Tier getCurrentTier();
-
-	Location getBlockLocation();
 
 	ItemStack asItem();
 

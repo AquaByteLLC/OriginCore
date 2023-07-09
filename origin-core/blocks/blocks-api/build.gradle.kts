@@ -11,6 +11,7 @@ dependencies {
     compileOnly(Dependencies.LFC_SHARED)
     compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(Dependencies.GUICE)
-    compileOnly(Dependencies.WORLD_GUARD)
+    compileOnly(Dependencies.WORLDEDIT)
+    compileOnly(Dependencies.WORLDGUARD)
     compileOnly(project(":commons"))
 }

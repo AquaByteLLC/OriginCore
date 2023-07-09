@@ -16,12 +16,16 @@ import generators.impl.wrapper.PDCUtil;
 import generators.wrapper.Generator;
 import generators.wrapper.Tier;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -58,7 +62,7 @@ public class GenHandler {
 	}
 
 	void drop() {
-		for (Long2ObjectMap.Entry<Generator> entry : reg.iterable()) {
+		for (Object2ObjectMap.Entry<Location, Generator> entry : reg.iterable()) {
 			Generator gen = entry.getValue();
 
 			if (!gen.getOfflineOwner().isOnline())
@@ -111,8 +115,16 @@ public class GenHandler {
 	}
 
 	@Subscribe
-	void onDeleteGen(BlockBreakEvent event) {
-		Player   player   = event.getPlayer();
+	void onDestroyGen(BlockDamageEvent event) {
+		onDestroyGen(event.getPlayer(), event);
+	}
+
+	@Subscribe
+	void onDestroyGen(BlockBreakEvent event) {
+		onDestroyGen(event.getPlayer(), event);
+	}
+
+	<E extends BlockEvent & Cancellable> void onDestroyGen(Player player, E event) {
 		Location location = event.getBlock().getLocation();
 
 		Generator generator = reg.getGenAt(location);
@@ -128,7 +140,7 @@ public class GenHandler {
 						if (generator.isOwnedBy(player))
 							msg = msg().getDestroyedGen();
 						else
-							msg = msg().getDestroyedGenAdmin();
+							msg = new OptionalMessage(msg().getDestroyedGenAdmin().format(StringPlaceholder.of("player", generator.getOfflineOwner().getName())));
 						msg.sendTo(player, GenInfo.placeholdersForTier(generator.getCurrentTier()));
 
 						yield config().getDestroyEffect();
@@ -205,6 +217,7 @@ public class GenHandler {
 	public void shutdown() {
 		if (drops != null)
 			drops.cancel();
+		drops = null;
 	}
 
 }

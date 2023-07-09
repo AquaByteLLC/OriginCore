@@ -8,7 +8,5 @@ public interface BlockLike {
 	Block getBlock();
 
 	Location getBlockLocation();
-//	void registerLocation();
-//	void unregisterLocation();
-}
 
+}

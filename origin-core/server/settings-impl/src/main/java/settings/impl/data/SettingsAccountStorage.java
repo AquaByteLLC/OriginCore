@@ -69,7 +69,7 @@ public class SettingsAccountStorage extends ORMLiteAccountStorage<SettingsAccoun
 				if (sec == null) continue;
 				SettingSection section = registry.getByKey(sec);
 				if(section == null) {
-					System.err.println("[settings] W: Removing unknown setting section key " + sec);
+					System.err.println("[settings] w: Removing unknown setting section key " + sec);
 					continue;
 				}
 
@@ -84,12 +84,12 @@ public class SettingsAccountStorage extends ORMLiteAccountStorage<SettingsAccoun
 				if(set == null) continue;
 				Setting setting = section.querySetting(set);
 				if(setting == null) {
-					System.err.println("[settings] W: Removing unknown setting key "+set);
+					System.err.println("[settings] w: Removing unknown setting key "+set);
 					continue;
 				}
 				set = set.withTail(key.getTail()); // #parts() does not return tail
 
-				System.out.println("[settings] I: Setting "+sec.append(set).withTail(set.getTail())+" on account "+uuid);
+				System.out.println("[settings] i: Setting "+sec.append(set).withTail(set.getTail())+" on account "+uuid);
 				account.holder.setOption(setting, set.hasTail() ? setting.getOption(set.getTail()) : setting.getDefaultOption());
 			}
 		return account;

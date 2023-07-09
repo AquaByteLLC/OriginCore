@@ -17,7 +17,7 @@ dependencies {
     compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(Dependencies.ITEMS)
     compileOnly(Dependencies.MENUS)
-    compileOnly(Dependencies.WORLD_GUARD)
+    compileOnly(Dependencies.WORLDGUARD)
     compileOnly(project(":commons"))
     compileOnly(project(":enchants-api"))
     compileOnly(project(":enchants-impl"))

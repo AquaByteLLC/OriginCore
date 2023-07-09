@@ -23,5 +23,6 @@ dependencies {
     compileOnly(Dependencies.ORMLITE_JDBC)
     compileOnly(project(":commons"))
     compileOnly(project(":settings-api"))
+    compileOnly(project(":blocks-api"))
     implementation(project(":generators-api"))
 }
