@@ -12,6 +12,7 @@ import settings.impl.SettingsPlugin;
 import settings.impl.menu.GlobalSettingsMenu;
 import settings.impl.registry.PlayerSettingsHolder;
 import settings.registry.SettingsHolder;
+import settings.setting.SettingSection;
 
 import java.util.UUID;
 

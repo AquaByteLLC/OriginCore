@@ -9,7 +9,7 @@ global_settings_menu:
         - "&fClick for &eGens&f Settings"
   echests:
     item:
-      type: ENDER_CHESTS
+      type: ENDER_CHEST
       name: "&dEnder &5Chests"
       lore:
         - "&fClick for &dEnder &5Chests&f Settings"

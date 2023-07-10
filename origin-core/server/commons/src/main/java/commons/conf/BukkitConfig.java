@@ -1,10 +1,5 @@
 package commons.conf;
 
-import commons.conf.wrapper.EffectGroup;
-import commons.conf.wrapper.EffectParticle;
-import commons.conf.wrapper.EffectSound;
-import commons.conf.wrapper.OptionalMessage;
-import commons.util.ReflectUtil;
 import me.vadim.util.conf.ConfigurationAccessor;
 import me.vadim.util.conf.ResourceProvider;
 import me.vadim.util.conf.bukkit.YamlFile;
@@ -13,9 +8,6 @@ import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import me.vadim.util.conf.wrapper.impl.UnformattedMessage;
 import me.vadim.util.item.ItemBuilder;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,20 +19,6 @@ public abstract class BukkitConfig extends YamlFile {
 
 	public BukkitConfig(String file, ResourceProvider resourceProvider) {
 		super(file, resourceProvider);
-	}
-
-	protected ItemStack getItem(String path) {
-		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
-
-		String   name = conf.getString("name");
-		String[] lore = conf.getStringArray("lore");
-		Material type = Material.matchMaterial(conf.getString("type"));
-
-		if (name == null || lore == null || type == null)
-			logError(resourceProvider.getLogger(), path, "item element");
-		assert type != null;
-
-		return ItemBuilder.create(type).displayName(name).lore(lore).build();
 	}
 
 	// for custom UnformattedItem impls
@@ -62,74 +40,6 @@ public abstract class BukkitConfig extends YamlFile {
 				logError(resourceProvider.getLogger(), path + ".type", "item type");
 		}
 		return (U) ufif.newUnformattedItem(type, conf.getPlaceholder("name"), Arrays.stream(conf.getStringArray("lore")).map(UnformattedMessage::new).map(PlaceholderMessage.class::cast).toList());
-	}
-
-	protected EffectSound getSound(String path) {
-		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
-
-		float volume = 1.0f;
-		if (conf.has("volume"))
-			volume = conf.getFloat("volume");
-
-		float pitch = 1.0f;
-		if (conf.has("pitch"))
-			pitch = conf.getFloat("pitch");
-
-		Sound sound = null;
-		if (conf.has("sound")) {
-			sound = ReflectUtil.getEnum(Sound.class, conf.getString("sound"));
-			if (sound == null)
-				logError(resourceProvider.getLogger(), path + ".sound", "sound");
-		}
-		return new EffectSound(sound, volume, pitch);
-	}
-
-	protected EffectParticle getParticle(String path) {
-		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
-
-		int count = 1;
-		if (conf.has("count"))
-			count = conf.getInt("count");
-
-		Particle particle = null;
-		if (conf.has("particle")) {
-			particle = ReflectUtil.getEnum(Particle.class, conf.getString("particle"));
-			if (particle == null)
-				logError(resourceProvider.getLogger(), path + ".particle", "particle");
-		}
-		return new EffectParticle(particle, count);
-	}
-
-	protected EffectGroup getEffect(String path) {
-		ConfigurationAccessor conf = getConfigurationAccessor().getPath(path);
-
-		EffectSound sound = EffectSound.EMPTY;
-		if (conf.has("sound"))
-			sound = getSound(path);
-
-		EffectParticle particle = EffectParticle.EMPTY;
-		if (conf.has("particle"))
-			particle = getParticle(path);
-
-		return new EffectGroup(sound, particle);
-	}
-
-	private static final String[] DISABLED_MESSAGE = { "null", "disable", "disabled", "off", "" };
-
-	protected OptionalMessage getOptional(String path) {
-		ConfigurationAccessor conf = getConfigurationAccessor();
-
-		PlaceholderMessage msg = null;
-
-		boolean disabled = false;
-		if (conf.has(path))
-			for (String m : DISABLED_MESSAGE)
-				disabled |= m.equalsIgnoreCase(conf.getString(path));
-
-		if(!disabled)
-			msg = conf.getPlaceholder(path);
-
-		return new OptionalMessage(msg);
 	}
 
 	protected interface UnformattedItemFactory {

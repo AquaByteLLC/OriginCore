@@ -17,7 +17,7 @@ effects:
 item:
   ender_chest:
     type: ENDER_CHEST
-    name: "Ender Chest"
+    name: "Linked Ender Chest"
     lore:
       - "Place this magical chest"
       - "..and pick the color!"
@@ -27,9 +27,10 @@ linked_inventory:
 select_color_menu:
   title: "Select a Color"
   colored_item:
-    name: "{color} Ender chest"
+    name: "{color} Ender Chest"
     lore:
-      - "click to make the chest be {color}"
+      - "&fclick to make the chest be {color}"
+      - "&fyou have are using &b{slots}&f out of &b{limit}"
   slot_limit_lore:
     - "&cYou have reached your"
     - "&climit of {limit} chests"

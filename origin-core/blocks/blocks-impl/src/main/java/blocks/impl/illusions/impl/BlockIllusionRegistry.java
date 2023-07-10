@@ -468,9 +468,9 @@ public class BlockIllusionRegistry implements IllusionRegistry {
 
 		try {
 			packet.a(new adapter(PacketPlayInUseEntity_a.get(packet)));
-		} catch (Exception e) {
+		} catch (Throwable t) {
 			ReflectUtil.serr("Caught exception in ClickCallback!");
-			ReflectUtil.serr(e);
+			ReflectUtil.serr(t);
 		}
 	}
 

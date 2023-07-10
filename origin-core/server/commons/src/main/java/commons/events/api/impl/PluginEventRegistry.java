@@ -111,11 +111,11 @@ public class PluginEventRegistry implements EventRegistry {
 				for (Subscriber subscriber : sub.callbacks.get(clazz))
 					try {
 						subscriber.process(context, event);
-					} catch (Exception e) {
+					} catch (Throwable t) {
 						Object listener = sub.listener.get();
 						ReflectUtil.serr("problem processing event " + event.getClass().getCanonicalName() +
 										 " in class " + (listener == null ? "<garbage collected>" : listener.getClass().getCanonicalName()));
-						throw new EventExecutionException(e);
+						throw new EventExecutionException(t);
 					}
 		}
 	}

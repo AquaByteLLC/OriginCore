@@ -22,9 +22,9 @@ import java.util.*
 class EnderChestMenu(private val plugin: EnderChestsPlugin, private val player: UUID) : MenuAdapter<NetworkColor>() {
 
 	override val MENU_SIZE = 9 * 3
-	override val BACK_SLOT = 45
-	override val DONE_SLOT = 49
-	override val NEXT_SLOT = 53
+	override val BACK_SLOT = 18
+	override val DONE_SLOT = 22
+	override val NEXT_SLOT = 26
 
 	private val registry: ChestRegistry = plugin.chestRegistry
 	private val accounts: AccountProvider<EnderChestAccount> = plugin.accounts
@@ -44,7 +44,7 @@ class EnderChestMenu(private val plugin: EnderChestsPlugin, private val player: 
 
 	companion object {
 
-		val colors: Map<NetworkColor, Material>
+		private val colors: Map<NetworkColor, Material>
 
 		init {
 			val map = mutableMapOf<NetworkColor, Material>()
@@ -55,23 +55,28 @@ class EnderChestMenu(private val plugin: EnderChestsPlugin, private val player: 
 			map[NetworkColor.AQUA] = Material.CYAN_CONCRETE
 			map[NetworkColor.PINK] = Material.PINK_CONCRETE
 			map[NetworkColor.PURPLE] = Material.PURPLE_CONCRETE
+			map[NetworkColor.WHITE] = Material.WHITE_CONCRETE
 
 			colors = map.toMap()
 		}
 	}
 
 	override val menu: MenuList<NetworkColor> = template.toList(queryItems(), transformer = {
-		val color = it.chatColor.toString() + StringUtil.convertToUserFriendlyCase(it.chatColor.name) + ChatColor.WHITE
-		val builder = config().selectColorItem.format(StringPlaceholder.of("color", color))
+		val color = it.chatColor.toString() + StringUtil.convertToUserFriendlyCase(it.name) + ChatColor.WHITE
+		val builder = config().selectColorItem.format(colors[it], StringPlaceholder.of("color", color))
 		val account = accounts.getAccount(player)
 
-		if(account.atSlotLimit(it)) { // the code your eyes are about to witness is unholy to the Lord
-			val pl = StringPlaceholder.builder().set("color", color).set("limit", account.slotLimit.toString()).build()
+		if (account.atSlotLimit(it)) { // the code your eyes are about to witness is unholy to the Lord
+			val pl = StringPlaceholder.builder()
+				.set("color", color)
+				.set("slots", registry.getNetwork(it, account.offlineOwner).slotsUsed.toString())
+				.set("limit", account.slotLimit.toString())
+				.build()
 			builder.allFlags().enchantment(Enchantment.MENDING, 1).editMeta { meta ->
 				var list = meta.lore
-				if(list == null) list = mutableListOf()
+				if (list == null) list = mutableListOf()
 				list.addAll(config().slotLimitLore.map { L -> L.format(pl) }.toList())
-				meta.lore = list
+				meta.lore = list.map { L -> pl.format(L) }
 			}
 		}
 
@@ -85,16 +90,26 @@ class EnderChestMenu(private val plugin: EnderChestsPlugin, private val player: 
 		next = blank() to NEXT_SLOT
 		back = blank() to BACK_SLOT
 
+		open = { event ->
+			val player = event.player as Player
+			val account = accounts.getAccount(player)
+		}
+
 		select = { event, button, color ->
 			val player = event.whoClicked as Player
+			val account = accounts.getAccount(player)
 
-			if (!accounts.getAccount(player).atSlotLimit(color)) {
-
+			if (!account.atSlotLimit(color)) {
+				account.selectColor(color)
+				player.closeInventory()
 			}
 		}
 
-		close = {
-//			chest.close(it.player as Player)
+		close = { event ->
+			val player = event.player as Player
+			val account = accounts.getAccount(player)
+
+			account.clearPending()
 		}
 	}
 

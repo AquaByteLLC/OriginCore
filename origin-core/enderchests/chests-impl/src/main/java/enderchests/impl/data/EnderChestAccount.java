@@ -5,13 +5,22 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import commons.Commons;
 import commons.data.account.impl.AbstractAccount;
+import enderchests.ChestNetwork;
+import enderchests.ChestRegistry;
+import enderchests.LinkedChest;
 import enderchests.NetworkColor;
+import enderchests.impl.EnderChestMenu;
 import enderchests.impl.EnderChestsPlugin;
 import enderchests.impl.LinkedEnderChest;
+import me.vadim.util.menu.Menu;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * @author vadim
@@ -104,6 +113,40 @@ public class EnderChestAccount extends AbstractAccount {
 
 	public boolean atSlotLimit(NetworkColor net) {
 		return EnderChestsPlugin.singletonCringe().getChestRegistry().getNetwork(net, getOfflineOwner()).getSlotsUsed() >= slotLimit;
+	}
+
+	private EnderChestMenu menu;
+
+	private Location pendingLocation;
+	private BlockFace pendingFace;
+
+	public void setPending(Location location, BlockFace face) {
+		Player player = getOfflineOwner().getPlayer();
+		if (player == null)
+			throw new UnsupportedOperationException("owner offline");
+
+		pendingLocation = location.clone();
+		pendingFace     = face;
+
+		if (menu == null) // lazy menu creation b/c of ORMLite
+			menu = new EnderChestMenu(EnderChestsPlugin.singletonCringe(), getOwnerUUID());
+
+		Menu menu = this.menu.getMenu();
+		menu.regen();
+		menu.open(player);
+	}
+
+	public void selectColor(NetworkColor color) {
+		if (pendingLocation == null || pendingFace == null)
+			throw new UnsupportedOperationException("no color selection pending");
+		ChestRegistry reg   = EnderChestsPlugin.singletonCringe().getChestRegistry();
+		ChestNetwork  net   = reg.getNetwork(color, getOfflineOwner());
+		LinkedChest   chest = reg.createChest(net, pendingLocation, pendingFace);
+	}
+
+	public void clearPending() {
+		pendingLocation = null;
+		pendingFace     = null;
 	}
 
 }

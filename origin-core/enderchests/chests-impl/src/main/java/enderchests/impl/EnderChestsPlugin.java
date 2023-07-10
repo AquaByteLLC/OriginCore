@@ -8,6 +8,7 @@ import commons.data.account.AccountStorage;
 import enderchests.ChestRegistry;
 import enderchests.impl.cmd.EnderChestCommand;
 import enderchests.impl.conf.Config;
+import enderchests.impl.conf.EnderChestSettings;
 import enderchests.impl.data.EChestAccountStorage;
 import enderchests.impl.data.EnderChestAccount;
 import enderchests.impl.data.LinkedStorage;
@@ -49,8 +50,7 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider, O
 
 	@Override
 	public AccountStorage<EnderChestAccount> getAccounts() {
-//		return accountStorage;
-		return null;
+		return accountStorage;
 	}
 
 	@Override
@@ -72,14 +72,16 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider, O
 
 		accountStorage = new EChestAccountStorage(lfc, Commons.db());
 		chestRegistry  = new EnderChestRegistry(lfc, accountStorage, BlocksAPI.getInstance().getProtectionRegistry());
-		chestHandler   = new EnderChestHandler(this, chestRegistry, accountStorage, Commons.events());
+		chestHandler   = new EnderChestHandler(this, chestRegistry, accountStorage, Commons.events(), lfc);
 		storage        = new LinkedStorage(Commons.db(), chestRegistry);
 
 		System.out.println("Loading enderchests...");
 		storage.load();
 
+		EnderChestSettings.init(this);
+
 		commands = new PaperCommandManager(this);
-		commands.registerCommand(new EnderChestCommand(chestRegistry, accountStorage));
+		commands.registerCommand(new EnderChestCommand(chestRegistry, accountStorage, lfc));
 	}
 
 	@Override

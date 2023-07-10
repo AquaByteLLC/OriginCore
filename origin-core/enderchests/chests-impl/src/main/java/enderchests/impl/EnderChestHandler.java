@@ -19,7 +19,6 @@ import net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffect;
 import net.minecraft.sounds.SoundEffect;
 import net.minecraft.world.level.block.Blocks;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.data.BlockData;
@@ -139,10 +138,10 @@ public class EnderChestHandler implements Listener {
 		BlockData data   = block.getBlockData().clone();
 
 		EnderChestAccount account = accounts.getAccount(player);
-		if (event.getItemInHand().getType() == Material.ENDER_CHEST) {
-			//todo: add item
-			ChestNetwork net   = registry.getNetwork(account.temp, player);
-			LinkedChest  chest = registry.createChest(net, block.getLocation(), ((Directional) data).getFacing());
+		if (Config.isEnderChestItem(event.getItemInHand())) {
+			account.setPending(block.getLocation(), ((Directional) data).getFacing());
+
+			event.setCancelled(true);
 		}
 	}
 

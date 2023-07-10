@@ -5,8 +5,11 @@ import commons.conf.wrapper.EffectGroup;
 import me.vadim.util.conf.ResourceProvider;
 import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import me.vadim.util.conf.wrapper.impl.UnformattedMessage;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +56,25 @@ public class Config extends BukkitConfig {
 		return getEffect("effects.shut");
 	}
 
+	public static final NamespacedKey echest_key = new NamespacedKey("enderchests", "chest.item");
+	public static final String echest_value = "unplaced_chest";
+
+	public static boolean isEnderChestItem(ItemStack item) {
+		if (item == null)
+			return false;
+		if (!item.hasItemMeta())
+			return false;
+
+		PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
+		return pdc.has(echest_key) && echest_value.equals(pdc.get(echest_key, PersistentDataType.STRING));
+	}
+
 	public ItemStack getEnderChestItem() {
-		return getItem("item.ender_chest");
+		ItemStack item = getItem("item.ender_chest");
+		item.editMeta(meta -> {
+			meta.getPersistentDataContainer().set(echest_key, PersistentDataType.STRING, echest_value);
+		});
+		return item;
 	}
 
 	String[] allowed;
@@ -66,9 +86,9 @@ public class Config extends BukkitConfig {
 	}
 
 	public String[] getAllowedChestSounds() {
-		if(allowed == null) {
+		if (allowed == null) {
 			allowed = new String[2];
-			Sound    sound;
+			Sound sound;
 
 			sound = getOpenEffect().sound.sound;
 			if (sound != null)

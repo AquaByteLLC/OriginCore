@@ -12,7 +12,7 @@ object Versions {
     const val LUCKO_PROFILES_VERSION = "1.2.0"
     const val ACF_VERSION = "0.5.1-SNAPSHOT"
     const val GUICE_VERSION = "5.1.0"
-    const val LFC_VERSION = "1.5"
+    const val LFC_VERSION = "1.6"
     const val MENUS_VERSION = "1.0.0"
     const val ITEMS_VERSION = "1.0"
     const val FASTUTIL_VERSION = "8.5.6"
