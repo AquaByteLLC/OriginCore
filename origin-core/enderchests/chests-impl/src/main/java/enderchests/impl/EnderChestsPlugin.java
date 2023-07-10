@@ -7,10 +7,10 @@ import commons.OriginModule;
 import commons.data.account.AccountStorage;
 import enderchests.ChestRegistry;
 import enderchests.impl.cmd.EnderChestCommand;
-import blocks.impl.cmd.IllusionCommand;
 import enderchests.impl.conf.Config;
 import enderchests.impl.data.EChestAccountStorage;
 import enderchests.impl.data.EnderChestAccount;
+import enderchests.impl.data.LinkedStorage;
 import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
@@ -29,9 +29,10 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider, O
 
 	private final LiteConfig lfc = new LiteConfig(this);
 	private PaperCommandManager commands;
-	private ChestRegistry     chestRegistry;
+	private EnderChestRegistry chestRegistry;
 	private EnderChestHandler chestHandler;
 	private EChestAccountStorage accountStorage;
+	private LinkedStorage storage;
 
 	public Config config() {
 		return lfc.open(Config.class);
@@ -48,7 +49,13 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider, O
 
 	@Override
 	public AccountStorage<EnderChestAccount> getAccounts() {
-		return accountStorage;
+//		return accountStorage;
+		return null;
+	}
+
+	@Override
+	public void onSave() throws Exception {
+		storage.save();
 	}
 
 	@Override
@@ -64,8 +71,12 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider, O
 		Commons.commons().registerModule(this);
 
 		accountStorage = new EChestAccountStorage(lfc, Commons.db());
-		chestRegistry = new EnderChestRegistry(lfc, accountStorage);
-		chestHandler  = new EnderChestHandler(this, chestRegistry, accountStorage, Commons.events());
+		chestRegistry  = new EnderChestRegistry(lfc, accountStorage, BlocksAPI.getInstance().getProtectionRegistry());
+		chestHandler   = new EnderChestHandler(this, chestRegistry, accountStorage, Commons.events());
+		storage        = new LinkedStorage(Commons.db(), chestRegistry);
+
+		System.out.println("Loading enderchests...");
+		storage.load();
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new EnderChestCommand(chestRegistry, accountStorage));
@@ -73,7 +84,7 @@ public class EnderChestsPlugin extends JavaPlugin implements ResourceProvider, O
 
 	@Override
 	public void onDisable() {
-
+		storage.save();
 	}
 
 }

@@ -16,4 +16,6 @@ public interface OriginModule {
 
 	default void afterReload() throws Exception {}
 
+	default void onSave() throws Exception {}
+
 }

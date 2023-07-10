@@ -11,6 +11,11 @@ public class CommonsConfig extends BukkitConfig {
 
 	public CommonsConfig(ResourceProvider resourceProvider) {
 		super("commons.yml", resourceProvider);
+		setDefaultTemplate();
+	}
+
+	public long getAutosaveInvervalTicks() {
+		return Math.round(getConfiguration().getDouble("autosave_interval_minutes") * 60. * 20.);
 	}
 
 	public ItemStack getMenuNext() {
@@ -28,5 +33,10 @@ public class CommonsConfig extends BukkitConfig {
 	public ItemStack getGensSettingsIcon() {
 		return getItem("global_settings_menu.gens.item");
 	}
+
+	public ItemStack getEChestsSettingsIcon() {
+		return getItem("global_settings_menu.echests.item");
+	}
+
 
 }

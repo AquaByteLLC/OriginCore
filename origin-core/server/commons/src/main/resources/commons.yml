@@ -1,10 +1,18 @@
+autosave_interval_minutes: 20
+
 global_settings_menu:
   gens:
     item:
       type: PISTON
       name: "&eGenerators"
       lore:
-        - "&fClick for Gens Settings"
+        - "&fClick for &eGens&f Settings"
+  echests:
+    item:
+      type: ENDER_CHESTS
+      name: "&dEnder &5Chests"
+      lore:
+        - "&fClick for &dEnder &5Chests&f Settings"
 
 generic_paged_menu:
   button:

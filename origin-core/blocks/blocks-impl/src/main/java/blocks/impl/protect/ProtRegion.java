@@ -4,6 +4,7 @@ import blocks.block.protect.ProtectedRegion;
 import blocks.block.util.Cuboid;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Hashtable;
 
@@ -25,7 +26,7 @@ class ProtRegion extends ProtObj implements ProtectedRegion {
 	}
 
 	@Override
-	public Cuboid getBounds() {
+	public @NotNull Cuboid getBounds() {
 		return cuboid;
 	}
 
@@ -47,14 +48,11 @@ class ProtRegion extends ProtObj implements ProtectedRegion {
 		return region.getWorld().getUID().equals(getWorld().getUID()) && region.getBounds().equals(cuboid) && region.getPriority() == prio;
 	}
 
-	/**
-	 * exclude {@link #prio} from hashCode due to usage in {@link TransientProtectionRegistry}
-	 */
 	@Override
 	public int hashCode() {
 		int result = cuboid.hashCode();
 		result = 7907 * result + getWorld().getUID().hashCode();
-//		result = 7907 * result + prio;
+		result = 7907 * result + prio;
 		return result;
 	}
 

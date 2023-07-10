@@ -1,6 +1,7 @@
 package enderchests;
 
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ public interface ChestRegistry {
 
 	@Nullable LinkedChest getChestAt(Location location);
 
-	@NotNull ChestNetwork getNetwork(NetworkColor color, Player player);
+	@NotNull ChestNetwork getNetwork(NetworkColor color, OfflinePlayer player);
 
 	@NotNull LinkedChest createChest(ChestNetwork network, Location location, BlockFace face);
 

@@ -2,6 +2,7 @@ package blocks.block.protect;
 
 import blocks.block.util.Cuboid;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a protected {@link Cuboid} region in {@link #getWorld() world}.
@@ -13,12 +14,12 @@ public interface ProtectedRegion extends ProtectedObject {
 	/**
 	 * @return the {@link Cuboid} that this region represents
 	 */
-	Cuboid getBounds();
+	@NotNull Cuboid getBounds();
 
 	/**
 	 * @return the {@link World} that this region is in
 	 */
-	World getWorld();
+	@NotNull World getWorld();
 
 	/**
 	 * Precedence when priorities are equal is undefined.

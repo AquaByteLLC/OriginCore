@@ -2,7 +2,7 @@ drop_rate_seconds: 5
 default_slots: 10
 autosave_interval_minutes: 20
 
-# Note that this section will not auto-restore, so if you mess something, you have to delete entire the to copy the default section.
+# Note that this section will not auto-restore, so if you mess something, you have to delete entire file to copy the default section.
 effects:
   # see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html for a list of sounds
   # see https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html for a list of particles

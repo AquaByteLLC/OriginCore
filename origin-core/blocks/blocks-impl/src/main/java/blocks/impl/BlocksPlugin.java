@@ -9,6 +9,8 @@ import blocks.block.illusions.IllusionsAPI;
 import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.block.protect.ProtectionRegistry;
+import blocks.block.protect.strategy.ProtectionStrategies;
+import blocks.block.protect.strategy.ProtectionStrategy;
 import blocks.block.regions.registry.RegionRegistry;
 import blocks.impl.cmd.IllusionCommand;
 import blocks.impl.cmd.ProtectCommand;
@@ -28,10 +30,18 @@ import commons.OriginModule;
 import commons.data.account.AccountProvider;
 import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
+import commons.util.ReflectUtil;
 import lombok.Getter;
 import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.ResourceProvider;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 public class BlocksPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
@@ -81,6 +91,22 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider, Origin
 		commonsPlugin.registerModule(this);
 
 		commands = new PaperCommandManager(this);
+		commands.getCommandCompletions().registerCompletion("strategy", c -> {
+			List<String> completions = new ArrayList<>();
+			completions.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
+			completions.addAll(Arrays.stream(ProtectionStrategies.values()).map(ProtectionStrategies::name).toList());
+			completions.add("PLAYERS");
+			return completions;
+		});
+		commands.getCommandContexts().registerContext(ProtectionStrategy.class, c -> {
+			String arg = c.popFirstArg();
+			if(arg.equalsIgnoreCase("PLAYERS"))
+				return ProtectionStrategies.PERMIT_PLAYERS;
+			Player player = Bukkit.getPlayer(arg);
+			if(player != null)
+				return ProtectionStrategies.permitOwner(player);
+			return ReflectUtil.getEnum(ProtectionStrategies.class, arg.toUpperCase().replace(' ', '_'));
+		});
 		commands.registerCommand(new IllusionCommand(illusions));
 		commands.registerCommand(new ProtectCommand(protectionRegistry));
 	}

@@ -1,5 +1,39 @@
+default_slots_per_net: 10
+
+# Note that this section will not auto-restore, so if you mess something, you have to delete entire file to copy the default section.
+effects:
+  # see https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html for a list of sounds
+  # see https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html for a list of particles
+  # you can add/remove fields at will
+  open:
+    sound: BLOCK_ENDER_CHEST_OPEN
+    volume: 0.8
+    pitch: 0.01
+  shut:
+    sound: BLOCK_END_PORTAL_SPAWN
+    volume: 0.5
+    pitch: 1.01
+
+item:
+  ender_chest:
+    type: ENDER_CHEST
+    name: "Ender Chest"
+    lore:
+      - "Place this magical chest"
+      - "..and pick the color!"
+
 linked_inventory:
   title: "{color} &8&nEnder Chest"
+select_color_menu:
+  title: "Select a Color"
+  colored_item:
+    name: "{color} Ender chest"
+    lore:
+      - "click to make the chest be {color}"
+  slot_limit_lore:
+    - "&cYou have reached your"
+    - "&climit of {limit} chests"
+    - "&con the {color} network."
 menu:
   button:
     next:

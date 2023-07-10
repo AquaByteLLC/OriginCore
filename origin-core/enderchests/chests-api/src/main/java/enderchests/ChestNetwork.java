@@ -14,4 +14,6 @@ public interface ChestNetwork extends Owned {
 
 	LinkedChest[] getChests();
 
+	int getSlotsUsed();
+
 }

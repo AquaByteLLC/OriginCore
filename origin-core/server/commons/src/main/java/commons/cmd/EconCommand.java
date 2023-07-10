@@ -40,6 +40,15 @@ public class EconCommand extends BaseCommand {
 		StringUtil.send(sender, ECON + String.format("&b%s&e has &d%s", target.getName(), currency.format(account.getBalance(currency))));
 	}
 
+	@Subcommand("getexact")
+	@CommandPermission("*")
+	public void getExact(CommandSender sender, @Flags("other") Player target, OriginCurrency currency) {
+		BankAccount account = accounts.getAccount(target);
+
+		// Player has X
+		StringUtil.send(sender, ECON + String.format("&b%s&e has &d%s&e of &d%s", target.getName(), account.getBalance(currency), currency));
+	}
+
 	@Subcommand("set")
 	@CommandPermission("*")
 	public void set(CommandSender sender, @Flags("other") Player target, OriginCurrency currency, double amount) {

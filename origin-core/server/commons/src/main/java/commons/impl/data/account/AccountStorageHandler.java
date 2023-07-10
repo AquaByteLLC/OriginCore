@@ -7,10 +7,12 @@ import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import commons.sched.SchedulerManager;
 import me.vadim.util.conf.ResourceProvider;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -34,7 +36,7 @@ public class AccountStorageHandler {
 	}
 
 	public Set<AccountStorage<?>> getStorages() {
-		return modulesView.values().stream().map(OriginModule::getAccounts).collect(Collectors.toSet());
+		return modulesView.values().stream().map(OriginModule::getAccounts).filter(Objects::nonNull).collect(Collectors.toSet());
 	}
 
 	public void saveAll() {
@@ -55,12 +57,12 @@ public class AccountStorageHandler {
 	}
 
 	@Subscribe
-	private void onJoin(PlayerJoinEvent event) {
+	private void onJoin(AsyncPlayerPreLoginEvent event) {
 		pool.submit(() -> {
 			try {
-				loadOne(event.getPlayer().getUniqueId());
+				loadOne(event.getUniqueId());
 			} catch (Exception e) {
-				logger.severe("Problem loading accounts for " + event.getPlayer().getUniqueId());
+				logger.severe("Problem loading accounts for " + event.getUniqueId());
 				e.printStackTrace();
 			}
 		});

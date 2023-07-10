@@ -1,3 +1,4 @@
+// @formatter:off -- IntelliJ not fucking with this file
 /**
  *
  * Copyright (c) 2006-2015, Speedment, Inc. All Rights Reserved.
@@ -117,26 +118,6 @@ public final class MapStream<K, V> implements Stream<Map.Entry<K, V>> {
             )
         ));
     }
-
-    //vadim start
-    public <R> MapStream<R, V> mapKey(Function<? super K, ? extends R> mapper) {
-        return new MapStream<>(inner.map(e ->
-            new AbstractMap.SimpleEntry<>(
-                    mapper.apply(e.getKey()),
-                    e.getValue()
-            )
-        ));
-    }
-
-    public <R> MapStream<K, R> mapValue(Function<? super V, ? extends R> mapper) {
-        return new MapStream<>(inner.map(e ->
-             new AbstractMap.SimpleEntry<>(
-                     e.getKey(),
-                     mapper.apply(e.getValue())
-             )
-        ));
-    }
-    //vadim end
     
     public <R> MapStream<R, V> flatMapKey(BiFunction<? super K, ? super V, ? extends Stream<? extends R>> mapper) {
         return new MapStream<>(inner.flatMap(e -> 
@@ -161,6 +142,51 @@ public final class MapStream<K, V> implements Stream<Map.Entry<K, V>> {
                 )
         ));
     }
+
+
+    //vadim start -- add method reference support
+    public <R> MapStream<R, V> mapKey(Function<? super K, ? extends R> mapper) {
+        return new MapStream<>(inner.map(e ->
+            new AbstractMap.SimpleEntry<>(
+                mapper.apply(e.getKey()),
+                e.getValue()
+            )
+        ));
+    }
+
+    public <R> MapStream<K, R> mapValue(Function<? super V, ? extends R> mapper) {
+        return new MapStream<>(inner.map(e ->
+            new AbstractMap.SimpleEntry<>(
+                e.getKey(),
+                mapper.apply(e.getValue())
+            )
+        ));
+    }
+
+    public <R> MapStream<R, V> flatMapKey(Function<? super K, ? extends Stream<? extends R>> mapper) {
+        return new MapStream<>(inner.flatMap(e ->
+            mapper.apply(e.getKey())
+                .map(k ->
+                    new AbstractMap.SimpleEntry<>(
+                        k,
+                        e.getValue()
+                    )
+                )
+        ));
+    }
+
+    public <R> MapStream<K, R> flatMapValue(Function<? super V, ? extends Stream<? extends R>> mapper) {
+        return new MapStream<>(inner.flatMap(e ->
+            mapper.apply(e.getValue())
+                .map(v ->
+                    new AbstractMap.SimpleEntry<>(
+                        e.getKey(),
+                        v
+                    )
+                )
+        ));
+    }
+    //vadim end
 
     @Override
     public IntStream mapToInt(ToIntFunction<? super Map.Entry<K, V>> mapper) {

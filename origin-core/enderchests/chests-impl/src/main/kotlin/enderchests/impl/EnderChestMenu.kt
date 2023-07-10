@@ -1,34 +1,33 @@
 package enderchests.impl
 
+import commons.data.account.AccountProvider
 import commons.menu.MenuAdapter
 import commons.util.StringUtil
 import enderchests.ChestRegistry
-import enderchests.LinkedChest
+import enderchests.NetworkColor
 import enderchests.impl.conf.Config
+import enderchests.impl.data.EnderChestAccount
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder
-import me.vadim.util.item.createItem
-import me.vadim.util.menu.MenuList
-import me.vadim.util.menu.button
-import me.vadim.util.menu.menu
-import me.vadim.util.menu.toList
+import me.vadim.util.menu.*
+import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
+import java.util.*
 
 /**
  * @author vadim
  */
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
-class EnderChestMenu(private val plugin: EnderChestsPlugin, private val chest: LinkedEnderChest) : MenuAdapter<ItemStack>() {
+class EnderChestMenu(private val plugin: EnderChestsPlugin, private val player: UUID) : MenuAdapter<NetworkColor>() {
 
-	 override val MENU_SIZE = Config.CHEST_SIZE + 9
-	 override val BACK_SLOT = 45
-	 override val DONE_SLOT = 49
-	 override val NEXT_SLOT = 53
+	override val MENU_SIZE = 9 * 3
+	override val BACK_SLOT = 45
+	override val DONE_SLOT = 49
+	override val NEXT_SLOT = 53
 
 	private val registry: ChestRegistry = plugin.chestRegistry
+	private val accounts: AccountProvider<EnderChestAccount> = plugin.accounts
 
 	private fun config(): Config = plugin.config()
 
@@ -42,29 +41,56 @@ class EnderChestMenu(private val plugin: EnderChestsPlugin, private val chest: L
 			protect = true
 		} into BACK_SLOT
 	}
-	
-	val items = mutableListOf<ItemStack>()
 
-	override val menu: MenuList<ItemStack> = template.toList(items, transformer = { it }) {
-		val color = chest.network.color
-		title = config().chestMenuTitle.format(StringPlaceholder.of("color", color.chatColor.toString() + StringUtil.convertToUserFriendlyCase(color.name) + "&r"))
+	companion object {
 
-		button(createItem(Material.BLACK_STAINED_GLASS_PANE) {
-			displayName = " "
-			lore = emptyList()
-			allFlags()
-		}) {
-			protect = true
-		} into 45..53
+		val colors: Map<NetworkColor, Material>
 
-		next = buttons[NEXT_SLOT]!! to NEXT_SLOT
-		back = buttons[BACK_SLOT]!! to BACK_SLOT
+		init {
+			val map = mutableMapOf<NetworkColor, Material>()
 
-		protectAll = false
+			map[NetworkColor.RED] = Material.RED_CONCRETE
+			map[NetworkColor.GOLD] = Material.YELLOW_CONCRETE
+			map[NetworkColor.LIME] = Material.LIME_CONCRETE
+			map[NetworkColor.AQUA] = Material.CYAN_CONCRETE
+			map[NetworkColor.PINK] = Material.PINK_CONCRETE
+			map[NetworkColor.PURPLE] = Material.PURPLE_CONCRETE
 
-		select = { event, button, item ->
-			if(event.currentItem == null) // just picked up an item, mark the slot as a placeholder
-				button.item = placeholder()
+			colors = map.toMap()
+		}
+	}
+
+	override val menu: MenuList<NetworkColor> = template.toList(queryItems(), transformer = {
+		val color = it.chatColor.toString() + StringUtil.convertToUserFriendlyCase(it.chatColor.name) + ChatColor.WHITE
+		val builder = config().selectColorItem.format(StringPlaceholder.of("color", color))
+		val account = accounts.getAccount(player)
+
+		if(account.atSlotLimit(it)) { // the code your eyes are about to witness is unholy to the Lord
+			val pl = StringPlaceholder.builder().set("color", color).set("limit", account.slotLimit.toString()).build()
+			builder.allFlags().enchantment(Enchantment.MENDING, 1).editMeta { meta ->
+				var list = meta.lore
+				if(list == null) list = mutableListOf()
+				list.addAll(config().slotLimitLore.map { L -> L.format(pl) }.toList())
+				meta.lore = list
+			}
+		}
+
+		builder.build()
+	}) {
+		title = config().selectColorMenuTitle.format(StringPlaceholder.EMPTY)
+
+		frameWith(blank())
+
+		// blank out buttons since we know this will be one page
+		next = blank() to NEXT_SLOT
+		back = blank() to BACK_SLOT
+
+		select = { event, button, color ->
+			val player = event.whoClicked as Player
+
+			if (!accounts.getAccount(player).atSlotLimit(color)) {
+
+			}
 		}
 
 		close = {
@@ -72,12 +98,5 @@ class EnderChestMenu(private val plugin: EnderChestsPlugin, private val chest: L
 		}
 	}
 
-	private fun placeholder(): ItemStack = ItemStack(Material.AIR).also {
-		ItemUtil.mark(it)
-	}
-
-	override fun queryItems(): MutableList<ItemStack> = items.toMutableList().apply {
-		while(size % (9*5) != 0)
-			add(placeholder())
-	}
+	override fun queryItems() = NetworkColor.values().toMutableList()
 }

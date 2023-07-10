@@ -32,7 +32,7 @@ public class BukkitEventListener<T extends Event> implements EventListener, Even
 	@Override
 	public void startListen(Plugin plugin, EventRegistry events) {
 		this.events = events;
-		plugin.getServer().getPluginManager().registerEvent(clazz, this, EventPriority.NORMAL, this, plugin, false);
+		plugin.getServer().getPluginManager().registerEvent(clazz, this, EventPriority.MONITOR, this, plugin, false);
 	}
 
 	@Override

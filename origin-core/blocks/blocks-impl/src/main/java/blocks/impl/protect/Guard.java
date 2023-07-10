@@ -1,5 +1,6 @@
 package blocks.impl.protect;
 
+import blocks.block.aspects.location.BlockLike;
 import blocks.block.protect.ProtectedBlock;
 import blocks.block.protect.ProtectedObject;
 import blocks.block.protect.ProtectedRegion;
@@ -13,6 +14,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -31,12 +33,17 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.BrewingStandFuelEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.UUID;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -49,7 +56,9 @@ class Guard {
 	private final World world;
 
 	final Long2ObjectMap<ProtectedBlock> blocks = new Long2ObjectOpenHashMap<>(500);
-	final ObjectList<ProtectedRegion> regions = new ObjectHashList<>(10);
+	final ObjectList<ProtectedRegion> regions = new ObjectArrayList<>(10);
+
+	final ReadWriteLock lock = new ReentrantReadWriteLock();
 
 	Guard(UUID world) {
 		this.world = Bukkit.getWorld(world);
@@ -70,9 +79,15 @@ class Guard {
 		z = block.getZ();
 
 		ObjectList<ProtectedRegion> list = new ObjectArrayList<>(10);
-		for (ProtectedRegion region : regions)
-			if (region.getBounds().contains(x, y, z))
-				list.add(region);
+
+		lock.readLock().lock();
+		try {
+			for (ProtectedRegion region : regions)
+				if (region.getBounds().contains(x, y, z))
+					list.add(region);
+		} finally {
+			lock.readLock().unlock();
+		}
 
 		return list;
 	}
@@ -80,94 +95,249 @@ class Guard {
 	public final ProtectedBlock getBlockAt(Block block) {
 		if (!inWorld(block))
 			return null;
-		return blocks.get(PackUtil.packLoc(block.getX(), block.getY(), block.getZ()));
+
+		ProtectedBlock result;
+
+		lock.readLock().lock();
+		try {
+			result = blocks.get(PackUtil.packLoc(block.getX(), block.getY(), block.getZ()));
+		} finally {
+			lock.readLock().unlock();
+		}
+
+		return result;
 	}
 
-	private static void handle(ProtectedObject prot, EventWrapper<?> wrapper) {
-		boolean notOp = wrapper.entity == null || !wrapper.entity.isOp();
-		switch (prot.getProtectionStrategy()) {
-			case OVERRIDE_ON -> { wrapper.event.setCancelled(true); }
-			case DEFAULT -> {
-				if (notOp)
-					wrapper.event.setCancelled(true);
+	public final ProtectedObject getProtectionAt(Block block) {
+		if (!inWorld(block))
+			return null;
+
+		ProtectedObject prot;
+
+		// blocks take priority over regions
+		prot = getBlockAt(block);
+		if (prot != null)
+			return prot;
+
+		ObjectList<ProtectedRegion> regions = getRegionsAt(block);
+		if (regions.isEmpty())
+			return null;
+
+		// pick highest priority region
+		int prio = Integer.MIN_VALUE;
+		for (ProtectedRegion region : regions)
+			if (region.getPriority() > prio) {
+				prio = region.getPriority();
+				prot = region;
 			}
-			case OVERRIDE_OFF -> { /* NOP */ }
-		}
+
+		return prot;
 	}
 
 	private void protect(EventWrapper<?> wrapper) {
-		boolean handled = false;
-		for (Block block : wrapper.blocks) {
-			if (block == null) continue;
-			ProtectedBlock prot = getBlockAt(block);
-			if (prot == null) continue;
+		boolean notOp = wrapper.entity == null || !wrapper.entity.isOp();
 
-			handled = true;
-			handle(prot, wrapper);
-		}
+		Iterator<EventBlock> iterator = wrapper.blocks.iterator();
 
-		// blocks take affinity
-		if (handled)
-			return;
+		ProtAction action = new ProtAction(wrapper.event); // use mutable object instead of allocating a new one each iteration
+		EventBlock block;
+		while (iterator.hasNext()) {
+			block = iterator.next();
+			if (block == null)
+				continue;
 
-		for (Block block : wrapper.blocks) {
-			if (block == null) continue;
-			ObjectList<ProtectedRegion> regions = getRegionsAt(block);
-			if (regions.isEmpty()) continue;
+			ProtectedObject prot = getProtectionAt(block.getBlock());
+			if (prot == null)
+				continue;
 
-			// pick highest priority region
-			ProtectedRegion prot = null;
-			int             prio = Integer.MIN_VALUE;
-			for (ProtectedRegion region : regions)
-				if (region.getPriority() > prio) {
-					prio = region.getPriority();
-					prot = region;
-				}
+			action.prot = prot;
+			action.block = block.getBlock();
+			action.entity = wrapper.entity;
 
-			assert prot != null; // regions is not empty, therefore the loop will have found at least one
-			handle(prot, wrapper);
+			if (!prot.getProtectionStrategy().permits(action)) {
+				if (wrapper.blocks.isMutable())
+					iterator.remove(); // in some events, you can remove a block from the event, instead of cancelling the whole event
+				else
+					wrapper.event.setCancelled(true);
+			}
 		}
 	}
 
-	private static List<Block> combine(List<Block> blocks, Block... block) {
-		List<Block> list = new ArrayList<>(blocks);
-		list.addAll(Arrays.asList(block));
-		return list;
+	// holy bad code
+
+	@SuppressWarnings("DataFlowIssue")
+	private static final class EventBlock implements BlockLike {
+
+		private final Block block;
+		private final BlockState state;
+
+		EventBlock(BlockState state) {
+			this.block = null;
+			this.state = state;
+		}
+
+		EventBlock(Block block) {
+			this.block = block;
+			this.state = null;
+		}
+
+		public BlockState getState() {
+			return state == null ? block.getState() : state;
+		}
+
+		@Override
+		public Block getBlock() {
+			return block == null ? state.getBlock() : block;
+		}
+
+		@Override
+		public Location getBlockLocation() {
+			return getBlock().getLocation();
+		}
+
+	}
+
+	@SuppressWarnings("rawtypes,unchecked")
+	private static class BlockList extends ArrayList<EventBlock> {
+
+		public static final int MUT_BLOCK = 1;
+		public static final int MUT_STATE = 2;
+		public static final int IMMUTABLE = 3;
+
+		private final List backing;
+		private final int mode;
+
+		private BlockList(List backing, int mode) {
+			super();
+			this.backing = backing;
+			this.mode    = mode;
+			if (mode != MUT_BLOCK && mode != MUT_STATE && mode != IMMUTABLE) throw new IllegalArgumentException("illegal mode " + mode);
+		}
+
+		public static BlockList ofBlocks(List<Block> blocks) {
+			return new BlockList(blocks, MUT_BLOCK);
+		}
+
+		public static BlockList ofStates(List<BlockState> states) {
+			return new BlockList(states, MUT_STATE);
+		}
+
+		public static BlockList ofImmutable(List<?> list) {
+			return new BlockList(list, IMMUTABLE);
+		}
+
+		public boolean isMutable() {
+			return mode != IMMUTABLE;
+		}
+
+		@Override
+		public int size() {
+			return backing.size();
+		}
+
+		@Override
+		public boolean contains(Object o) {
+			return backing.contains(o);
+		}
+
+		@Override
+		public EventBlock get(int index) {
+			Object o = backing.get(index);
+			if (o instanceof Block block)
+				return new EventBlock(block);
+			if (o instanceof BlockState state)
+				return new EventBlock(state);
+			throw new IllegalStateException();
+		}
+
+		@NotNull
+		@Override
+		public ListIterator<EventBlock> listIterator(int index) {
+			throw new UnsupportedOperationException();
+		}
+
+		@NotNull
+		@Override
+		public ListIterator<EventBlock> listIterator() {
+			throw new UnsupportedOperationException();
+		}
+
+		@NotNull
+		@Override
+		public Iterator<EventBlock> iterator() {
+			return new Iterator<EventBlock>() {
+				Iterator backing = BlockList.this.backing.iterator();
+
+				@Override
+				public boolean hasNext() {
+					return backing.hasNext();
+				}
+
+				@Override
+				public EventBlock next() {
+					Object o = backing.next();
+					if (o instanceof Block block)
+						return new EventBlock(block);
+					if (o instanceof BlockState state)
+						return new EventBlock(state);
+					throw new IllegalStateException();
+				}
+
+				@Override
+				public void remove() {
+					backing.remove();
+				}
+			};
+		}
+
+		@Override
+		public boolean add(EventBlock eventBlock) {
+			if (!isMutable()) throw new UnsupportedOperationException();
+			return backing.add(mode == MUT_BLOCK ? eventBlock.getBlock() : eventBlock.getState());
+		}
+
+		@Override
+		public boolean remove(Object o) {
+			if (!isMutable()) throw new UnsupportedOperationException();
+			EventBlock eventBlock = (EventBlock) o;
+			return backing.remove(mode == MUT_BLOCK ? eventBlock.getBlock() : eventBlock.getState());
+		}
+
 	}
 
 	private static final class EventWrapper<E extends Event & Cancellable> {
 
-		E event;
-		Entity entity;
-		List<Block> blocks;
+		final E event;
+		final Entity entity;
+		final BlockList blocks;
+		final Block cause; // the block that triggered this event
 
 		EventWrapper(E event, Entity entity, Block... block) {
 			this.event  = event;
 			this.entity = entity;
-			this.blocks = Arrays.asList(block);
+			this.blocks = BlockList.ofImmutable(Arrays.asList(block));
+			this.cause  = block[0];
 		}
 
 		EventWrapper(E event, Block... block) {
 			this.event  = event;
 			this.entity = null;
-			this.blocks = Arrays.asList(block);
+			this.blocks = BlockList.ofImmutable(Arrays.asList(block));
+			this.cause  = block[0];
 		}
 
-		EventWrapper(E event, Entity entity, List<Block> blocks) {
+		EventWrapper(E event, Block cause, BlockList blockList) {
+			this.event  = event;
+			this.entity = null;
+			this.cause  = cause;
+			this.blocks = blockList;
+		}
+
+		EventWrapper(E event, Entity entity, Block cause, BlockList blockList) {
 			this.event  = event;
 			this.entity = entity;
-			this.blocks = blocks;
-		}
-
-		EventWrapper(E event, Block block, List<Block> blocks) {
-			this.event  = event;
-			this.blocks = combine(blocks, block);
-		}
-
-		EventWrapper(E event, Entity entity, Block block, List<Block> blocks) {
-			this.event  = event;
-			this.entity = entity;
-			this.blocks = combine(blocks, block);
+			this.cause  = cause;
+			this.blocks = blockList;
 		}
 
 		Player getPlayer() {
@@ -251,12 +421,12 @@ class Guard {
 
 	@Subscribe
 	void onExplode(BlockExplodeEvent event) {
-		protect(new EventWrapper<>(event, event.getBlock(), event.blockList()));
+		protect(new EventWrapper<>(event, event.getBlock(), BlockList.ofBlocks(event.blockList())));
 	}
 
 	@Subscribe
 	void onExplode(EntityExplodeEvent event) {
-		protect(new EventWrapper<>(event, event.getLocation().getBlock(), event.blockList()));
+		protect(new EventWrapper<>(event, event.getLocation().getBlock(), BlockList.ofBlocks(event.blockList())));
 	}
 
 	@Subscribe
@@ -266,7 +436,7 @@ class Guard {
 
 	@Subscribe
 	void onFertilize(BlockFertilizeEvent event) {
-		protect(new EventWrapper<>(event, event.getPlayer(), event.getBlock(), event.getBlocks().stream().map(BlockState::getBlock).toList()));
+		protect(new EventWrapper<>(event, event.getPlayer(), event.getBlock(), BlockList.ofStates(event.getBlocks())));
 	}
 
 	@Subscribe
@@ -284,7 +454,7 @@ class Guard {
 		protect(new EventWrapper<>(event, event.getPlayer(), event.getBlock()));
 	}
 
-	// removed -- performance (besides, this event doesn't even seem to be doing anything)
+	// removed -- performance (besides, cancelling this event doesn't even seem to be doing anything)
 //	@Subscribe
 //	void onPhysics(BlockPhysicsEvent event) {
 //		protect(new EventWrapper<>(event, event.getBlock(), event.getSourceBlock()));
@@ -294,19 +464,19 @@ class Guard {
 	void onPistonExtend(BlockPistonExtendEvent event) {
 		List<Block> blocks = new ArrayList<>(event.getBlocks());
 		blocks.add(event.getBlock().getRelative(((Directional) event.getBlock().getBlockData()).getFacing())); // the piston head
-		protect(new EventWrapper<>(event, event.getBlock(), blocks));
+		protect(new EventWrapper<>(event, event.getBlock(), BlockList.ofImmutable(blocks)));
 	}
 
 	@Subscribe
 	void onPistonsRetract(BlockPistonRetractEvent event) {
 		List<Block> blocks = new ArrayList<>(event.getBlocks());
 		blocks.add(event.getBlock().getRelative(((Directional) event.getBlock().getBlockData()).getFacing())); // the piston head
-		protect(new EventWrapper<>(event, event.getBlock(), blocks));
+		protect(new EventWrapper<>(event, event.getBlock(), BlockList.ofImmutable(blocks)));
 	}
 
 	@Subscribe
 	void onPlace(BlockPlaceEvent event) {
-		protect(new EventWrapper<>(event, event.getPlayer(), event.getBlock(), event.getBlockAgainst(), event.getBlockPlaced()));
+		protect(new EventWrapper<>(event, event.getPlayer(), event.getBlock(), event.getBlockPlaced()));
 	}
 
 	@Subscribe
@@ -379,12 +549,22 @@ class Guard {
 
 	@Subscribe
 	void onSpongeAbsorb(SpongeAbsorbEvent event) {
-		protect(new EventWrapper<>(event, event.getBlock(), event.getBlocks().stream().map(BlockState::getBlock).toList()));
+		protect(new EventWrapper<>(event, event.getBlock(), BlockList.ofStates(event.getBlocks())));
 	}
 
 	@Subscribe
 	void onTNTPrime(TNTPrimeEvent event) {
 		protect(new EventWrapper<>(event, event.getPrimingEntity(), event.getBlock(), event.getPrimingBlock()));
+	}
+
+	@Subscribe
+	void onSpread(BlockSpreadEvent event) {
+		protect(new EventWrapper<>(event, event.getBlock(), event.getSource()));
+	}
+
+	@Subscribe
+	void onForm(BlockFormEvent event) {
+		protect(new EventWrapper<>(event, event.getBlock()));
 	}
 
 	@Subscribe
@@ -415,6 +595,12 @@ class Guard {
 	@Subscribe
 	void onInsideBlock(EntityInsideBlockEvent event) {
 		protect(new EventWrapper<>(event, event.getEntity(), event.getBlock()));
+	}
+
+	@Subscribe
+	void onInteract(PlayerInteractEvent event) {
+		if (event.getAction() == Action.PHYSICAL) // trample
+			protect(new EventWrapper<>(event, event.getPlayer(), event.getClickedBlock()));
 	}
 
 }

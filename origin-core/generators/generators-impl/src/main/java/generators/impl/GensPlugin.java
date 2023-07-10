@@ -55,6 +55,11 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider, OriginMo
 	}
 
 	@Override
+	public void onSave() throws Exception {
+		genStorage.save();
+	}
+
+	@Override
 	public void onLoad() {
 		lfc = new LiteConfig(this);
 		DataPersisterManager.registerDataPersisters(new TierPersister(lfc));
@@ -82,6 +87,7 @@ public class GensPlugin extends JavaPlugin implements ResourceProvider, OriginMo
 
 		GensSettings.init(this);
 
+		System.out.println("Loading gens...");
 		genStorage.load();
 
 		handler.startup();

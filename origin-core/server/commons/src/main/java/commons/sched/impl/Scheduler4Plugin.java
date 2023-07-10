@@ -27,7 +27,7 @@ public class Scheduler4Plugin implements SchedulerManager {
 		this.bsync  = new SyncSchedulerBukkit(plugin);
 
 		this.easync = esp.newExtendedThreadPool(new ThreadFactoryBuilder().setNameFormat("scheduler-async-worker %d").setDaemon(false).build());
-		this.esync  = new SyncExecutorService(-1);
+		this.esync  = new SyncExecutorService(1000);
 
 		esynct = bsync.runTimer(esync::executeBatch, 1);
 	}

@@ -18,6 +18,7 @@ import generators.wrapper.Tier;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.menu.Menu;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -43,28 +44,20 @@ public class GenCommand extends BaseCommand {
 		this.accounts = plugin.getAccounts();
 	}
 
-	@Subcommand("listsubcommands")
-	@SuppressWarnings("ALL")
-	public void reflect(Player player) throws Throwable {
-		Field f = BaseCommand.class.getDeclaredField("subCommands");
-		f.setAccessible(true);
-		Multimap<String, ?> map = (Multimap) f.get(this);
-		for (String s : map.keySet()) {
-			System.out.println("SUBCOMMAND: " + s);
-		}
-	}
-
 	@Subcommand("setmaxslots")
-	public void setMaxSlots(Player sender, int maxSlots) {
-		accounts.getAccount(sender).slotLimit = maxSlots;
+	@CommandPermission("*")
+	public void setMaxSlots(CommandSender sender, @Flags("other") Player target, int maxSlots) {
+		accounts.getAccount(target).slotLimit = maxSlots;
 	}
 
 	@Subcommand("getmaxslots")
-	public void getMaxSlots(Player sender) {
-		StringUtil.send(sender, "&enum slots: &b" + accounts.getAccount(sender).slotLimit);
+	@CommandPermission("*")
+	public void getMaxSlots(CommandSender sender, @Flags("other") Player target) {
+		StringUtil.send(sender, "&enum slots: &b" + accounts.getAccount(target).slotLimit);
 	}
 
 	@Subcommand("save-all")
+	@CommandPermission("*")
 	public void flushAndSave(Player sender) {
 		Commons.scheduler().getAsyncExecutor().submit(() -> {
 			((AccountStorage<GenAccount>) accounts).flushAndSave();
@@ -74,6 +67,7 @@ public class GenCommand extends BaseCommand {
 	}
 
 	@Subcommand("stress")
+	@CommandPermission("*")
 	public void stressTest(Player sender, int k) {
 		Tier tier = conf.open(Tiers.class).findTier(sender.getItemInHand().getType());
 
@@ -102,6 +96,7 @@ public class GenCommand extends BaseCommand {
 	}
 
 	@Subcommand("ctrl+a delete")
+	@CommandPermission("*")
 	public void deleteAll(Player sender) {
 		reg.all().forEachRemaining(reg::deleteGen);
 		sender.sendMessage("hehehehaw");

@@ -2,10 +2,10 @@ package generators.impl;
 
 import blocks.BlocksAPI;
 import blocks.block.protect.ProtectedBlock;
+import blocks.block.protect.ProtectedObject;
 import blocks.block.protect.ProtectionRegistry;
-import blocks.block.protect.ProtectionStrategy;
+import blocks.block.protect.strategy.ProtectionStrategies;
 import commons.Commons;
-import commons.util.PackUtil;
 import generators.GeneratorRegistry;
 import generators.wrapper.Generator;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -58,16 +58,17 @@ public class GenRegistry implements GeneratorRegistry {
 	@Override
 	public void createGen(Generator generator) {
 		ProtectionRegistry registry = BlocksAPI.getInstance().getProtectionRegistry();
-		ProtectedBlock block = registry.protectBlock(generator.getBlock());
-		block.setProtectionStrategy(ProtectionStrategy.OVERRIDE_ON);
+		ProtectedBlock     block    = registry.defineBlock(generator.getBlock());
+		block.setProtectionStrategy(ProtectionStrategies.permitOwner(generator.getOfflineOwner()));
 		gens.put(generator.getBlockLocation(), generator);
 	}
 
 	@Override
 	public void deleteGen(Generator generator) {
 		ProtectionRegistry registry = BlocksAPI.getInstance().getProtectionRegistry();
-		ProtectedBlock block = registry.protectBlock(generator.getBlock());
-		registry.removeProtection(block);
+		ProtectedObject    object   = registry.getActiveProtection(generator.getBlock());
+		if (object instanceof ProtectedBlock block)
+			registry.release(block);
 		gens.remove(generator.getBlockLocation());
 	}
 

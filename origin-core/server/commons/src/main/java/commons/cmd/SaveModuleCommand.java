@@ -30,6 +30,7 @@ public class SaveModuleCommand extends ModuleCommand {
 			AccountStorage<?> accounts = module.getAccounts();
 			if(accounts != null)
 				accounts.flushAndSave();
+			module.onSave();
 			return false;
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -68,7 +69,7 @@ public class SaveModuleCommand extends ModuleCommand {
 				err |= saveModule(sender, module);
 			}
 			if(!err)
-				StringUtil.send(sender, MODULES + "&2All accounts saved!");
+				StringUtil.send(sender, MODULES + "&2Done!");
 			else
 				StringUtil.send(sender, MODULES + "&eCompleted with errors: some accounts not saved.");
 		});

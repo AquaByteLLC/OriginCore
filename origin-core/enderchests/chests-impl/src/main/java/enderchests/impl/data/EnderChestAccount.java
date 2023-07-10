@@ -1,10 +1,12 @@
 package enderchests.impl.data;
 
 
+import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import commons.Commons;
 import commons.data.account.impl.AbstractAccount;
 import enderchests.NetworkColor;
+import enderchests.impl.EnderChestsPlugin;
 import enderchests.impl.LinkedEnderChest;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -95,6 +97,13 @@ public class EnderChestAccount extends AbstractAccount {
 			if (player.getPlayer() != null && player.isOnline() && currentLinkedInventory != null)
 				player.getPlayer().openInventory(currentLinkedInventory.getInventory());
 		}
+	}
+
+	@DatabaseField
+	public int slotLimit = EnderChestsPlugin.singletonCringe().config().getDefaultsSlots();
+
+	public boolean atSlotLimit(NetworkColor net) {
+		return EnderChestsPlugin.singletonCringe().getChestRegistry().getNetwork(net, getOfflineOwner()).getSlotsUsed() >= slotLimit;
 	}
 
 }

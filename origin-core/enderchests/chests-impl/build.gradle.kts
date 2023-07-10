@@ -20,6 +20,7 @@ dependencies {
     compileOnly(Dependencies.ORMLITE_CORE)
     compileOnly(Dependencies.ORMLITE_JDBC)
     compileOnly(project(":commons"))
+    compileOnly(project(":settings-api"))
     implementation(project(":chests-api"))
     compileOnly(project(":blocks-api"))
     compileOnly(project(":blocks-impl"))

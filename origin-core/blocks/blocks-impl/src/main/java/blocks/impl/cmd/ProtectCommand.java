@@ -4,12 +4,12 @@ import blocks.block.protect.ProtectedBlock;
 import blocks.block.protect.ProtectedObject;
 import blocks.block.protect.ProtectedRegion;
 import blocks.block.protect.ProtectionRegistry;
-import blocks.block.protect.ProtectionStrategy;
+import blocks.block.protect.strategy.ProtectionStrategy;
 import blocks.block.util.Cuboid;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -18,6 +18,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.SessionManager;
+import commons.util.StringUtil;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -35,21 +36,44 @@ public class ProtectCommand extends BaseCommand {
 		this.registry = registry;
 	}
 
-	@Subcommand("block")
-	void setBlockStrategy(Player player, @Optional ProtectionStrategy strategy) {
-		Block target = player.getTargetBlockExact(10);
-		if (target == null) {
-			player.sendMessage("look at a block");
+	private static final String BLOCKS = "&7[&bBLOCKS&7]&r ";
+	private static final String REGION = "&7[&bREGION&7]&r ";
+	private static final String PROTECTION = "&7[&bPROTECTION&7]&r ";
+
+	@Subcommand("block strategy set")
+	@CommandCompletion("@strategy")
+	void setBlockStrategy(Player player, ProtectionStrategy strategy) {
+		if (strategy == null) {
+			StringUtil.send(player, PROTECTION + "&cunknown protection strategy");
 			return;
 		}
 
-		ProtectedBlock block = registry.protectBlock(target);
-		if (strategy == null) {
-			registry.removeProtection(block);
-			player.sendMessage("protection removed");
+		Block target = player.getTargetBlockExact(10);
+		if (target == null) {
+			StringUtil.send(player, PROTECTION + "&clook at a block");
+			return;
+		}
+
+		ProtectedBlock block = registry.defineBlock(target);
+
+		block.setProtectionStrategy(strategy);
+		StringUtil.send(player, BLOCKS + "&aprotection strategy updated to '&b" + block.getProtectionStrategy() + "&a'");
+	}
+
+	@Subcommand("block release")
+	void releaseBlock(Player player) {
+		Block target = player.getTargetBlockExact(10);
+		if (target == null) {
+			StringUtil.send(player, PROTECTION + "&clook at a block");
+			return;
+		}
+
+		ProtectedObject object = registry.getActiveProtection(target);
+		if (object instanceof ProtectedBlock block) {
+			registry.release(block);
+			StringUtil.send(player, BLOCKS + "&aprotection strategy '&b" + block.getProtectionStrategy() + "&a' removed");
 		} else {
-			block.setProtectionStrategy(strategy);
-			player.sendMessage("protection strategy updated to " + strategy);
+			StringUtil.send(player, BLOCKS + "&cnot protected");
 		}
 	}
 
@@ -65,7 +89,7 @@ public class ProtectCommand extends BaseCommand {
 			if (selectionWorld == null) throw new IncompleteRegionException();
 			selection = localSession.getSelection(selectionWorld);
 		} catch (IncompleteRegionException ex) {
-			player.sendMessage("selecte a region");
+			StringUtil.send(player, REGION + "&cselect a cubiod region first");
 			return null;
 		}
 		World        world = BukkitAdapter.adapt(selectionWorld);
@@ -73,39 +97,57 @@ public class ProtectCommand extends BaseCommand {
 		BlockVector3 max   = selection.getBoundingBox().getMaximumPoint();
 
 		Cuboid cuboid = new Cuboid(BukkitAdapter.adapt(world, min), BukkitAdapter.adapt(world, max));
-		return registry.protectRegion(world, cuboid);
+		return registry.defineRegion(world, cuboid);
 	}
 
-	@Subcommand("region")
-	void setRegionStrategy(Player player, @Optional ProtectionStrategy strategy) {
-		ProtectedRegion region = getRegion(player);
+	@Subcommand("region strategy set")
+	@CommandCompletion("@strategy")
+	void setRegionStrategy(Player player, ProtectionStrategy strategy) {
 		if (strategy == null) {
-			registry.removeProtection(region);
-			player.sendMessage("protection removed");
-		} else {
-			region.setProtectionStrategy(strategy);
-			player.sendMessage("protection strategy updated to " + strategy);
+			StringUtil.send(player, PROTECTION + "&cunknown protection strategy");
+			return;
 		}
+
+		ProtectedRegion region = getRegion(player);
+		region.setProtectionStrategy(strategy);
+		StringUtil.send(player, REGION + "&aprotection strategy updated to '&b" + region.getProtectionStrategy() + "&a'");
 	}
 
-	@Subcommand("priority")
+	@Subcommand("region priority set")
 	void setRegionPriority(Player player, int priority) {
 		ProtectedRegion region = getRegion(player);
 		region.setPriority(priority);
-		player.sendMessage("priority set to " + priority);
+		StringUtil.send(player, REGION + "&apriority updated to &b" + region.getPriority());
 	}
 
-	@Subcommand("what")
-	void printStatus(Player player) {
+	@Subcommand("region release")
+	void releaseRegion(Player player) {
 		Block target = player.getTargetBlockExact(10);
 		if (target == null) {
-			player.sendMessage("look at a block");
+			StringUtil.send(player, PROTECTION + "&clook at a block");
+			return;
+		}
+
+		ProtectedObject object = registry.getActiveProtection(target);
+		if (object instanceof ProtectedRegion region) {
+			registry.release(region);
+			StringUtil.send(player, REGION + "&aprotection strategy '&b" + region.getProtectionStrategy() + "&a' with priority &b" + region.getPriority() + "&a removed");
+		} else {
+			StringUtil.send(player, REGION + "&cnot protected");
+		}
+	}
+
+	@Subcommand("status")
+	void sendStatus(Player player) {
+		Block target = player.getTargetBlockExact(10);
+		if (target == null) {
+			StringUtil.send(player, PROTECTION + "&clook at a block");
 			return;
 		}
 
 		// this shit is AIDS, please do not scroll further
 
-		ProtectedObject[] prot = registry.getProtectionAt(target);
+		ProtectedObject[] prot = registry.getAllProtection(target);
 
 		ProtectedBlock  block  = null;
 		ProtectedRegion region = null;
@@ -118,15 +160,15 @@ public class ProtectCommand extends BaseCommand {
 				if (rg.getPriority() > region.getPriority())
 					region = rg;
 				rg_ct++;
-			} else
-				block = (ProtectedBlock) object;
+			} else if (object instanceof ProtectedBlock b)
+				block = b;
 
 		if (block != null)
-			player.sendMessage("protected by BLOCK " + block.getProtectionStrategy());
+			StringUtil.send(player, BLOCKS + "&aprotected by '&b" + block.getProtectionStrategy() + "&a'");
 		if (region != null)
-			player.sendMessage("protected by " + rg_ct + " REGION" + (rg_ct == 1 ? "" : "S") + " (highest priority" + (block != null ? " BELOW block" : "") + " is " + region.getPriority() + " -> " + region.getProtectionStrategy() + ")");
+			StringUtil.send(player, REGION + "&aprotected by &b" + rg_ct + "&a region" + (rg_ct == 1 ? "" : "s") + ", with the highest" + (block != null ? " BELOW block" : "") + " being '&b" + region.getProtectionStrategy() + "&a' (with priority &b" + region.getPriority() + "&a)");
 		if (block == null && region == null)
-			player.sendMessage("not protected");
+			StringUtil.send(player, PROTECTION + "&cnot protected");
 	}
 
 }

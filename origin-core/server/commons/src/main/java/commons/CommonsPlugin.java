@@ -8,17 +8,17 @@ import commons.cmd.ReloadModuleCommand;
 import commons.cmd.SaveModuleCommand;
 import commons.conf.CommonsConfig;
 import commons.data.account.AccountStorage;
-import commons.impl.data.account.AccountStorageHandler;
 import commons.data.sql.SessionProvider;
-import commons.impl.data.sql.LocationPersister;
 import commons.data.sql.impl.SQLiteSession;
 import commons.econ.BankAccount;
 import commons.entity.registry.EntityRegistry;
 import commons.events.api.EventRegistry;
 import commons.events.impl.PluginEventWrapper;
+import commons.impl.data.account.AccountStorageHandler;
 import commons.impl.data.account.PlayerDefaultAccount;
 import commons.impl.data.account.PlayerDefaultAccountStorage;
 import commons.impl.data.account.ServerAccount;
+import commons.impl.data.sql.LocationPersister;
 import commons.sched.SchedulerManager;
 import commons.sched.impl.Scheduler4Plugin;
 import commons.util.StringUtil;
@@ -32,6 +32,7 @@ import me.vadim.util.menu.Menus;
 import me.vadim.util.menu.MenusKt;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -135,13 +136,13 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 
 	@Deprecated
 	public void registerReloadHook(JavaPlugin plugin, ConfigurationManager manager) {
-		if(plugin instanceof OriginModule module)
+		if (plugin instanceof OriginModule module)
 			registerModule(module);
 	}
 
 	@Deprecated
 	public void registerAccountLoader(AccountStorage<?> accounts) {
-		getLogger().info("Registering account loader for "+accounts.getAccountClass().getCanonicalName());
+		getLogger().info("Registering account loader for " + accounts.getAccountClass().getCanonicalName());
 		throw new RuntimeException("Please use `Commons.commons().registerModule(this);`!");
 	}
 
@@ -152,9 +153,32 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 		modules.put(StringUtil.formatModuleName(module), module);
 	}
 
+	private BukkitTask autosave;
+
+	private void autosave() {
+		for (OriginModule module : modules.values()) {
+			try {
+				AccountStorage<?> storage = module.getAccounts();
+				if (storage != null)
+					storage.flushAndSave();
+			} catch (Exception e) {
+				getLogger().severe("Failure to autosave accounts for module " + StringUtil.formatModuleName(module));
+				e.printStackTrace();
+			}
+
+			try {
+				module.onSave();
+			} catch (Exception e) {
+				getLogger().severe("Failure to autosave data for module " + StringUtil.formatModuleName(module));
+				e.printStackTrace();
+			}
+		}
+	}
+
+
 	@Override
 	protected void load() {
-		instance = this;
+		instance           = this;
 		MenusKt.makesMeCry = this;
 		getLogger().info("(load) commons plugin awaken");
 		com.j256.ormlite.logger.Logger.setGlobalLogLevel(Level.WARNING); // supress spam from TableUtils class
@@ -171,9 +195,11 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 		//	- kennytv
 		// == Complete list of motherfuckers as of 2023-07-07
 		class gayness_remover extends PrintStream {
+
 			gayness_remover(@NotNull OutputStream out) {
 				super(out);
 			}
+
 		}
 		System.setOut(new gayness_remover(System.out));
 		System.setErr(new gayness_remover(System.err));
@@ -196,9 +222,11 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 		events.enable();
 
 		scheduler = new Scheduler4Plugin(this);
-		storage = new AccountStorageHandler(modules, scheduler, getEventRegistry(), rp);
+		storage   = new AccountStorageHandler(modules, scheduler, getEventRegistry(), rp);
 
 		bungeeCord = new BungeeCordImpl(this);
+
+		autosave = scheduler.getBukkitAsync().runTimer(this::autosave, config().getAutosaveInvervalTicks());
 
 		commands = new PaperCommandManager(this);
 		commands.registerCommand(new EconCommand(accounts));
@@ -215,6 +243,8 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 	public void disable() {
 		Menus.disable();
 		getLogger().info("(disable) commons plugin goodbye");
+		autosave.cancel();
+		// will trust modules to save on their own
 		storage.shutdown();
 		events.disable();
 		scheduler.shutdown();

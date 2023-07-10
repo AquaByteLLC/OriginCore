@@ -1,5 +1,7 @@
 package generators.impl;
 
+import blocks.block.protect.ProtectedObject;
+import blocks.block.protect.strategy.ProtectionStrategies;
 import commons.Commons;
 import commons.conf.wrapper.EffectGroup;
 import commons.conf.wrapper.OptionalMessage;
@@ -15,11 +17,12 @@ import generators.impl.wrapper.GenInfo;
 import generators.impl.wrapper.PDCUtil;
 import generators.wrapper.Generator;
 import generators.wrapper.Tier;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -108,10 +111,14 @@ public class GenHandler {
 
 		Generator gen = tier.toGenerator(player, location);
 		reg.createGen(gen);
-		config().getCreateEffect().sendToIf(player,
-											location.clone(), GensSettings.SOUNDS::isEnabled,
+		config().getCreateEffect().sendAtIf(location.clone(), GensSettings.SOUNDS::isEnabled,
 											location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
 		msg().getCreatedGen().sendTo(player, GenInfo.placeholdersForTier(gen.getCurrentTier()));
+
+		// just in case ?
+		event.setCancelled(false);
+		event.setBuild(true);
+		gen.getBlock().setType(gen.getCurrentTier().getBlock());
 	}
 
 	@Subscribe
@@ -148,8 +155,7 @@ public class GenHandler {
 					case NO_PERMISSION -> config().getErrorEffect();
 				};
 		// send corresponding effect if configured
-		effect.sendToIf(player,
-						location.clone(), GensSettings.SOUNDS::isEnabled,
+		effect.sendAtIf(location.clone(), GensSettings.SOUNDS::isEnabled,
 						location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
 	}
 
@@ -181,8 +187,7 @@ public class GenHandler {
 					default -> config().getErrorEffect();
 				};
 		// send corresponding effect if configured
-		effect.sendToIf(player,
-						location.clone(), GensSettings.SOUNDS::isEnabled,
+		effect.sendAtIf(location.clone(), GensSettings.SOUNDS::isEnabled,
 						location.add(.5, 1.5, .5), GensSettings.PARTICLES::isEnabled);
 	}
 

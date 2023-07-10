@@ -1,5 +1,6 @@
 package commons.conf.wrapper;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -29,13 +30,15 @@ public class EffectGroup {
 				this.particle.spawnTo(player, p);
 	}
 
-	public void sendAtIf(Player player, Location s, Predicate<Player> sound, Location p, Predicate<Player> particle) {
-		if (sound.test(player))
-			if (this.sound != null)
-				this.sound.playAt(player.getWorld(), s);
-		if (particle.test(player))
-			if (this.particle != null)
-				this.particle.spawnAt(player.getWorld(), p);
+	public void sendAtIf(Location s, Predicate<Player> sound, Location p, Predicate<Player> particle) {
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (sound.test(player))
+				if (this.sound != null)
+					this.sound.playTo(player, s);
+			if (particle.test(player))
+				if (this.particle != null)
+					this.particle.spawnTo(player, p);
+		}
 	}
 
 }

@@ -56,7 +56,7 @@ class ManageMenu(plugin: GensPlugin, private val owner: OfflinePlayer) : GenMenu
 			click = { event, button ->
 				val player = event.whoClicked as Player
 				if(gen()?.destroy(reg, player) == DestroyResult.SUCCESS)
-					config().errorEffect.sendToIf(player,
+					config().destroyEffect.sendToIf(player,
 													player.location, { GensSettings.SOUNDS.isEnabled(it) },
 													player.location, { false })
 				refresh()

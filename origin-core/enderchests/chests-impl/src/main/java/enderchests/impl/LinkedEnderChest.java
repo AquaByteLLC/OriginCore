@@ -1,17 +1,33 @@
 package enderchests.impl;
 
 import blocks.BlocksAPI;
+import blocks.block.protect.ProtectedBlock;
+import blocks.block.protect.ProtectedObject;
+import blocks.block.protect.ProtectionRegistry;
+import blocks.block.protect.strategy.ProtectionStrategies;
 import blocks.block.util.PlayerInteraction;
 import blocks.impl.illusions.impl.FallingBlockOverlay;
 import blocks.impl.illusions.impl.PacketBasedFakeBlock;
 import commons.Commons;
+import commons.conf.wrapper.EffectGroup;
 import commons.data.account.AccountProvider;
 import commons.util.BukkitUtil;
 import enderchests.ChestNetwork;
+import enderchests.ChestRegistry;
 import enderchests.LinkedChest;
+import enderchests.impl.conf.Config;
+import enderchests.impl.conf.EnderChestSettings;
 import enderchests.impl.data.EnderChestAccount;
+import me.vadim.util.conf.ConfigurationProvider;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockAction;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Particle;
+import org.bukkit.SoundGroup;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -27,17 +43,15 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import settings.EnumeratedSetting;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.UUID;
 
 /**
  * @author vadim
  */
 public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChest {
-
-	public static final Sound open = Sound.BLOCK_ENDER_CHEST_OPEN;
-	public static final Sound close = Sound.BLOCK_END_PORTAL_SPAWN;
 
 	private static org.bukkit.Color awt2bukkit(Color color) {
 		return org.bukkit.Color.fromRGB(color.getRed(), color.getGreen(), color.getBlue());
@@ -55,8 +69,10 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 	private final AccountProvider<EnderChestAccount> accounts;
 	private final ChestNetwork network;
 	private final FallingBlockOverlay overlay;
+	private final ChestRegistry registry;
+	private final ConfigurationProvider conf;
 
-	LinkedEnderChest(Location location, AccountProvider<EnderChestAccount> accounts, BlockFace face, ChestNetwork network) {
+	LinkedEnderChest(Location location, AccountProvider<EnderChestAccount> accounts, BlockFace face, ChestNetwork network, ChestRegistry registry, ConfigurationProvider conf) {
 		super(location, blockDataFromFaceParameter(face), null);
 		this.accounts = accounts;
 		this.network  = network;
@@ -66,6 +82,12 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 			if (click == PlayerInteraction.LEFT_CLICK)
 				leftClick(player);
 		});
+		this.registry = registry;
+		this.conf     = conf;
+	}
+
+	private Config config() {
+		return conf.open(Config.class);
 	}
 
 	public void leftClick(Player player) {
@@ -83,9 +105,9 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 			Commons.scheduler().getBukkitSync().runTask(() -> {
 				getBlock().setType(Material.AIR);
 				if (player.getGameMode() != GameMode.CREATIVE)
-					player.getInventory().addItem(new ItemStack(Material.ENDER_CHEST));
+					player.getInventory().addItem(config().getEnderChestItem());
 				BlocksAPI.getInstance().getIllusions().globalRegistry().unregister(this);
-				//todo: item
+				registry.deleteChest(this);
 			});
 		}
 	}
@@ -156,19 +178,13 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 
 	@Override
 	public void setOpen(boolean isOpen) {
-		float vol;
-		float pitch;
-		Sound sound;
-		if (isOpen) {
-			vol   = .8f;
-			sound = open;
-			pitch = .01f;
-		} else {
-			vol   = .5f;
-			sound = close;
-			pitch = 1.01f;
-		}
-		getBlock().getWorld().playSound(getBlockLocation().add(.5, .5, .5), sound, vol, pitch);
+		EffectGroup effect;
+		if (isOpen)
+			effect = config().getOpenEffect();
+		else
+			effect = config().getShutEffect();
+		effect.sendAtIf(getBlockLocation().add(.5, .5, .5), EnderChestSettings.SOUNDS::isEnabled,
+						getBlockLocation(), EnumeratedSetting::never);
 		for (Player onlinePlayer : Bukkit.getOnlinePlayers())
 			BukkitUtil.sendPacket(onlinePlayer, new PacketPlayOutBlockAction(CraftLocation.toBlockPosition(getBlockLocation()),
 																			 ((CraftBlockData) Material.ENDER_CHEST.createBlockData()).getState().b(),
@@ -181,13 +197,23 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 	}
 
 	@Override
-	public void ensureHopperConnectivity() {
+	public void validateBlock() {
+		ProtectionRegistry protection = BlocksAPI.getInstance().getProtectionRegistry();
+		ProtectedObject    object     = protection.getActiveProtection(getBlock());
+		if (object instanceof ProtectedBlock block)
+			protection.release(block);
+
+		BlocksAPI.getInstance().getIllusions().globalRegistry().register(this);
+
 		getBlock().setType(Material.CHEST);
 		Inventory inventory = ((Chest) getBlock().getState()).getBlockInventory();
 		inventory.clear();
 		ItemStack blank = new ItemStack(Material.STONE);
 		ItemUtil.mark(blank); // no reason
 		inventory.addItem(blank); // add dummy item to trigger inventory move event
+
+		ProtectedBlock block = protection.defineBlock(getBlock());
+		block.setProtectionStrategy(ProtectionStrategies.permitOwner(getOfflineOwner()));
 	}
 
 	@Override
@@ -232,6 +258,11 @@ public class LinkedEnderChest extends PacketBasedFakeBlock implements LinkedChes
 	@Override
 	public boolean hasOverlay() {
 		return true;
+	}
+
+	@Override
+	public Directional getProjectedBlockData() {
+		return (Directional) super.getProjectedBlockData(); // this will always be ENDER_CHEST
 	}
 
 }

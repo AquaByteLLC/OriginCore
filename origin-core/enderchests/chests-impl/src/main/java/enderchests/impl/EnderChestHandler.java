@@ -1,7 +1,5 @@
 package enderchests.impl;
 
-import blocks.BlocksAPI;
-import blocks.block.illusions.IllusionsAPI;
 import commons.Commons;
 import commons.data.account.AccountProvider;
 import commons.events.api.EventContext;
@@ -12,7 +10,9 @@ import commons.util.reflect.Reflection;
 import enderchests.ChestNetwork;
 import enderchests.ChestRegistry;
 import enderchests.LinkedChest;
+import enderchests.impl.conf.Config;
 import enderchests.impl.data.EnderChestAccount;
+import me.vadim.util.conf.ConfigurationProvider;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockAction;
 import net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffect;
@@ -46,14 +46,14 @@ public class EnderChestHandler implements Listener {
 
 	private final JavaPlugin plugin;
 	private final ChestRegistry registry;
-	private final IllusionsAPI illusions;
 	private final AccountProvider<EnderChestAccount> accounts;
+	private final ConfigurationProvider conf;
 
-	public EnderChestHandler(JavaPlugin plugin, ChestRegistry registry, AccountProvider<EnderChestAccount> accounts, EventRegistry events) {
-		this.plugin    = plugin;
-		this.registry  = registry;
-		this.illusions = BlocksAPI.getInstance().getIllusions();
-		this.accounts  = accounts;
+	public EnderChestHandler(JavaPlugin plugin, ChestRegistry registry, AccountProvider<EnderChestAccount> accounts, EventRegistry events, ConfigurationProvider conf) {
+		this.plugin   = plugin;
+		this.registry = registry;
+		this.accounts = accounts;
+		this.conf     = conf;
 		events.subscribeAll(this);
 	}
 
@@ -143,14 +143,6 @@ public class EnderChestHandler implements Listener {
 			//todo: add item
 			ChestNetwork net   = registry.getNetwork(account.temp, player);
 			LinkedChest  chest = registry.createChest(net, block.getLocation(), ((Directional) data).getFacing());
-			illusions.globalRegistry().register(chest);
-			chest.ensureHopperConnectivity();
-			Commons.scheduler().getBukkitSync().runLater(() -> {
-//				player.sendBlockChange(block.getLocation(), chest.getProjectedBlockData());
-				System.out.println(player);
-				System.out.println(block);
-				System.out.println(chest);
-			}, 1L);
 		}
 	}
 
@@ -202,11 +194,6 @@ public class EnderChestHandler implements Listener {
 
 	private static final FieldAccess<Holder<SoundEffect>> PacketPlayOutNamedSoundEffect_b = Reflection.unreflectFieldAccess(PacketPlayOutNamedSoundEffect.class, "b");
 
-	private static final String[] allowed = {
-			"minecraft." + LinkedEnderChest.open.key().value(),
-			"minecraft." + LinkedEnderChest.close.key().value(),
-			};
-
 	@Subscribe
 	void playNamedSound(EventContext context, PacketPlayOutNamedSoundEffect packet) {
 		Location    location = new Location(context.getPlayer().getWorld(), packet.d(), packet.e(), packet.f());
@@ -214,11 +201,11 @@ public class EnderChestHandler implements Listener {
 		if (chest == null) return;
 
 		boolean allow = false;
-		for (String key : allowed)
+		for (String key : conf.open(Config.class).getAllowedChestSounds())
 			if (key.equalsIgnoreCase(packet.a().a().a().d()))
 				allow = true;
 
-		if(!allow) // block other sound effects from this block
+		if (!allow) // block other sound effects from this block
 			context.setCancelled(true);
 	}
 

@@ -1,4 +1,4 @@
-package generators.impl.conf;
+package enderchests.impl.conf;
 
 import commons.Commons;
 import me.lucko.helper.item.ItemStackBuilder;
@@ -18,19 +18,19 @@ import settings.setting.key.LocalKey;
 /**
  * @author vadim
  */
-public enum GensSettings implements EnumeratedSetting {
+public enum EnderChestSettings implements EnumeratedSetting {
 
 	PARTICLES(Settings.api().getFactory().newSettingBuilder()
 					  .setName("Particles")
 					  .setDescription("Particle Settings")
-					  .addOptions(Settings.api().getFactory().boolOptON("Gen-related particles will show.", "Gen-related particles won't show."))
+					  .addOptions(Settings.api().getFactory().boolOptON("EnderChest particles will show.", "EnderChest Particles won't show."))
 					  .setDefaultOption(0)
 					  .setMenuItem(ItemStackBuilder.of(Material.NETHER_STAR).build())
 					  .build()),
 	SOUNDS(Settings.api().getFactory().newSettingBuilder()
 				   .setName("Sounds")
 				   .setDescription("Sound Settings")
-				   .addOptions(Settings.api().getFactory().boolOptON("Gen-related sounds will play.", "Gen-related sounds won't play."))
+				   .addOptions(Settings.api().getFactory().boolOptON("EnderChest sounds will play.", "EnderChest sounds won't play."))
 				   .setDefaultOption(0)
 				   .setMenuItem(ItemStackBuilder.of(Material.NOTE_BLOCK).build())
 				   .build()),
@@ -63,17 +63,17 @@ public enum GensSettings implements EnumeratedSetting {
 	static {
 		SectionBuilder builder = Settings.api().getFactory().newSectionBuilder();
 
-		for (GensSettings value : values())
+		for (EnderChestSettings value : values())
 			builder.addSetting(value.setting);
 
-		builder.setMenuItem(Commons.config().getGensSettingsIcon());
+		builder.setMenuItem(Commons.config().getEChestsSettingsIcon());
 
 		section = builder.build();
 	}
 
 	private final Setting setting;
 
-	GensSettings(Setting setting) {
+	EnderChestSettings(Setting setting) {
 		this.setting = setting;
 	}
 
