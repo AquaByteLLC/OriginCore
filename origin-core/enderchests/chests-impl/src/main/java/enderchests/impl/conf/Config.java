@@ -1,8 +1,8 @@
 package enderchests.impl.conf;
 
 import commons.conf.BukkitConfig;
-import commons.conf.wrapper.EffectGroup;
 import me.vadim.util.conf.ResourceProvider;
+import me.vadim.util.conf.bukkit.wrapper.EffectGroup;
 import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import me.vadim.util.conf.wrapper.impl.UnformattedMessage;
 import org.bukkit.NamespacedKey;

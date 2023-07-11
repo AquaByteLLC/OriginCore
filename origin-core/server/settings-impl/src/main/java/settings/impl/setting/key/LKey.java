@@ -30,6 +30,8 @@ public class LKey implements LocalKey {
 		illegal = StringUtil.stripColor(illegal);
 		illegal = illegal.toLowerCase().replace(' ', '_');
 		illegal = ILLEGAL.matcher(illegal).replaceAll("");
+		if(illegal.isBlank())
+			throw new IllegalArgumentException("Key is blank after conversion.");
 		return of(illegal);
 	}
 
