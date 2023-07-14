@@ -16,20 +16,25 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import farming.impl.Messages;
-import me.lucko.helper.item.ItemStackBuilder;
+import farming.impl.conf.MessagesConfig;
 import me.lucko.helper.text3.Text;
-import org.bukkit.Material;
+import me.vadim.util.conf.LiteConfig;
+import me.vadim.util.conf.wrapper.Placeholder;
+import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 @CommandAlias("farming")
 public class RegionCommands extends BaseCommand {
 
 	private final BlockRegistry registry;
 	private final RegionRegistry regionRegistry;
+	private final MessagesConfig messagesConfig;
+	private final LiteConfig liteConfig;
 
-	public RegionCommands(BlockRegistry registry, RegionRegistry regionRegistry) {
+	public RegionCommands(LiteConfig liteConfig, BlockRegistry registry, RegionRegistry regionRegistry) {
 		this.registry = registry;
+		this.liteConfig = liteConfig;
+		this.messagesConfig = liteConfig.open(MessagesConfig.class);
 		this.regionRegistry = regionRegistry;
 	}
 
@@ -37,8 +42,13 @@ public class RegionCommands extends BaseCommand {
 	@CommandPermission("origin.admin.regions")
 	@Syntax("<regionName> <blockName>")
 	public void registerRegion(Player player, String regionName, String blockName) {
+		final Placeholder pl = StringPlaceholder.builder()
+				.set("region_name", regionName)
+				.set("block_name", blockName)
+				.build();
+
 		if (!registry.getBlocks().containsKey(blockName)) {
-			Text.sendMessage(player, Messages.BLOCK_NOT_FOUND);
+			player.sendMessage(messagesConfig.getBlockNotFound().format(pl));
 			return;
 		}
 
@@ -47,12 +57,13 @@ public class RegionCommands extends BaseCommand {
 		final RegionManager regionManager = regionContainer.get(world);
 
 		if (!regionManager.getRegions().containsKey(regionName)) {
-			Text.sendMessage(player, Messages.NO_WG_REGION);
+			player.sendMessage(messagesConfig.getNoWgRegion().format(pl));
 			return;
 		}
 
 		OriginRegion region = new OriginRegion(regionName, blockName, player.getWorld());
 		region.newInstance(regionRegistry);
+		player.sendMessage(messagesConfig.getRegionRegister().format(pl));
 		Text.sendMessage(player, Messages.ORIGIN_REGION_ADDED);
 	}
 
@@ -65,22 +76,21 @@ public class RegionCommands extends BaseCommand {
 		final RegionManager regionManager = regionContainer.get(world);
 		final BlockAccount account = BlocksPlugin.get().getInstance(BlocksPlugin.class).getAccounts().getAccount(player);
 
+		final Placeholder pl = StringPlaceholder.builder()
+				.set("region_name", regionName)
+				.build();
+
 		if (!regionManager.getRegions().containsKey(regionName)) {
-			Text.sendMessage(player, Messages.NO_WG_REGION);
+			player.sendMessage(messagesConfig.getNoWgRegion().format(pl));
 			return;
 		}
 
 		if (!regionRegistry.getRegions().containsKey(regionName)) {
-			Text.sendMessage(player, Messages.REGION_NOT_REGISTERED);
+			player.sendMessage(messagesConfig.getRegionNotRegistered().format(pl));
+			return;
 		}
 
 		OriginRegion region = regionRegistry.getRegions().get(regionName).getRegion();
-		Text.sendMessage(player, Messages.ORIGIN_REGION_REMOVED);
-	}
-
-	@Subcommand("test")
-	public void test(Player player) {
-		ItemStack stack = ItemStackBuilder.of(Material.STONE_AXE).name("&c&lTesting").build();
-		player.getInventory().addItem(stack);
+		player.sendMessage(messagesConfig.getRegionRemove().format(pl));
 	}
 }

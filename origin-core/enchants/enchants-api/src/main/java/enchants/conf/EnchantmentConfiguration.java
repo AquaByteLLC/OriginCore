@@ -7,13 +7,13 @@ import me.lucko.helper.item.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,28 +168,28 @@ public class EnchantmentConfiguration {
 		return configuration.getInt(maxLevelPath);
 	}
 
-	public double getMaxCost() {
+	public BigDecimal getMaxCost() {
 		final String path = EnchantConfigPaths.maxCostPath;
 		final String maxCostPath = EnchantConfigPaths.getAndReplace(path, enchantKey);
-		return configuration.getDouble(maxCostPath);
+		return BigDecimal.valueOf(configuration.getDouble(maxCostPath));
 	}
 
-	public double getStartCost() {
+	public BigDecimal getStartCost() {
 		final String path = EnchantConfigPaths.startCostPath;
 		final String startCostPath = EnchantConfigPaths.getAndReplace(path, enchantKey);
-		return configuration.getDouble(startCostPath);
+		return BigDecimal.valueOf(configuration.getDouble(startCostPath));
 	}
 
-	public double getMaxChance() {
+	public BigDecimal getMaxChance() {
 		final String path = EnchantConfigPaths.maxChancePath;
 		final String maxChancePath = EnchantConfigPaths.getAndReplace(path, enchantKey);
-		return configuration.getDouble(maxChancePath);
+		return BigDecimal.valueOf(configuration.getDouble(maxChancePath));
 	}
 
-	public double getStartChance() {
+	public BigDecimal getStartChance() {
 		final String path = EnchantConfigPaths.startChancePath;
 		final String startChancePath = EnchantConfigPaths.getAndReplace(path, enchantKey);
-		return configuration.getDouble(startChancePath);
+		return BigDecimal.valueOf(configuration.getDouble(startChancePath));
 	}
 
 	public ItemStack getMenuItem() {

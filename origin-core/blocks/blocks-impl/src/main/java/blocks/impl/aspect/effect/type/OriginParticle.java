@@ -32,6 +32,5 @@ public class OriginParticle implements EffectType<Particle> {
 		Location newLoc = new Location(player.getWorld(),
 				location.getX() + 0.5D, location.getY() + 0.5D, location.getZ() + 0.5D);
 		Players.spawnParticle(player, newLoc, this.type, this.val0);
-
 	}
 }

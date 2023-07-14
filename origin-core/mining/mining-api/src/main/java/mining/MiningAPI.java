@@ -41,7 +41,7 @@ public class MiningAPI {
 	public static void map(BossBar bossBar) {
 		helper = new BlockAnimHelper();
 		Schedulers.bukkit().runTaskTimer(injector.getInstance(JavaPlugin.class), $ -> {
-			helper.progression();
+			helper.progression("mining");
 		}, 1, 1);
 	}
 

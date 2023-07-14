@@ -69,6 +69,21 @@ public class EnchantPlugin extends JavaPlugin implements ResourceProvider, Origi
 
 		injector = Guice.createInjector(new EnchantPluginModule(this, registry, factory, this));
 
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+		System.out.println("Hi");
+
 		lfc = new LiteConfig(this);
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.reload();

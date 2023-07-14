@@ -6,18 +6,19 @@ Blocks:
     modelData: 0
     hasParticle: true
     hasEffect: true
+    hasSound: true
     effects:
+      sounds:
+        type: "ENTITY_PLAYER_LEVELUP"
       particles:
         type: "DRAGON_BREATH"
         amount: 20
-      effect:
-        type: "DRAGON_BREATH"
-        radius: 10
     drops:
       diamond:
         material: "DIAMOND"
-        itemName: "&cDragonStoneDiamond"
+        itemName: "&cDragonStoneDiamond ${drop_price}"
+        sellPrice: 224.5
         glowing: true
         data: 0
         lore:
-          - "&aThis is a dragon stone diamond."
+          - "&aThis is a dragon stone diamond. "

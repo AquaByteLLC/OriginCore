@@ -2,6 +2,6 @@ name: ${name}
 version: ${version}
 main: ${main}
 api-version: ${api}
-load: STARTUP
 
-depend: ${depends}
+depend:
+  - DecentHolograms

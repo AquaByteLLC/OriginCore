@@ -36,11 +36,11 @@ public class EnderChestNetwork extends PlayerOwned implements ChestNetwork {
 		super(uuid);
 		this.color = color;
 		this.inventory = Bukkit.createInventory(null, Config.CHEST_SIZE,
-												StringUtil.colorize(conf.open(Config.class)
-																		.getLinkedInventoryTitle().format(StringPlaceholder.of("color",
-																									 color.chatColor.toString() +
-																									 StringUtil.convertToUserFriendlyCase(color.name()) +
-																									 "&r"))));
+				StringUtil.colorize(conf.open(Config.class)
+						.getLinkedInventoryTitle().format(StringPlaceholder.of("color",
+								color.chatColor.toString() +
+										StringUtil.convertToUserFriendlyCase(color.name()) +
+										"&r"))));
 		this.accounts = accounts;
 		this.registry = registry;
 		this.conf     = conf;

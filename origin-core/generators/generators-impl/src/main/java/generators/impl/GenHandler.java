@@ -1,10 +1,6 @@
 package generators.impl;
 
-import blocks.block.protect.ProtectedObject;
-import blocks.block.protect.strategy.ProtectionStrategies;
 import commons.Commons;
-import commons.conf.wrapper.EffectGroup;
-import commons.conf.wrapper.OptionalMessage;
 import commons.data.account.AccountProvider;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
@@ -19,10 +15,10 @@ import generators.wrapper.Generator;
 import generators.wrapper.Tier;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import me.vadim.util.conf.ConfigurationProvider;
+import me.vadim.util.conf.bukkit.wrapper.EffectGroup;
+import me.vadim.util.conf.bukkit.wrapper.OptionalMessage;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;

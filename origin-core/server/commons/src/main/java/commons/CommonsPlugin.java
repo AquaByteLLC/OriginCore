@@ -223,7 +223,6 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 
 		scheduler = new Scheduler4Plugin(this);
 		storage   = new AccountStorageHandler(modules, scheduler, getEventRegistry(), rp);
-
 		bungeeCord = new BungeeCordImpl(this);
 
 		autosave = scheduler.getBukkitAsync().runTimer(this::autosave, config().getAutosaveInvervalTicks());

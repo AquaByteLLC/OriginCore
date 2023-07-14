@@ -10,8 +10,8 @@ setupOriginModule(
             Pair("enchants", listOf("enchants-api", "enchants-impl")),
             Pair("generators", listOf("generators-api", "generators-impl")),
             Pair("enderchests", listOf("chests-api", "chests-impl")),
-            Pair("server", listOf("commons", "settings-api", "settings-impl"))
-              ));
+            Pair("server", listOf("commons", "settings-api", "settings-impl")),
+));
 
 
 fun setupOriginModule(base: String, setup: List<Pair<String, List<String>>>) =

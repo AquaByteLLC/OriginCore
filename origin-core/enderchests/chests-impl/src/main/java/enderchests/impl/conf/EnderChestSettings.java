@@ -33,7 +33,7 @@ public enum EnderChestSettings implements EnumeratedSetting {
 				   .addOptions(Settings.api().getFactory().boolOptON("EnderChest sounds will play.", "EnderChest sounds won't play."))
 				   .setDefaultOption(0)
 				   .setMenuItem(ItemStackBuilder.of(Material.NOTE_BLOCK).build())
-				   .build()),
+				   .build())
 	;
 
 	public static final SettingSection section;
@@ -66,6 +66,7 @@ public enum EnderChestSettings implements EnumeratedSetting {
 		for (EnderChestSettings value : values())
 			builder.addSetting(value.setting);
 
+		System.out.println(Commons.config().getEChestsSettingsIcon().displayName().compact().toString() + " : ECHESTNAME");
 		builder.setMenuItem(Commons.config().getEChestsSettingsIcon());
 
 		section = builder.build();

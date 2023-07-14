@@ -23,5 +23,7 @@ subprojects {
         maven("https://oss.sonatype.org/content/repositories/central")
         maven("https://repo.dmulloy2.net/repository/public/")
         maven("https://maven.enginehub.org/repo/")
+        maven("https://jitpack.io")
+        maven("https://repo.viaversion.com")
     }
 }

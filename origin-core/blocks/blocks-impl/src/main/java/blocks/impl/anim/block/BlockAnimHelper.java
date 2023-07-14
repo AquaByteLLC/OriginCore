@@ -14,7 +14,7 @@ import blocks.block.progress.SpeedAttribute;
 import blocks.block.progress.registry.ProgressRegistry;
 import blocks.impl.BlocksPlugin;
 import blocks.impl.data.account.BlockAccount;
-import blocks.impl.events.AbstractBreakEvent;
+import blocks.impl.events.BreakEvent;
 import commons.events.impl.impl.PacketEventListener;
 import commons.util.reflect.FieldAccess;
 import commons.util.reflect.Reflection;
@@ -72,7 +72,7 @@ public class BlockAnimHelper {
 	private static final FieldAccess<Integer> lastDigTickField = Reflection.unreflectFieldAccess(PlayerInteractManager.class, "g");
 
 	@SneakyThrows
-	public void progression() {
+	public void progression(String calling) {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player == null) return;
 
@@ -153,7 +153,9 @@ public class BlockAnimHelper {
 
 					long endTime = (long) (System.currentTimeMillis() + regenable.getRegenTime() * 1000);
 					regenerationRegistry.createRegen(regenable, block);
-					new AbstractBreakEvent(block, player).callEvent();
+
+					new BreakEvent(calling, block, player, false).callEvent();
+
 					cleanup(blockPosition, block, player, blockProgress, playerAccount);
 					updatePacket(player);
 				}

@@ -54,7 +54,7 @@ public abstract class BukkitConfig extends YamlFile {
 		protected final PlaceholderMessage name;
 		protected final List<PlaceholderMessage> lore;
 
-		protected UnformattedItem(Material material, PlaceholderMessage name, List<PlaceholderMessage> lore) {
+		public UnformattedItem(Material material, PlaceholderMessage name, List<PlaceholderMessage> lore) {
 			this.material = material;
 			this.name     = name;
 			this.lore     = lore;

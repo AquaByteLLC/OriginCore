@@ -4,7 +4,6 @@ import commons.conf.CommonsConfig;
 import commons.data.sql.SessionProvider;
 import commons.events.api.EventRegistry;
 import commons.sched.SchedulerManager;
-
 import java.util.logging.Logger;
 
 /**

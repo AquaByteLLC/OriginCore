@@ -1,14 +1,13 @@
 package enchants.impl.item;
 
-import commons.util.BigMath;
 import commons.util.BukkitUtil;
 import commons.util.StringUtil;
 import enchants.EnchantAPI;
-import enchants.impl.conf.EnchantPlaceholder;
-import enchants.item.EnchantFactory;
 import enchants.EnchantKey;
 import enchants.EnchantRegistry;
+import enchants.impl.conf.EnchantPlaceholder;
 import enchants.item.Enchant;
+import enchants.item.EnchantFactory;
 import enchants.item.EnchantedItem;
 import lombok.SneakyThrows;
 import me.lucko.helper.text3.Text;
@@ -21,8 +20,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Consumer;
@@ -136,7 +133,7 @@ public class EnchantedItemImpl implements EnchantedItem {
 		return enchants;
 	}
 
-	public BigDecimal calc(Enchant holder, Enchant.ProgressionType type, long lvl, BigDecimal start, BigDecimal max) {
+	public static BigDecimal calc(Enchant holder, Enchant.ProgressionType type, long lvl, BigDecimal start, BigDecimal max) {
 		long maxLvl = holder.getMaxLevel();
 
 		if (maxLvl == 1)
@@ -220,7 +217,9 @@ public class EnchantedItemImpl implements EnchantedItem {
 		final Random random = new Random();
 		final int randomNumber = random.nextInt(100);
 		final BigDecimal chance = getChance(enchantKey);
-		return chance.compareTo(BigDecimal.valueOf(randomNumber)) <= 0; // randomNumber <= chance;
+		System.out.println(chance);
+		System.out.println(chance.compareTo(BigDecimal.valueOf(randomNumber)));
+		return (randomNumber <= chance.doubleValue()); // randomNumber <= chance;
 	}
 
 	/**

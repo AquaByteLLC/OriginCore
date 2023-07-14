@@ -1,7 +1,6 @@
 package settings.impl.setting.key;
 
 import commons.util.StringUtil;
-import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.Nullable;
 import settings.setting.key.GlobalKey;
 import settings.setting.key.LocalKey;
@@ -57,8 +56,11 @@ public class GKey implements GlobalKey {
 	public static GlobalKey convert(String illegal) {
 		if(illegal == null) throw new NullPointerException();
 		illegal = StringUtil.stripColor(illegal);
+		System.out.println(illegal + " : First");
 		illegal = illegal.toLowerCase().replace(' ', '_');
+		System.out.println(illegal + " : Second");
 		illegal = ILLEGAL.matcher(illegal).replaceAll("");
+		System.out.println(illegal + " : Third");
 		if(illegal.isBlank())
 			throw new IllegalArgumentException("Key is blank after conversion.");
 		return of(illegal);

@@ -4,13 +4,9 @@ import co.aikar.commands.PaperCommandManager;
 import commons.Commons;
 import commons.OriginModule;
 import commons.data.account.AccountStorage;
-import me.lucko.helper.item.ItemStackBuilder;
-import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.vadim.util.conf.ConfigurationManager;
-import me.vadim.util.conf.ConfigurationProvider;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
-import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import settings.Settings;
 import settings.impl.cmd.SettingsCommand;
@@ -82,6 +78,7 @@ public class SettingsPlugin extends JavaPlugin implements ResourceProvider, Orig
 		SettingsFactory factory = Settings.api().getFactory();
 
 		// example "Mining" section
+		/*
 		Settings.api().getSections().createSection(this,
 												   factory.newSectionBuilder()
 														  .setName("Mining")
@@ -106,6 +103,7 @@ public class SettingsPlugin extends JavaPlugin implements ResourceProvider, Orig
 																			 .setMenuItem(ItemStackBuilder.of(Material.NETHER_STAR).build())
 																			 .build())
 														  .build());
+		 */
 	}
 
 	@Override

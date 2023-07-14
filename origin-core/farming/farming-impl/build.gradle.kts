@@ -2,7 +2,8 @@ group = "farming.impl"
 sharedProjectData.main_cls = "$group.FarmingPlugin"
 
 setupShadowJar()
-copyToPluginsFolder("commons", "settings-impl", "blocks-impl")
+setupKotlin()
+copyToPluginsFolder("commons", "settings-impl", "blocks-impl", "enchants-impl")
 
 dependencies {
     compileOnly(Dependencies.LOMBOK)
@@ -12,6 +13,7 @@ dependencies {
     compileOnly(Dependencies.SPIGOT)
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
+    compileOnly(Dependencies.DECENT_HOLOGRAMS)
     compileOnly(Dependencies.GUICE)
     compileOnly(Dependencies.LFC_SHARED)
     compileOnly(Dependencies.LFC_BUKKIT)
@@ -22,5 +24,6 @@ dependencies {
     compileOnly(project(":enchants-api"))
     compileOnly(project(":enchants-impl"))
     compileOnly(project(":blocks-api"))
+    compileOnly(project(":settings-api"))
     compileOnly(project(":blocks-impl"))
 }

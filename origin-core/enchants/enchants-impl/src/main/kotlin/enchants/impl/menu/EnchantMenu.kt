@@ -11,6 +11,7 @@ import enchants.item.EnchantedItem
 import me.vadim.util.menu.*
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
+import java.math.BigDecimal
 
 /**
  * @author vadim
@@ -54,7 +55,7 @@ class EnchantMenu(private val plugin: EnchantPlugin, private val item: Enchanted
 
 			var price = 0.0
 			for (l in lvl_current until (lvl_new + 1))
-				price += EnchantedItemImpl.calc(enchant, enchant.costType, l, enchant.startCost, enchant.maxCost)
+				price.plus(EnchantedItemImpl.calc(enchant, enchant.costType, l, enchant.startCost, enchant.maxCost).toDouble())
 
 			pl
 				.set("levels", n_lvls.toString())

@@ -30,8 +30,9 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 	private double difX = 0;
 	private double difY = 0;
 	private double difZ = 0;
+	private final boolean dropItem;
 
-	public BlockEntity(Player owner, World world, Block block, ItemStack item) {
+	public BlockEntity(Player owner, World world, Block block, ItemStack item, boolean dropItem) {
 		super(
 				new EntityArmorStand(world, block.getX() + 0.5, block.getY() + 0.5, block.getZ() + 0.5),
 				"block-entity",
@@ -42,13 +43,12 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 		this.owner = owner;
 		this.block = block;
 		this.item = item;
+		this.dropItem = dropItem;
 	}
 
 	@Override
 	public void tick() {
-		System.out.println("4");
 		if (this.getTicksRan() == 0) {
-			System.out.println("5");
 			this.spawnEntity(this.owner);
 
 			DataWatcher watcher = getEntity().aj();
@@ -61,7 +61,6 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 			BukkitUtil.sendPacket(this.owner, packetPlayOutEntityMetadata);
 		}
 
-		System.out.println("6");
 		short moveX = 0;
 		short moveY = -2;
 		short moveZ = 0;
@@ -94,6 +93,7 @@ public class BlockEntity extends EntityHelper.EntityWrapper<EntityArmorStand> {
 
 				final PacketPlayOutEntityDestroy packetPlayOutEntityDestroy = new PacketPlayOutEntityDestroy(this.getEntity().getBukkitEntity().getEntityId());
 				BukkitUtil.sendPacket(this.owner, packetPlayOutEntityDestroy);
+				if (dropItem) owner.getInventory().addItem(item);
 				return;
 			}
 		}

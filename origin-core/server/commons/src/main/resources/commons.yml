@@ -13,7 +13,12 @@ global_settings_menu:
       name: "&dEnder &5Chests"
       lore:
         - "&fClick for &dEnder &5Chests&f Settings"
-
+  farming:
+    item:
+      type: ENDER_CHEST
+      name: "&dFarming"
+      lore:
+        - "&fClick for &dFarming Settings"
 generic_paged_menu:
   button:
     next:

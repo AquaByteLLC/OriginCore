@@ -5,6 +5,7 @@ import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.block.builder.FixedAspectHolder;
 import blocks.impl.BlocksPlugin;
 import blocks.impl.data.account.BlockAccount;
+import blocks.impl.events.BreakEvent;
 import commons.events.api.EventContext;
 import commons.events.impl.EventSubscriber;
 import commons.events.impl.impl.DetachedSubscriber;
@@ -14,21 +15,28 @@ import enchants.impl.item.EnchantedItemImpl;
 import enchants.item.EnchantFactory;
 import enchants.item.EnchantTarget;
 import enchants.item.EnchantedItem;
+import farming.impl.enchants.entity.ExplosiveEntity;
 import farming.impl.util.LocationUtil;
+import me.lucko.helper.Schedulers;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Ageable;
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+;
+
 public enum EnchantTypes implements EnchantKey {
 
 	EXPLOSION("Explosion",
-			subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
+			subscribe(BreakEvent.class, (key, ctx, event) -> {
+				if (event.isCalledFromEnchant()) return;
+
 				final ItemStack playersItem = ctx.getPlayer().getInventory().getItemInMainHand();
 				final BlocksPlugin plugin = BlocksPlugin.get().getInstance(BlocksPlugin.class);
 
@@ -45,12 +53,21 @@ public enum EnchantTypes implements EnchantKey {
 					final RegenerationRegistry regenerationRegistry = account.getRegenerationRegistry();
 
 					if (item.activate(key)) {
-						List<FixedAspectHolder> aspectList = LocationUtil.getBlocks(block, 4);
-						aspectList.forEach(holder -> {
-							new BlockBreakEvent(holder.getBlock(), player).callEvent();
+						new ExplosiveEntity(((CraftWorld) player.getWorld()).getHandle(), player, block, entity -> {
+							Schedulers.bukkit().runTask(plugin, () -> {
 
+								List<FixedAspectHolder> aspectList = LocationUtil.getBlocks(block, 4);
+								aspectList.forEach(holder -> {
+									if (holder.getBlock().getBlockData() instanceof Ageable ageable) {
+										if (BlocksAPI.inRegion(block.getLocation())) {
+											if (ageable.getAge() == ageable.getMaximumAge()) {
+												new BreakEvent("farming", holder.getBlock(), player, true).callEvent();
+											}
+										}
+									}
+								});
+							});
 						});
-
 					}
 				}
 			}), EnchantTarget.tools());
@@ -88,6 +105,7 @@ public enum EnchantTypes implements EnchantKey {
 		final int vf = v++;
 		return new DetachedSubscriber<>(clazz, (ctx, event) -> cons.consume(values()[vf], ctx, event));
 	}
+
 
 	@FunctionalInterface
 	private interface Consumer3<T> {

@@ -1,10 +1,8 @@
 package generators.impl.conf;
 
 import commons.conf.BukkitConfig;
-import commons.conf.wrapper.OptionalMessage;
 import me.vadim.util.conf.ResourceProvider;
-import me.vadim.util.conf.bukkit.YamlFile;
-import me.vadim.util.conf.wrapper.PlaceholderMessage;
+import me.vadim.util.conf.bukkit.wrapper.OptionalMessage;
 
 /**
  * @author vadim

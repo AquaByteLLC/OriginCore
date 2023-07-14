@@ -1,16 +1,15 @@
 package generators.impl.conf;
 
 import commons.conf.BukkitConfig;
-import commons.conf.wrapper.EffectGroup;
 import commons.util.StringUtil;
 import generators.wrapper.Upgrade;
 import me.vadim.util.conf.ResourceProvider;
+import me.vadim.util.conf.bukkit.wrapper.EffectGroup;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import me.vadim.util.item.ItemBuilder;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;

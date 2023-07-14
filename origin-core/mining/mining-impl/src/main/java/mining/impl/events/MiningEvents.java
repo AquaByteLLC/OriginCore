@@ -15,8 +15,8 @@ import blocks.impl.BlocksPlugin;
 import blocks.impl.anim.entity.BlockEntity;
 import blocks.impl.builder.OriginBlock;
 import blocks.impl.data.account.BlockAccount;
-import blocks.impl.events.AbstractBreakEvent;
-import blocks.impl.events.AbstractRegenEvent;
+import blocks.impl.events.BreakEvent;
+import blocks.impl.events.RegenEvent;
 import commons.events.api.EventRegistry;
 import commons.events.impl.impl.DetachedSubscriber;
 import commons.events.impl.impl.PacketEventListener;
@@ -50,8 +50,8 @@ import java.util.Random;
 public class MiningEvents {
 
 	private static DetachedSubscriber<PacketPlayInBlockDig> digInPacket;
-	private static DetachedSubscriber<AbstractRegenEvent> regenEvent;
-	private static DetachedSubscriber<AbstractBreakEvent> breakEvent;
+	private static DetachedSubscriber<RegenEvent> regenEvent;
+	private static DetachedSubscriber<BreakEvent> breakEvent;
 	private static final FieldAccess<PacketPlayInBlockDig.EnumPlayerDigType> c = Reflection.unreflectFieldAccess(PacketPlayInBlockDig.class, "c");
 	private static final FieldAccess<BlockPosition> a = Reflection.unreflectFieldAccess(PacketPlayInBlockDig.class, "a");
 	private static final BlocksPlugin plugin = BlocksPlugin.get().getInstance(BlocksPlugin.class);
@@ -93,7 +93,8 @@ public class MiningEvents {
 	}
 
 	private static void initBreak() {
-		breakEvent = new DetachedSubscriber<>(AbstractBreakEvent.class, (context, event) -> {
+		breakEvent = new DetachedSubscriber<>(BreakEvent.class, (context, event) -> {
+			if (!event.getCalling().equals("mining")) return;
 			Player player = event.getPlayer();
 			Block block = event.getBlock();
 
@@ -126,7 +127,7 @@ public class MiningEvents {
 			if (dropable != null) {
 				dropable.getDrops().forEach(drop -> {
 					// TODO: ITEM BACKPACKS?????
-					new BlockEntity(player, nmsWorld, block, drop);
+					new BlockEntity(player, nmsWorld, block, drop, true);
 				});
 
 				Projectable projectable = (Projectable) originBlock.getAspects().get(AspectType.PROJECTABLE);
@@ -144,7 +145,7 @@ public class MiningEvents {
 
 				long endTime = (long) (System.currentTimeMillis() + regenable.getRegenTime() * 1000);
 				regenerationRegistry.createRegen(regenable, block);
-				new AbstractRegenEvent(regenable, player, block, endTime).callEvent();
+				new RegenEvent("mining", regenable, player, block, endTime).callEvent();
 			}
 
 			final BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
@@ -160,8 +161,8 @@ public class MiningEvents {
 	}
 
 	private static void initRegen() {
-		regenEvent = new DetachedSubscriber<>(AbstractRegenEvent.class, ((context, event) -> {
-
+		regenEvent = new DetachedSubscriber<>(RegenEvent.class, ((context, event) -> {
+			if (!event.getCalling().equals("mining")) return;
 			final BlockAccount account = plugin.getAccounts().getAccount(event.getPlayer());
 			if (account == null) return;
 

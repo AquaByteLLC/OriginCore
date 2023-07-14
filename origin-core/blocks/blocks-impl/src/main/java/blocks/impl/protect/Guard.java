@@ -552,11 +552,14 @@ class Guard {
 		protect(new EventWrapper<>(event, event.getBlock(), BlockList.ofStates(event.getBlocks())));
 	}
 
+	/*
 	@Subscribe
 	void onTNTPrime(TNTPrimeEvent event) {
 		protect(new EventWrapper<>(event, event.getPrimingEntity(), event.getBlock(), event.getPrimingBlock()));
 	}
 
+
+	 */
 	@Subscribe
 	void onSpread(BlockSpreadEvent event) {
 		protect(new EventWrapper<>(event, event.getBlock(), event.getSource()));

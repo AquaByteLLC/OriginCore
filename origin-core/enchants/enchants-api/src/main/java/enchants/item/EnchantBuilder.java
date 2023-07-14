@@ -3,6 +3,7 @@ package enchants.item;
 import commons.events.impl.EventSubscriber;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -18,13 +19,13 @@ public interface EnchantBuilder {
 
 	EnchantBuilder setMenuItem(ItemStack menuItem);
 
-	EnchantBuilder setStartCost(double startCost);
+	EnchantBuilder setStartCost(BigDecimal startCost);
 
-	EnchantBuilder setMaxCost(double maxCost);
+	EnchantBuilder setMaxCost(BigDecimal maxCost);
 
-	EnchantBuilder setStartChance(double startChance);
+	EnchantBuilder setStartChance(BigDecimal startChance);
 
-	EnchantBuilder setMaxChance(double maxChance);
+	EnchantBuilder setMaxChance(BigDecimal maxChance);
 
 	EnchantBuilder setChanceType(Enchant.ProgressionType type);
 

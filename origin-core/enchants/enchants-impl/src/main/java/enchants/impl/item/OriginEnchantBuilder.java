@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class OriginEnchantBuilder implements EnchantBuilder {
@@ -21,10 +22,10 @@ public class OriginEnchantBuilder implements EnchantBuilder {
 	private List<String> information;
 	private int maxLevel;
 	private ItemStack menuItem;
-	private double startCost;
-	private double maxCost;
-	private double startChance;
-	private double maxChance;
+	private BigDecimal startCost;
+	private BigDecimal maxCost;
+	private BigDecimal startChance;
+	private BigDecimal maxChance;
 	private Enchant.ProgressionType chanceType;
 	private Enchant.ProgressionType costType;
 	private final EnchantmentConfiguration config;
@@ -68,22 +69,22 @@ public class OriginEnchantBuilder implements EnchantBuilder {
 		return this;
 	}
 
-	public EnchantBuilder setStartCost(double startCost) {
+	public EnchantBuilder setStartCost(BigDecimal startCost) {
 		this.startCost = startCost;
 		return this;
 	}
 
-	public EnchantBuilder setMaxCost(double maxCost) {
+	public EnchantBuilder setMaxCost(BigDecimal maxCost) {
 		this.maxCost = maxCost;
 		return this;
 	}
 
-	public EnchantBuilder setStartChance(double startChance) {
+	public EnchantBuilder setStartChance(BigDecimal startChance) {
 		this.startChance = startChance;
 		return this;
 	}
 
-	public EnchantBuilder setMaxChance(double maxChance) {
+	public EnchantBuilder setMaxChance(BigDecimal maxChance) {
 		this.maxChance = maxChance;
 		return this;
 	}

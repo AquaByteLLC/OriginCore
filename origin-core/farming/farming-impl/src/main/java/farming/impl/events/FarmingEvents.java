@@ -1,68 +1,59 @@
 package farming.impl.events;
 
-import blocks.BlocksAPI;
-import blocks.block.aspects.AspectType;
-import blocks.block.aspects.drop.Dropable;
-import blocks.block.aspects.effect.Effectable;
-import blocks.block.aspects.projection.Projectable;
-import blocks.block.aspects.regeneration.Regenable;
-import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
-import blocks.block.illusions.FakeBlock;
-import blocks.block.illusions.IllusionRegistry;
 import blocks.impl.BlocksPlugin;
-import blocks.impl.anim.entity.BlockEntity;
-import blocks.impl.builder.OriginBlock;
-import blocks.impl.data.account.BlockAccount;
-import blocks.impl.events.AbstractBreakEvent;
-import blocks.impl.events.AbstractRegenEvent;
+import blocks.impl.events.BreakEvent;
+import blocks.impl.events.RegenEvent;
 import commons.events.api.EventRegistry;
 import commons.events.impl.impl.DetachedSubscriber;
-import me.lucko.helper.Schedulers;
-import net.minecraft.world.level.World;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.block.data.Ageable;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftLocation;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class FarmingEvents {
 
-	private static DetachedSubscriber<AbstractRegenEvent> regenEvent;
-	private static DetachedSubscriber<AbstractBreakEvent> breakEvent;
+	private static DetachedSubscriber<RegenEvent> regenEvent;
+	private static DetachedSubscriber<BreakEvent> breakEvent;
 	private static DetachedSubscriber<BlockBreakEvent> blockBreakEvent;
 	private static final BlocksPlugin plugin = BlocksPlugin.get().getInstance(BlocksPlugin.class);
 
 	public static void init(EventRegistry registry) {
-		initBreak();
-		initRegen();
-		initBlockBreak();
+		//initBreak();
+		//initRegen();
+		//initBlockBreak();
 
-		breakEvent.bind(registry);
-		regenEvent.bind(registry);
-		blockBreakEvent.bind(registry);
+		//breakEvent.bind(registry);
+		//regenEvent.bind(registry);
+		//blockBreakEvent.bind(registry);
 	}
 
+	/*
 	private static void initBlockBreak() {
 		blockBreakEvent = new DetachedSubscriber<>(BlockBreakEvent.class, (context, event) -> {
 			final Block block = event.getBlock();
 			final BlockData blockData = event.getBlock().getBlockData();
+			final Player player = event.getPlayer();
+			final BlockAccount account = BlocksPlugin.get().getInstance(BlocksPlugin.class).getAccountStorage().getAccount(player);
+			final RegenerationRegistry regenerationRegistry = account.getRegenerationRegistry();
 
 			if (blockData instanceof Ageable ageable) {
 				if (BlocksAPI.inRegion(block.getLocation())) {
+					if (regenerationRegistry.getRegenerations().containsKey(CraftLocation.toBlockPosition(block.getLocation()))) {
+						event.setCancelled(true);
+						return;
+					}
 					if (ageable.getAge() == ageable.getMaximumAge()) {
-						new AbstractBreakEvent(block, event.getPlayer()).callEvent();
+						new BreakEvent("farming", block, event.getPlayer(), false).callEvent();
+						final Position position = Position.of(block.getLocation().clone().set(block.getX(), block.getY() + 1, block.getZ()));
+						final float xIncrementation = MathUtils.random(-3.5f, 3.5f);
+						final float yIncrementation = 2.7f;
+						final float zIncrementation = MathUtils.random(-3.5f, 3.5f);
+
+						
+						final InterpolatedHologram hologram = new InterpolatedHologram(block, position,
+								"TESTING!");
+
+						hologram.create(player, 27, 20, xIncrementation, yIncrementation, zIncrementation, true, true, true, InterpolationType.circle);
+						System.out.println(new PlayerVersionProtocol(player.getUniqueId()).getPlayerVersion());
+
 						event.setCancelled(true);
 					}
 				}
@@ -71,23 +62,13 @@ public class FarmingEvents {
 	}
 
 	private static void initBreak() {
-		breakEvent = new DetachedSubscriber<>(AbstractBreakEvent.class, (context, event) -> {
+		breakEvent = new DetachedSubscriber<>(BreakEvent.class, (context, event) -> {
+			if (!event.getCalling().equals("farming")) return;
 			Player player = event.getPlayer();
 			Block block = event.getBlock();
 
 			final BlockAccount account = plugin.getAccounts().getAccount(player);
 			if (account == null) return;
-
-			final RegenerationRegistry regenerationRegistry = account.getRegenerationRegistry();
-			if (regenerationRegistry.getRegenerations().containsKey(CraftLocation.toBlockPosition(block.getLocation())))
-				return;
-
-			final List<ItemStack> clonedDrops = new ArrayList<>(block.getDrops());
-			if (clonedDrops.isEmpty()) {
-				return;
-			}
-
-			block.getDrops().clear();
 
 			final World nmsWorld = ((CraftWorld) block.getWorld()).getHandle();
 			final OriginBlock originBlock = (OriginBlock) BlocksAPI.getBlock(block.getLocation());
@@ -98,17 +79,9 @@ public class FarmingEvents {
 			Dropable dropable = (Dropable) originBlock.getAspects().get(AspectType.DROPABLE);
 			Projectable projectable = (Projectable) originBlock.getAspects().get(AspectType.PROJECTABLE);
 
-			if (effectable != null) {
-				effectable.getEffects().forEach(effect ->
-						effect.getEffectType().handleEffect(player, block.getLocation()));
-			}
-
-			if (dropable != null) {
-				dropable.getDrops().forEach(drop -> {
-					// TODO: ITEM BACKPACKS?????
-					new BlockEntity(player, nmsWorld, block, drop);
-				});
-			}
+			final RegenerationRegistry regenerationRegistry = account.getRegenerationRegistry();
+			if (regenerationRegistry.getRegenerations().containsKey(CraftLocation.toBlockPosition(block.getLocation())))
+				return;
 
 			FakeBlock fake = projectable.toFakeBlock(originBlock.getBlockLocation());
 			Regenable regenable = (Regenable) originBlock.getAspects().get(AspectType.REGENABLE);
@@ -119,12 +92,46 @@ public class FarmingEvents {
 
 			final long endTime = (long) (System.currentTimeMillis() + regenable.getRegenTime() * 1000);
 			regenerationRegistry.createRegen(regenable, block);
-			new AbstractRegenEvent(regenable, player, block, endTime).callEvent();
+			new RegenEvent("farming", regenable, player, block, endTime).callEvent();
+
+			final List<ItemStack> clonedDrops = new ArrayList<>(block.getDrops());
+			if (clonedDrops.isEmpty()) {
+				return;
+			}
+
+			block.getDrops().clear();
+
+			if (!event.isCalledFromEnchant()) {
+				if (effectable != null) {
+					effectable.getEffects().forEach(effect -> {
+						if (effect.getEffectType() instanceof OriginParticle) {
+							if (FarmingSettings.CUSTOM_BLOCK_PARTICLES.isEnabled(player)) {
+								System.out.println("ENABLED");
+								effect.getEffectType().handleEffect(player, block.getLocation());
+							}
+						}
+						if (effect.getEffectType() instanceof OriginSound) {
+							if (FarmingSettings.CUSTOM_BLOCK_SOUNDS.isEnabled(player)) {
+								System.out.println("ENABLED");
+								effect.getEffectType().handleEffect(player, block.getLocation());
+							}
+						}
+					});
+				}
+			}
+
+			if (dropable != null) {
+				dropable.getDrops().forEach(drop -> {
+					// TODO: ITEM BACKPACKS?????
+					new BlockEntity(player, nmsWorld, block, drop, true);
+				});
+			}
 		});
 	}
 
 	private static void initRegen() {
-		regenEvent = new DetachedSubscriber<>(AbstractRegenEvent.class, ((context, event) -> {
+		regenEvent = new DetachedSubscriber<>(RegenEvent.class, ((context, event) -> {
+			if (!event.getCalling().equals("farming")) return;
 
 			final BlockAccount account = plugin.getAccounts().getAccount(event.getPlayer());
 			if (account == null) return;
@@ -166,4 +173,6 @@ public class FarmingEvents {
 			}, 0, 5);
 		}));
 	}
+
+	 */
 }
