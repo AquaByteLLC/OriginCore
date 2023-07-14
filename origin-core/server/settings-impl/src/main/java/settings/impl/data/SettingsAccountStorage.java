@@ -51,6 +51,7 @@ public class SettingsAccountStorage extends ORMLiteAccountStorage<SettingsAccoun
 		account.init();
 		if (account.serialized != null && account.serialized.length > 0)
 			for (String s : new String(Base64.getDecoder().decode(account.serialized), StandardCharsets.UTF_8).split(String.valueOf(DELIM))) {
+				if(s.isBlank()) continue;
 				GlobalKey key   = GKey.of(s);
 				GlobalKey sec   = null;
 				String[]  parts = key.parts();
@@ -60,6 +61,8 @@ public class SettingsAccountStorage extends ORMLiteAccountStorage<SettingsAccoun
 					i++;
 					if (SECTION.full().equals(part))
 						break;
+					if(part.isBlank())
+						continue;
 
 					if (sec == null)
 						sec = GKey.of(part);
@@ -76,6 +79,8 @@ public class SettingsAccountStorage extends ORMLiteAccountStorage<SettingsAccoun
 				GlobalKey set = null;
 				for (; i < parts.length; i++) {
 					String part = parts[i];
+					if(part.isBlank())
+						continue;
 					if (set == null)
 						set = GKey.of(part);
 					else

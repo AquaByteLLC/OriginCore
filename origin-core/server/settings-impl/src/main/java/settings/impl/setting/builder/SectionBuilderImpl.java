@@ -52,11 +52,13 @@ public class SectionBuilderImpl implements SectionBuilder {
 
 		if(menuItem == null)
 			menuItem = ItemBuilder.create(Material.STONE).build();
-		if(name == null)
+		if(name == null || name.isBlank())
 			name = menuItem.getItemMeta().getDisplayName();
-		if(description == null)
+		if(description == null || description.isEmpty() || description.stream().allMatch(String::isBlank))
 			description = menuItem.getLore();
 
+		if(name.isBlank())
+			throw new IllegalStateException("Can't build section because no name was provided.");
 
 		SettingSection section = new MenuSection(GKey.convert(name), name, menuItem, description);
 		inital.forEach(section::createSetting);
