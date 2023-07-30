@@ -1,7 +1,7 @@
 package farming.impl.action;
 
 import farming.impl.FarmingPlugin;
-import farming.impl.conf.EffectsConfig;
+import farming.impl.conf.GeneralConfig;
 import lombok.Getter;
 import me.vadim.util.conf.bukkit.wrapper.EffectGroup;
 import me.vadim.util.conf.bukkit.wrapper.EffectParticle;
@@ -24,7 +24,7 @@ public enum FarmingActions {
 	;
 
 	@Getter private final EffectGroup group;
-	private final YamlConfiguration lfc = FarmingPlugin.lfc.open(EffectsConfig.class).getConfiguration();
+	private final YamlConfiguration lfc = FarmingPlugin.lfc.open(GeneralConfig.class).getConfiguration();
 	private final static String SOUND_PATH = "effects.sound.";
 	private static final String PARTICLE_PATH = "effects.particle.";
 

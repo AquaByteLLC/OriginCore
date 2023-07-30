@@ -15,10 +15,8 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import farming.impl.Messages;
-import farming.impl.conf.MessagesConfig;
-import me.lucko.helper.text3.Text;
-import me.vadim.util.conf.LiteConfig;
+import commons.versioning.VersionSender;
+import farming.impl.action.Messages;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.entity.Player;
@@ -28,14 +26,12 @@ public class RegionCommands extends BaseCommand {
 
 	private final BlockRegistry registry;
 	private final RegionRegistry regionRegistry;
-	private final MessagesConfig messagesConfig;
-	private final LiteConfig liteConfig;
+	private final VersionSender sender;
 
-	public RegionCommands(LiteConfig liteConfig, BlockRegistry registry, RegionRegistry regionRegistry) {
+	public RegionCommands(BlockRegistry registry, RegionRegistry regionRegistry) {
 		this.registry = registry;
-		this.liteConfig = liteConfig;
-		this.messagesConfig = liteConfig.open(MessagesConfig.class);
 		this.regionRegistry = regionRegistry;
+		this.sender = Messages.versionSender;
 	}
 
 	@Subcommand("region register")
@@ -48,7 +44,7 @@ public class RegionCommands extends BaseCommand {
 				.build();
 
 		if (!registry.getBlocks().containsKey(blockName)) {
-			player.sendMessage(messagesConfig.getBlockNotFound().format(pl));
+			sender.sendMessage(player, Messages.BLOCK_NOT_FOUND, pl);
 			return;
 		}
 
@@ -57,14 +53,13 @@ public class RegionCommands extends BaseCommand {
 		final RegionManager regionManager = regionContainer.get(world);
 
 		if (!regionManager.getRegions().containsKey(regionName)) {
-			player.sendMessage(messagesConfig.getNoWgRegion().format(pl));
+			sender.sendMessage(player, Messages.WG_REGION_NOT_FOUND, pl);
 			return;
 		}
 
 		OriginRegion region = new OriginRegion(regionName, blockName, player.getWorld());
+		sender.sendMessage(player, Messages.REGION_REGISTER, pl);
 		region.newInstance(regionRegistry);
-		player.sendMessage(messagesConfig.getRegionRegister().format(pl));
-		Text.sendMessage(player, Messages.ORIGIN_REGION_ADDED);
 	}
 
 	@Subcommand("region unregister")
@@ -81,16 +76,16 @@ public class RegionCommands extends BaseCommand {
 				.build();
 
 		if (!regionManager.getRegions().containsKey(regionName)) {
-			player.sendMessage(messagesConfig.getNoWgRegion().format(pl));
+			sender.sendMessage(player, Messages.WG_REGION_NOT_FOUND, pl);
 			return;
 		}
 
 		if (!regionRegistry.getRegions().containsKey(regionName)) {
-			player.sendMessage(messagesConfig.getRegionNotRegistered().format(pl));
+			sender.sendMessage(player, Messages.REGION_NOT_REGISTERED, pl);
 			return;
 		}
 
 		OriginRegion region = regionRegistry.getRegions().get(regionName).getRegion();
-		player.sendMessage(messagesConfig.getRegionRemove().format(pl));
+		sender.sendMessage(player, Messages.REGION_REMOVE, pl);
 	}
 }

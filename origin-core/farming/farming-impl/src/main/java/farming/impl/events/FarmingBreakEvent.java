@@ -24,12 +24,13 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftLocation;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FarmingBreakEvent {
+public class FarmingBreakEvent implements Listener {
 
 	private final EventRegistry eventRegistry;
 	private final BlocksPlugin plugin;
@@ -41,7 +42,7 @@ public class FarmingBreakEvent {
 	}
 
 	@Subscribe
-	public void farmingBreakEvent(BreakEvent event) {
+	void farmingBreakEvent(BreakEvent event) {
 		if (!event.getCalling().equals("farming")) return;
 		Player player = event.getPlayer();
 		Block block = event.getBlock();

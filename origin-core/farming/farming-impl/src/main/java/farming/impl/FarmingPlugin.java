@@ -14,21 +14,22 @@ import commons.OriginModule;
 import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
 import enchants.impl.EnchantPlugin;
+import farming.impl.action.Messages;
 import farming.impl.commands.RegionCommands;
 import farming.impl.conf.BlocksConfig;
-import farming.impl.conf.EffectsConfig;
 import farming.impl.conf.GeneralConfig;
-import farming.impl.conf.MessagesConfig;
 import farming.impl.enchants.EnchantTypes;
 import farming.impl.events.CropBreakEvent;
 import farming.impl.events.FarmingBreakEvent;
 import farming.impl.events.RegenEvent;
+import lombok.Getter;
 import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,7 +37,7 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 
 	public static final ExecutorService pool = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("[EnchantPool]").build());
 
-	private static Injector injector;
+	@Getter private static Injector injector;
 	private BlocksAPI blocksAPI;
 	private BlocksPlugin blocksPlugin;
 	public static LiteConfig lfc;
@@ -60,9 +61,6 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 		lfc = new LiteConfig(this);
 		lfc.register(GeneralConfig.class, GeneralConfig::new);
 		lfc.register(BlocksConfig.class, BlocksConfig::new);
-		lfc.register(EffectsConfig.class, EffectsConfig::new);
-		lfc.register(MessagesConfig.class, MessagesConfig::new);
-
 		lfc.reload();
 
 		Commons.commons().registerModule(this);
@@ -75,9 +73,11 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 		EnchantPlugin enchantPlugin = EnchantPlugin.get().getInstance(EnchantPlugin.class);
 
 		EnchantTypes.init(enchantPlugin.getRegistry(), enchantPlugin.getFactory());
+		Messages.init();
+
 		//FarmingEvents.init(eventRegistry);
 
-	//	FarmingSettings.init(this);
+		//FarmingSettings.init(this);
 		setupEvents(eventRegistry);
 		setupCommands();
 		setupBlocksYml();
@@ -85,6 +85,20 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 
 	@Override
 	public void onDisable() {
+		try {
+			save();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void afterReload() throws Exception {
+		OriginModule.super.afterReload();
+		Messages.init();
+	}
+
+	void save() throws IOException {
 		lfc.open(BlocksConfig.class).save();
 
 		Bukkit.getOnlinePlayers().forEach(player ->
@@ -93,11 +107,12 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 								.getAccount(player)
 								.getRegenerationRegistry()
 								.getRegenerations()));
+
 	}
 
 	private void setupCommands() {
 		PaperCommandManager commands = new PaperCommandManager(this);
-		commands.registerCommand(new RegionCommands(lfc, blocksAPI.getBlockRegistry(), blocksAPI.getRegionRegistry()));
+		commands.registerCommand(new RegionCommands(blocksAPI.getBlockRegistry(), blocksAPI.getRegionRegistry()));
 	}
 
 	private void setupEvents(EventRegistry registry) {
@@ -211,18 +226,18 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 	 */
 
 	protected static class FarmingModule extends AbstractModule {
-		private final JavaPlugin plugin;
+		private final FarmingPlugin plugin;
 		private final LiteConfig lfc;
 		private final BlocksAPI blocksAPI;
 
-		FarmingModule(JavaPlugin plugin, LiteConfig lfc, BlocksAPI blocksAPI) {
+		FarmingModule(FarmingPlugin plugin, LiteConfig lfc, BlocksAPI blocksAPI) {
 			this.plugin = plugin;
 			this.lfc = lfc;
 			this.blocksAPI = blocksAPI;
 		}
 
 		protected void configure() {
-			this.bind(JavaPlugin.class).toInstance(plugin);
+			this.bind(FarmingPlugin.class).toInstance(plugin);
 			this.bind(LiteConfig.class).toInstance(lfc);
 			this.bind(BlocksAPI.class).toInstance(blocksAPI);
 		}

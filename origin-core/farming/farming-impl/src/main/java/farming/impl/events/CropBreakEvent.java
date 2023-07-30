@@ -17,9 +17,10 @@ import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_19_R3.util.CraftLocation;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class CropBreakEvent {
+public class CropBreakEvent implements Listener {
 
 	private final EventRegistry eventRegistry;
 	private final BlocksPlugin plugin;
@@ -31,7 +32,7 @@ public class CropBreakEvent {
 	}
 
 	@Subscribe
-	public void cropBreakEvent(BlockBreakEvent event) {
+	void cropBreakEvent(BlockBreakEvent event) {
 		final Block block = event.getBlock();
 		final BlockData blockData = event.getBlock().getBlockData();
 		final Player player = event.getPlayer();
@@ -50,7 +51,6 @@ public class CropBreakEvent {
 					final float xIncrementation = MathUtils.random(-3.5f, 3.5f);
 					final float yIncrementation = 2.7f;
 					final float zIncrementation = MathUtils.random(-3.5f, 3.5f);
-
 
 					final InterpolatedHologram hologram = new InterpolatedHologram(block, position,
 							StringPlaceholder.of("{test}", String.valueOf(zIncrementation)),"zIncr: {test}");

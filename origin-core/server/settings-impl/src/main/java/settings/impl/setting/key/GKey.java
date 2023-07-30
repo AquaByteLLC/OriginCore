@@ -58,7 +58,7 @@ public class GKey implements GlobalKey {
 		illegal = StringUtil.stripColor(illegal);
 		System.out.println(illegal + " : First");
 		illegal = illegal.toLowerCase().replace(' ', '_');
-		System.out.println(illegal + " : Second");
+		System.out.println(illegal +  " : Second");
 		illegal = ILLEGAL.matcher(illegal).replaceAll("");
 		System.out.println(illegal + " : Third");
 		if(illegal.isBlank())

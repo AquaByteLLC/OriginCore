@@ -3,6 +3,7 @@ package commons.impl.data.account;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import commons.Commons;
 import commons.data.account.impl.AbstractAccount;
 import commons.econ.BankAccount;
 import commons.econ.Currency;
@@ -10,11 +11,16 @@ import commons.econ.Transaction;
 import commons.econ.TransactionResponse;
 import commons.econ.impl.Txn;
 import commons.impl.econ.OriginCurrency;
+import commons.levels.Level;
+import commons.levels.event.ExperienceGainEvent;
+import commons.levels.event.LevelUpEvent;
+import commons.levels.registry.impl.LevelRegistry;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -31,8 +37,14 @@ public class PlayerDefaultAccount extends AbstractAccount implements BankAccount
 		super(uuid);
 	}
 
-	@DatabaseField double currency;
-	@DatabaseField double token;
+	@DatabaseField
+	double currency;
+	@DatabaseField
+	int level;
+	@DatabaseField
+	double experience;
+	@DatabaseField
+	double token;
 
 	final ReadWriteLock cL = new ReentrantReadWriteLock();
 
@@ -40,6 +52,39 @@ public class PlayerDefaultAccount extends AbstractAccount implements BankAccount
 		if (!(currency instanceof OriginCurrency o))
 			throw new IllegalArgumentException("incompatible currency " + currency);
 		return o;
+	}
+
+	public void addExperience(BigDecimal value) {
+		final LevelRegistry levelRegistry = Commons.commons().levelRegistry;
+		if (level > levelRegistry.getLevels().size()) return;
+
+		experience += value.doubleValue();
+
+		new ExperienceGainEvent("commons", getOfflineOwner().getPlayer(), value.doubleValue(), false).callEvent();
+	}
+
+	public void addLevel(BigInteger value) {
+
+		final LevelRegistry levelRegistry = Commons.commons().levelRegistry;
+
+		if ((level + value.intValueExact()) > levelRegistry.getLevels().size()) return;
+
+		level += value.intValue();
+
+		final Level lev = levelRegistry.getLevels().get(getLevel().intValueExact() - 1);
+
+		experience -= lev.getRequiredExperience();
+		if (experience < 0) experience = 0;
+
+		new LevelUpEvent("commons", getOfflineOwner().getPlayer(), level, false).callEvent();
+	}
+
+	public @Nullable BigInteger getLevel() {
+		return BigInteger.valueOf(level);
+	}
+
+	public @Nullable BigDecimal getExperience() {
+		return BigDecimal.valueOf(experience);
 	}
 
 	@Override

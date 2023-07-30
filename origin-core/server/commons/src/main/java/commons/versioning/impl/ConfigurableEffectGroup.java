@@ -8,21 +8,31 @@ import me.vadim.util.conf.bukkit.wrapper.EffectSound;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.io.IOException;
 
 public class ConfigurableEffectGroup implements EffectGroupVersioned {
 	private final VersionSender sender;
 	private final String effectKey;
-	private final YamlConfiguration cfg;
+	private final FileConfiguration cfg;
 	private final EffectGroup legacy;
 	private final EffectGroup nonLegacy;
 
-	public ConfigurableEffectGroup(VersionSender sender, String effectKey) {
+	public ConfigurableEffectGroup(VersionSender sender,
+	                               String effectKey,
+	                               EffectSound soundEffectLegacy,
+	                               EffectSound soundEffectNonLegacy,
+	                               EffectParticle particleEffectLegacy,
+	                               EffectParticle particleEffectNonLegacy) {
 		this.sender = sender;
 		this.effectKey = effectKey;
 		this.cfg = sender.cfg();
 
-		EffectGroupPaths.createSectionsAndCreateKey(effectKey, cfg);
+		EffectGroupPaths.createSectionsAndCreateKey(sender, effectKey, cfg, soundEffectLegacy,
+				soundEffectNonLegacy,
+				particleEffectLegacy,
+				particleEffectNonLegacy);
 
 		this.legacy = createGroup(true);
 		this.nonLegacy = createGroup(false);
@@ -33,12 +43,12 @@ public class ConfigurableEffectGroup implements EffectGroupVersioned {
 
 
 	@Override
-	public EffectGroup getLegacy() {
+	public EffectGroup legacy() {
 		return this.legacy;
 	}
 
 	@Override
-	public EffectGroup getNonLegacy() {
+	public EffectGroup nonLegacy() {
 		return this.nonLegacy;
 	}
 
@@ -83,7 +93,7 @@ public class ConfigurableEffectGroup implements EffectGroupVersioned {
 			return section.isConfigurationSection(path) ? section.getConfigurationSection(path) : section.createSection(path);
 		}
 
-		static void createSectionsAndCreateKey(String key, YamlConfiguration configuration) {
+		static void createSectionsAndCreateKey(VersionSender sender, String key, FileConfiguration configuration, EffectSound soundEffectLegacy, EffectSound soundEffectNonLegacy, EffectParticle particleEffectLegacy, EffectParticle particleEffectNonLegacy) {
 			final String particleSectionLegacy = getAndReplace(particlesSectionLegacy, key);
 			final String particleSectionNonLegacy = getAndReplace(particlesSectionNonLegacy, key);
 
@@ -117,20 +127,26 @@ public class ConfigurableEffectGroup implements EffectGroupVersioned {
 			assert particlesSectionLegacyCfg != null;
 			assert particlesSectionNonLegacyCfg != null;
 
-			soundsSectionLegacyCfg.set(getAsRelative(soundTypeLegacy), "ENTITY_PLAYER_LEVELUP");
-			soundsSectionNonLegacyCfg.set(getAsRelative(soundTypeNonLegacy), "ENTITY_PLAYER_LEVELUP");
+			soundsSectionLegacyCfg.set(getAsRelative(soundTypeLegacy), soundEffectLegacy.sound.toString());
+			soundsSectionNonLegacyCfg.set(getAsRelative(soundTypeNonLegacy), soundEffectNonLegacy.sound.toString());
 
-			soundsSectionLegacyCfg.set(getAsRelative(volumeLegacy), 1.0);
-			soundsSectionNonLegacyCfg.set(getAsRelative(volumeNonLegacy), 1.0);
+			soundsSectionLegacyCfg.set(getAsRelative(volumeLegacy), soundEffectLegacy.volume);
+			soundsSectionNonLegacyCfg.set(getAsRelative(volumeNonLegacy), soundEffectNonLegacy.volume);
 
-			soundsSectionLegacyCfg.set(getAsRelative(pitchLegacy), 1.0);
-			soundsSectionNonLegacyCfg.set(getAsRelative(pitchNonLegacy), 1.0);
+			soundsSectionLegacyCfg.set(getAsRelative(pitchLegacy), soundEffectLegacy.pitch);
+			soundsSectionNonLegacyCfg.set(getAsRelative(pitchNonLegacy), soundEffectNonLegacy.pitch);
 
-			particlesSectionLegacyCfg.set(getAsRelative(particleTypeLegacy), "DRAGON_BREATH");
-			particlesSectionNonLegacyCfg.set(getAsRelative(particleTypeNonLegacy), "DRAGON_BREATH");
+			particlesSectionLegacyCfg.set(getAsRelative(particleTypeLegacy), particleEffectLegacy.particle.toString());
+			particlesSectionNonLegacyCfg.set(getAsRelative(particleTypeNonLegacy), particleEffectNonLegacy.particle.toString());
 
-			particlesSectionLegacyCfg.set(getAsRelative(particleCountLegacy), 10);
-			particlesSectionNonLegacyCfg.set(getAsRelative(particleCountNonLegacy), 10);
+			particlesSectionLegacyCfg.set(getAsRelative(particleCountLegacy), particleEffectLegacy.count);
+			particlesSectionNonLegacyCfg.set(getAsRelative(particleCountNonLegacy), particleEffectNonLegacy.count);
+
+			try {
+				configuration.save(sender.file());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 

@@ -19,6 +19,11 @@ import commons.impl.data.account.PlayerDefaultAccount;
 import commons.impl.data.account.PlayerDefaultAccountStorage;
 import commons.impl.data.account.ServerAccount;
 import commons.impl.data.sql.LocationPersister;
+import commons.levels.conf.LevelsYml;
+import commons.levels.conf.action.LevelEffects;
+import commons.levels.conf.action.LevelMessages;
+import commons.levels.event.impl.LevelEvents;
+import commons.levels.registry.impl.LevelRegistry;
 import commons.sched.SchedulerManager;
 import commons.sched.impl.Scheduler4Plugin;
 import commons.util.StringUtil;
@@ -73,6 +78,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 	};
 
 	private final LiteConfig lfc = new LiteConfig(rp);
+	public LevelRegistry levelRegistry;
 
 	public static CommonsPlugin commons() {
 		if (instance == null)
@@ -153,6 +159,13 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 		modules.put(StringUtil.formatModuleName(module), module);
 	}
 
+	@Override
+	public void afterReload() throws Exception {
+		OriginModule.super.afterReload();
+		LevelMessages.init();
+		LevelEffects.init();
+	}
+
 	private BukkitTask autosave;
 
 	private void autosave() {
@@ -214,11 +227,17 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 		getLogger().info("(enable) commons plugin hello");
 
 		lfc.register(CommonsConfig.class, CommonsConfig::new);
+		lfc.register(LevelsYml.class, LevelsYml::new);
 		lfc.reload();
+
+		LevelMessages.init();
+		LevelEffects.init();
 
 		accounts = new PlayerDefaultAccountStorage(getDatabase());
 
 		events = new PluginEventWrapper(this);
+		levelRegistry = new LevelRegistry(lfc.open(LevelsYml.class));
+
 		events.enable();
 
 		scheduler = new Scheduler4Plugin(this);
@@ -235,6 +254,9 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 		commands.getCommandCompletions().registerCompletion("modules", c -> new ArrayList<>(modules.keySet()));
 
 		getEventRegistry().subscribeAll(this);
+
+		new LevelEvents(lfc).init();
+
 		registerModule(this);
 	}
 

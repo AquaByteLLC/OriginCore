@@ -7,4 +7,3 @@ depend:
   - enchants-impl
   - blocks-impl
   - commons
-  - settings-impl

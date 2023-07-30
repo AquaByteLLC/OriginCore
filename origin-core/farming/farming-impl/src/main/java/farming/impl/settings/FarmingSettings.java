@@ -65,7 +65,7 @@ public enum FarmingSettings implements EnumeratedSetting {
 			builder.addSetting(value.setting);
 
 		builder.setMenuItem(Commons.config().getFarmingSettingsIcon());
-
+		builder.setName("farming");
 		section = builder.build();
 	}
 

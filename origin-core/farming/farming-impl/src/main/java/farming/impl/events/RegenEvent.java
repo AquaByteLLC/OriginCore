@@ -15,10 +15,11 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RegenEvent {
+public class RegenEvent implements Listener {
 
 	private final EventRegistry eventRegistry;
 	private final BlocksPlugin plugin;
@@ -30,7 +31,7 @@ public class RegenEvent {
 	}
 
 	@Subscribe
-	public void regenEvent(blocks.impl.events.RegenEvent event) {
+	void regenEvent(blocks.impl.events.RegenEvent event) {
 		if (!event.getCalling().equals("farming")) return;
 
 		final BlockAccount account = plugin.getAccounts().getAccount(event.getPlayer());

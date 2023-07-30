@@ -1,0 +1,94 @@
+legacy:
+  locked_Level:
+    type: RED_DYE
+    name: "&4&l[&c&l!&4&l] #ff5555&lL#f84e4e&lo#f14747&lc#ea4040&lk#e33939&le#dc3232&ld #d52b2b&lU#cd2323&lp#c61c1c&lg#bf1515&lr#b80e0e&la#b10707&ld#aa0000&le &7(None)"
+    lore:
+      - "&8Locked Item"
+      - "&7"
+      - ' &4| &cInformation'
+      - " &4| &7Prefix: {prefix}"
+      - " &4| &7Level: &c{level}/{max_level}"
+      - " &2| &aReward(s)"
+      - " &2| &7{rewards}"
+      - "&7"
+  unlocked_level:
+    type: LIME_DYE
+    name: "&2&l[&a&l!&2&l] #55ff55&lP#4ff94f&lu#4af44a&lr#44ee44&lc#3ee83e&lh#39e339&la#33dd33&ls#2dd72d&le#28d228&ld #22cc22&lU#1cc61c&lp#17c117&lg#11bb11&lr#0bb50b&la#06b006&ld#00aa00&le &7(Hooray!)"
+    lore:
+      - "&8Unlocked Item"
+      - "&7"
+      - ' &4| &cInformation'
+      - " &4| &7Prefix: {prefix}"
+      - " &4| &7Level: &c{level}/{max_level}"
+      - " &2| &aReward(s)"
+      - " &2| &7{rewards}"
+      - "&7"
+  next_level:
+    type: YELLOW_DYE
+    name: "&6&l[&e&l!&6&l] #ffff55&l+#fff84e&l1 #fff248&lP#ffeb41&ll#ffe53b&la#ffde34&ly#ffd82e&le#ffd127&lr #ffcb21&lL#ffc41a&le#ffbe14&lv#ffb70d&le#ffb107&ll#ffaa00&ls &7(Right-Click)"
+    lore:
+      - "&8Next Item"
+      - "&7"
+      - ' &4| &cInformation'
+      - " &4| &7Prefix: {prefix}"
+      - " &4| &7Level: &c{level}/{max_level}"
+      - " &2| &aReward(s)"
+      - " &2| &7{rewards}"
+      - "&7"
+nonlegacy:
+  locked_Level:
+    type: RED_DYE
+    name: "&4&l[&c&l!&4&l] #ff5555&lL#f84e4e&lo#f14747&lc#ea4040&lk#e33939&le#dc3232&ld #d52b2b&lU#cd2323&lp#c61c1c&lg#bf1515&lr#b80e0e&la#b10707&ld#aa0000&le &7(None)"
+    lore:
+      - "&8Locked Item"
+      - "&7"
+      - ' &4| &cInformation'
+      - " &4| &7Prefix: {prefix}"
+      - " &4| &7Level: &c{level}/{max_level}"
+      - " &2| &aReward(s)"
+      - " &2| &7{rewards}"
+      - "&7"
+  unlocked_level:
+    type: LIME_DYE
+    name: "&2&l[&a&l!&2&l] #55ff55&lP#4ff94f&lu#4af44a&lr#44ee44&lc#3ee83e&lh#39e339&la#33dd33&ls#2dd72d&le#28d228&ld #22cc22&lU#1cc61c&lp#17c117&lg#11bb11&lr#0bb50b&la#06b006&ld#00aa00&le &7(Hooray!)"
+    lore:
+      - "&8Unlocked Item"
+      - "&7"
+      - ' &4| &cInformation'
+      - " &4| &7Prefix: {prefix}"
+      - " &4| &7Level: &c{level}/{max_level}"
+      - " &2| &aReward(s)"
+      - " &2| &7{rewards}"
+      - "&7"
+  next_level:
+    type: YELLOW_DYE
+    name: "&6&l[&e&l!&6&l] #ffff55&l+#fff84e&l1 #fff248&lP#ffeb41&ll#ffe53b&la#ffde34&ly#ffd82e&le#ffd127&lr #ffcb21&lL#ffc41a&le#ffbe14&lv#ffb70d&le#ffb107&ll#ffaa00&ls &7(Right-Click)"
+    lore:
+      - "&8Next Item"
+      - "&7"
+      - ' &4| &cInformation'
+      - " &4| &7Prefix: {prefix}"
+      - " &4| &7Level: &c{level}/{max_level}"
+      - " &2| &aReward(s)"
+      - " &2| &7{rewards}"
+      - "&7"
+
+levels:
+  1:
+    experience: 4
+    rewards:
+      name:
+        - "&eReward is __"
+        - "&eReward is __ 12"
+      count: 1
+      commands:
+        - ""
+  2:
+    experience: 8
+    rewards:
+      name:
+        - "&eReward is __ 123"
+        - "&eReward is __ 132"
+      count: 1
+      commands:
+        - ""

@@ -6,6 +6,7 @@ package commons.cmd;
 final class Prefix {
 
 	static final String ECON = "&r&7[&l&6econ&r&7]&r ";
+	static final String LEVELS = "&r&7[&l&dlevels&r&7]&r ";
 	static final String MODULES = "&r&7[&l&dmodules&r&7]&r ";
 	static final String ERR = "&4[&c!&4]&r ";
 
