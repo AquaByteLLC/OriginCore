@@ -49,6 +49,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import static commons.hologram.InterpolatedHologram.disposeSafely;
+
 /**
  * @author vadim
  */
@@ -239,6 +241,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 		levelRegistry = new LevelRegistry(lfc.open(LevelsYml.class));
 
 		events.enable();
+		disposeSafely();
 
 		scheduler = new Scheduler4Plugin(this);
 		storage   = new AccountStorageHandler(modules, scheduler, getEventRegistry(), rp);

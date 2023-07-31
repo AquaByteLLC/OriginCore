@@ -13,10 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InterpolatedHologram {
@@ -26,26 +23,48 @@ public class InterpolatedHologram {
 	private final String text;
 	private final Block block;
 	private final HashMap<Position, String> positionMap;
+	private static final Set<Hologram> hologramSet = new HashSet<>();
 
 	public InterpolatedHologram(Block block, Position startPosition, Placeholder placeholder, String... text) {
 		this.startPosition = startPosition;
 		this.block = block;
 		this.positionMap = new HashMap<>();
 
-		this.text = placeholder.format(Arrays.toString(text));
+		StringBuilder stringBuilder = new StringBuilder();
+
+		for (String s : text) stringBuilder.append("%s".formatted(s));
+
+		this.text = placeholder.format(stringBuilder.toString());
 
 		positionMap.put(startPosition, String.valueOf(UUID.randomUUID()));
+	}
+
+	public static void disposeSafely() {
+		Schedulers.bukkit().runTaskTimerAsynchronously(CommonsPlugin.commons(), ($) -> {
+			if (hologramSet.isEmpty()) return;
+			for (Hologram hologram : hologramSet) {
+				if (hologram != null) {
+					try {
+						hologram.delete();
+					} catch (Exception e) {
+						throw new RuntimeException("Hologram doesn't exist!");
+					}
+				}
+
+			}
+		}, 0, 200);
 	}
 
 	public void create(Player player, float lifeSpan, float moveTicks, float xIncr, float yIncr, float zIncr, boolean interpolateX, boolean interpolateY, boolean interpolateZ, InterpolationType interpolation) {
 		this.hologram = DHAPI.createHologram(positionMap.get(startPosition),
 				startPosition.toLocation(),
-				Collections.singletonList(text));
+				Collections.singletonList(this.text));
 
 		final AtomicInteger timeLived = new AtomicInteger();
 
 		hologram.setDefaultVisibleState(false);
 		hologram.setShowPlayer(player);
+		hologramSet.add(hologram);
 
 		Schedulers.bukkit().runTaskTimerAsynchronously(CommonsPlugin.commons(), ($) -> {
 

@@ -56,7 +56,7 @@ public enum EnchantTypes implements EnchantKey {
 						new ExplosiveEntity(((CraftWorld) player.getWorld()).getHandle(), player, block, entity -> {
 							Schedulers.bukkit().runTask(plugin, () -> {
 
-								List<FixedAspectHolder> aspectList = LocationUtil.getBlocks(block, 4);
+								List<FixedAspectHolder> aspectList = LocationUtil.getBlocks(block, 100);
 								aspectList.forEach(holder -> {
 									if (holder.getBlock().getBlockData() instanceof Ageable ageable) {
 										if (BlocksAPI.inRegion(block.getLocation())) {

@@ -19,9 +19,7 @@ import farming.impl.commands.RegionCommands;
 import farming.impl.conf.BlocksConfig;
 import farming.impl.conf.GeneralConfig;
 import farming.impl.enchants.EnchantTypes;
-import farming.impl.events.CropBreakEvent;
-import farming.impl.events.FarmingBreakEvent;
-import farming.impl.events.RegenEvent;
+import farming.impl.events.FarmingEvents;
 import lombok.Getter;
 import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
@@ -73,12 +71,11 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 		EnchantPlugin enchantPlugin = EnchantPlugin.get().getInstance(EnchantPlugin.class);
 
 		EnchantTypes.init(enchantPlugin.getRegistry(), enchantPlugin.getFactory());
+		FarmingEvents.init(eventRegistry);
 		Messages.init();
 
-		//FarmingEvents.init(eventRegistry);
-
 		//FarmingSettings.init(this);
-		setupEvents(eventRegistry);
+
 		setupCommands();
 		setupBlocksYml();
 	}
@@ -113,12 +110,6 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 	private void setupCommands() {
 		PaperCommandManager commands = new PaperCommandManager(this);
 		commands.registerCommand(new RegionCommands(blocksAPI.getBlockRegistry(), blocksAPI.getRegionRegistry()));
-	}
-
-	private void setupEvents(EventRegistry registry) {
-		new CropBreakEvent(blocksPlugin, registry);
-		new RegenEvent(blocksPlugin, registry);
-		new FarmingBreakEvent(blocksPlugin, registry);
 	}
 
 	private void setupBlocksYml() {

@@ -3,7 +3,4 @@ version: ${version}
 main: ${main}
 api-version: ${api}
 
-depend:
-  - enchants-impl
-  - blocks-impl
-  - commons
+depend: ${depends}
