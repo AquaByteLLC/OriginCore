@@ -4,6 +4,7 @@ import blocks.BlocksAPI;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.impl.BlocksPlugin;
 import blocks.impl.builder.OriginBlock;
+import blocks.impl.data.region.RegionsStorage;
 import co.aikar.commands.PaperCommandManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
@@ -32,8 +33,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class FarmingPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
-
-	public static final ExecutorService pool = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("[EnchantPool]").build());
 
 	@Getter private static Injector injector;
 	private BlocksAPI blocksAPI;
@@ -104,6 +103,11 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 								.getAccount(player)
 								.getRegenerationRegistry()
 								.getRegenerations()));
+
+	}
+
+	@Override
+	public void onSave() throws Exception {
 
 	}
 

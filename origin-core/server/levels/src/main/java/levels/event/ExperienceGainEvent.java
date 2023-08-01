@@ -1,4 +1,4 @@
-package commons.levels.event;
+package levels.event;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -6,8 +6,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public class LevelUpEvent extends Event {
-	private final int level;
+public class ExperienceGainEvent extends Event {
+	private final double amount;
 	private final Player player;
 	private boolean isCancelled;
 	@Getter
@@ -16,8 +16,8 @@ public class LevelUpEvent extends Event {
 	private static final HandlerList HANDLERS_LIST = new HandlerList();
 	@Getter private final String calling;
 
-	public LevelUpEvent(String calling, Player player, int level, boolean calledFromEnchant) {
-		this.level = level;
+	public ExperienceGainEvent(String calling, Player player, double amount, boolean calledFromEnchant) {
+		this.amount = amount;
 		this.player = player;
 		this.calling = calling;
 		this.calledFromEnchant = calledFromEnchant;
@@ -27,8 +27,8 @@ public class LevelUpEvent extends Event {
 		return player;
 	}
 
-	public int getLevel() {
-		return level;
+	public double getAmount() {
+		return amount;
 	}
 
 	public void setCancelled(boolean cancelled) {

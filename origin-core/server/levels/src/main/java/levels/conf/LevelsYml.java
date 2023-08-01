@@ -1,8 +1,8 @@
-package commons.levels.conf;
+package levels.conf;
 
 import commons.conf.BukkitConfig;
-import commons.levels.Level;
-import commons.levels.reward.LevelReward;
+import levels.Level;
+import levels.reward.LevelReward;
 import me.vadim.util.conf.ResourceProvider;
 import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import org.bukkit.configuration.file.YamlConfiguration;

@@ -1,4 +1,4 @@
-package commons.levels.conf.action;
+package levels.conf.action;
 
 import commons.CommonsPlugin;
 import commons.conf.SettableConfig;

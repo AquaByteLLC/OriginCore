@@ -5,6 +5,7 @@ import blocks.block.regions.registry.RegionRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class RegionRegistryImpl implements RegionRegistry {
 	private final HashMap<String, OriginRegion.RegionInstance> regions;
@@ -24,7 +25,7 @@ public class RegionRegistryImpl implements RegionRegistry {
 	}
 
 	@Override
-	public @NotNull HashMap<String, OriginRegion.RegionInstance> getRegions() {
+	public @NotNull Map<String, OriginRegion.RegionInstance> getRegions() {
 		return this.regions;
 	}
 }

@@ -1,7 +1,7 @@
-package commons.levels.registry;
+package levels.registry;
 
-import commons.levels.Level;
-import commons.levels.conf.LevelsYml;
+import levels.Level;
+import levels.conf.LevelsYml;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

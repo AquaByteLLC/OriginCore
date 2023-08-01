@@ -14,8 +14,14 @@ public interface OriginModule {
 
 	ConfigurationManager getConfigurationManager();
 
+	/**
+	 * /reload callback.
+	 */
 	default void afterReload() throws Exception {}
 
+	/**
+	 * Autosave callback.
+	 */
 	default void onSave() throws Exception {}
 
 }

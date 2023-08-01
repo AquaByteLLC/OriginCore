@@ -1,4 +1,4 @@
-package commons.levels.reward;
+package levels.reward;
 
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;

@@ -10,6 +10,9 @@ import java.io.IOException;
 import static commons.util.ReflectUtil.sneaky;
 
 public class SettableConfig {
+
+	// bruh just do super("foloder/config.yml"); in the config class 😭
+
 	@Getter private final File file, parentFolder;
 	private final YamlConfiguration fileConfiguration;
 

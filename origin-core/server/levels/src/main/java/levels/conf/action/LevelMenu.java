@@ -1,6 +1,6 @@
-package commons.levels.conf.action;
+package levels.conf.action;
 
-import commons.levels.conf.LevelsYml;
+import levels.conf.LevelsYml;
 import commons.versioning.VersionSender;
 import commons.versioning.impl.VersionMenu;
 

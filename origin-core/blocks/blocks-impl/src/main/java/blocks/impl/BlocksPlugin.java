@@ -17,6 +17,7 @@ import blocks.impl.cmd.ProtectCommand;
 import blocks.impl.data.account.BlockAccount;
 import blocks.impl.data.account.BlockAccountStorage;
 import blocks.impl.anim.item.BreakSpeed;
+import blocks.impl.data.region.RegionsStorage;
 import blocks.impl.illusions.impl.Illusions;
 import blocks.impl.protect.TransientProtectionRegistry;
 import blocks.impl.registry.*;
@@ -45,6 +46,7 @@ import java.util.List;
 
 @Getter
 public class BlocksPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
+
 	private static Injector injector;
 
 	public static Injector get() {
@@ -68,26 +70,27 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider, Origin
 	private RegionRegistry regionRegistry;
 	private ProtectionRegistry protectionRegistry;
 	private BlockAccountStorage accountStorage;
+	private RegionsStorage regionsStorage;
 	private PaperCommandManager commands; // op-only debug commands
 
 	@Override
 	public void onEnable() {
 		final CommonsPlugin commonsPlugin = CommonsPlugin.commons();
-		final EventRegistry events = commonsPlugin.getEventRegistry();
 
-		this.blockRegistry = new BlockRegistryImpl();
+		this.blockRegistry           = new BlockRegistryImpl();
 		this.overlayLocationRegistry = new OverlayRegistryImpl();
-		this.illusions = new Illusions(this, Commons.events());
-		this.regenerationRegistry = new RegenerationRegistryImpl();
-		this.blockLocationRegistry = new LocationRegistryImpl();
-		this.progressRegistry = new ProgressRegistryImpl();
-		this.speedAttribute = new BreakSpeed();
-		this.regionRegistry = new RegionRegistryImpl();
-		this.protectionRegistry = new TransientProtectionRegistry();
+		this.illusions               = new Illusions(this, Commons.events());
+		this.regenerationRegistry    = new RegenerationRegistryImpl();
+		this.blockLocationRegistry   = new LocationRegistryImpl();
+		this.progressRegistry        = new ProgressRegistryImpl();
+		this.speedAttribute          = new BreakSpeed();
+		this.regionRegistry          = new RegionRegistryImpl();
+		this.protectionRegistry      = new TransientProtectionRegistry();
 
 		injector = Guice.createInjector(new BlockModule(new BlocksAPI(this, blockLocationRegistry, illusions, regenerationRegistry, blockRegistry, overlayLocationRegistry, progressRegistry, speedAttribute, regionRegistry, protectionRegistry), this));
 
-		accountStorage = new BlockAccountStorage(commonsPlugin.getDatabase());
+		accountStorage = new BlockAccountStorage(Commons.db());
+		regionsStorage = new RegionsStorage(Commons.db(), regionRegistry);
 		commonsPlugin.registerModule(this);
 
 		commands = new PaperCommandManager(this);
@@ -100,15 +103,27 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider, Origin
 		});
 		commands.getCommandContexts().registerContext(ProtectionStrategy.class, c -> {
 			String arg = c.popFirstArg();
-			if(arg.equalsIgnoreCase("PLAYERS"))
+			if (arg.equalsIgnoreCase("PLAYERS"))
 				return ProtectionStrategies.PERMIT_PLAYERS;
 			Player player = Bukkit.getPlayer(arg);
-			if(player != null)
+			if (player != null)
 				return ProtectionStrategies.permitOwner(player);
 			return ReflectUtil.getEnum(ProtectionStrategies.class, arg.toUpperCase().replace(' ', '_'));
 		});
 		commands.registerCommand(new IllusionCommand(illusions));
 		commands.registerCommand(new ProtectCommand(protectionRegistry));
+
+		regionsStorage.load();
+	}
+
+	@Override
+	public void onDisable() {
+		regionsStorage.save();
+	}
+
+	@Override
+	public void onSave() throws Exception {
+		regionsStorage.save();
 	}
 
 	@Override
@@ -127,7 +142,7 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider, Origin
 		private final BlocksPlugin blocksPlugin;
 
 		BlockModule(BlocksAPI blocks, BlocksPlugin blocksPlugin) {
-			this.blocksAPI = blocks;
+			this.blocksAPI    = blocks;
 			this.blocksPlugin = blocksPlugin;
 		}
 
@@ -136,5 +151,7 @@ public class BlocksPlugin extends JavaPlugin implements ResourceProvider, Origin
 			this.bind(BlocksAPI.class).toInstance(blocksAPI);
 			this.bind(BlocksPlugin.class).toInstance(blocksPlugin);
 		}
+
 	}
+
 }

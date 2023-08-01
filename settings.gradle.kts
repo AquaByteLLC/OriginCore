@@ -10,7 +10,7 @@ setupOriginModule(
             Pair("enchants", listOf("enchants-api", "enchants-impl")),
             Pair("generators", listOf("generators-api", "generators-impl")),
             Pair("enderchests", listOf("chests-api", "chests-impl")),
-            Pair("server", listOf("commons", "settings-api", "settings-impl")),
+            Pair("server", listOf("commons", "levels", "settings-api", "settings-impl")),
 ));
 
 

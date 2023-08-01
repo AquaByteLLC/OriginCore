@@ -1,15 +1,15 @@
-package commons.levels.event.impl;
+package levels.event.impl;
 
 import commons.Commons;
 import commons.events.api.EventRegistry;
 import commons.events.impl.impl.DetachedSubscriber;
 import commons.impl.data.account.PlayerDefaultAccount;
-import commons.levels.Level;
-import commons.levels.conf.LevelsYml;
-import commons.levels.conf.action.LevelMessages;
-import commons.levels.event.ExperienceGainEvent;
-import commons.levels.event.LevelUpEvent;
-import commons.levels.registry.impl.LevelRegistry;
+import levels.Level;
+import levels.conf.LevelsYml;
+import levels.conf.action.LevelMessages;
+import levels.event.ExperienceGainEvent;
+import levels.event.LevelUpEvent;
+import levels.registry.impl.LevelRegistry;
 import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;

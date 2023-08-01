@@ -22,17 +22,10 @@ public record OriginRegion(String regionID, String allowedBlock, World world) {
 		@Getter
 		private final ProtectedRegion wgRegion;
 
-		public RegionInstance(RegionRegistry registry, OriginRegion region, String block) {
+		private RegionInstance(RegionRegistry registry, OriginRegion region, String block) {
 			this.region = region;
 			this.block = block;
 			final RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-			System.out.println(region.regionID);
-			System.out.println(region.regionID);
-			System.out.println(region.regionID);
-			System.out.println(region.regionID);
-			System.out.println(region.regionID);
-			System.out.println(region.regionID);
-			System.out.println(region.regionID);
 
 			this.wgRegion = container.get(BukkitAdapter.adapt(region.world)).getRegion(region.regionID());
 			registry.createRegion(wgRegion.getId(), this);

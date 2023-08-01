@@ -1,26 +1,16 @@
 package commons.menu
 
 import commons.CommonsPlugin
-import commons.levels.Level
-import commons.util.StringUtil
+import levels.Level
 import me.lucko.helper.item.ItemStackBuilder
-import me.vadim.util.conf.wrapper.Placeholder
-import me.vadim.util.item.ItemBuilderKt
-import me.vadim.util.item.mutateItem
 import me.vadim.util.menu.*
-import net.minecraft.world.item.Items
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.OfflinePlayer
-import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.Item
-import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
-class LevelMenuLegacy(plugin: CommonsPlugin, private val owner: OfflinePlayer) : LevelMenu<Level>(plugin) {
+class LevelMenuLegacy(plugin: CommonsPlugin, private val owner: OfflinePlayer) : LevelMenu<levels.Level>(plugin) {
 
-    override val menu: MenuList<Level> = template.toList(queryItems(), transformer = { query(it) }) {
+    override val menu: MenuList<levels.Level> = template.toList(queryItems(), transformer = { query(it) }) {
         title = "test title"
 
         next = buttons[NEXT_SLOT]!! to NEXT_SLOT
@@ -107,8 +97,8 @@ class LevelMenuLegacy(plugin: CommonsPlugin, private val owner: OfflinePlayer) :
 
      */
 
-    override fun queryItems(): MutableList<Level> = reg.levels;
-    fun query(level: Level): ItemStack {
+    override fun queryItems(): MutableList<levels.Level> = reg.levels;
+    fun query(level: levels.Level): ItemStack {
         val playerLevel = accounts.getAccount(owner).level!!.toInt()
         val req = level.levelNumber()
 

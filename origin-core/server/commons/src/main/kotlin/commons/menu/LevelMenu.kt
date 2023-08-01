@@ -3,8 +3,8 @@ package commons.menu
 import commons.CommonsPlugin
 import commons.data.account.AccountStorage
 import commons.impl.data.account.PlayerDefaultAccount
-import commons.levels.conf.LevelsYml
-import commons.levels.registry.impl.LevelRegistry
+import levels.conf.LevelsYml
+import levels.registry.impl.LevelRegistry
 import me.vadim.util.conf.ConfigurationProvider
 
 /**

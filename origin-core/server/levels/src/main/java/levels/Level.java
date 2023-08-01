@@ -1,7 +1,7 @@
-package commons.levels;
+package levels;
 
 
-import commons.levels.reward.LevelReward;
+import levels.reward.LevelReward;
 
 import java.util.List;
 

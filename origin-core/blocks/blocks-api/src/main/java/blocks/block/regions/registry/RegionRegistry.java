@@ -4,6 +4,7 @@ import blocks.block.regions.OriginRegion;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public interface RegionRegistry {
 
@@ -11,6 +12,6 @@ public interface RegionRegistry {
 
 	void deleteRegion(String wgID);
 
-	@NotNull HashMap<String, OriginRegion.RegionInstance> getRegions();
+	@NotNull Map<String, OriginRegion.RegionInstance> getRegions();
 
 }
