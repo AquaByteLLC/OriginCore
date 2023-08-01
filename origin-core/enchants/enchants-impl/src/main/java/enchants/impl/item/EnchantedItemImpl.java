@@ -12,6 +12,7 @@ import enchants.item.EnchantedItem;
 import lombok.SneakyThrows;
 import me.lucko.helper.text3.Text;
 import me.vadim.util.conf.wrapper.Placeholder;
+import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -86,14 +87,14 @@ public class EnchantedItemImpl implements EnchantedItem {
 			if (canEnchant(pdc))
 				pdc.set(enchantKey.getNamespacedKey(), PersistentDataType.LONG, Math.min(enchant.getMaxLevel(), level));
 		});
-		updateMeta();
+		// updateMeta();
 	}
 
 	@Override
 	public void removeEnchant(EnchantKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return;
 		writeContainer(pdc -> pdc.remove(enchantKey.getNamespacedKey()));
-		updateMeta();
+		// updateMeta();
 	}
 
 	@Override
@@ -103,7 +104,7 @@ public class EnchantedItemImpl implements EnchantedItem {
 			Set<EnchantKey> keys = getAllEnchants();
 			if (!keys.isEmpty())
 				keys.forEach(this::removeEnchant);
-			updateMeta();
+			// updateMeta();
 		}
 	}
 
@@ -174,6 +175,27 @@ public class EnchantedItemImpl implements EnchantedItem {
 	public long getLevel(EnchantKey enchantKey) {
 		if (!hasEnchant(enchantKey)) return 0L;
 		return readContainer().get(enchantKey.getNamespacedKey(), PersistentDataType.LONG);
+	}
+
+	public List<String> getEnchants() {
+		final List<String> enchantList = new ArrayList<>();
+		{
+			final Set<EnchantKey> keys = getAllEnchants();
+
+			for (EnchantKey key : keys) {
+				final Enchant enchant = getRegistry().getByKey(key);
+				final long level = getLevel(key);
+
+				final Placeholder placeholder = StringPlaceholder.builder()
+						.set("level", StringUtil.formatNumber(level))
+						.set("name", enchant.getKey().getName())
+						.build();
+
+				enchantList.add(Text.colorize(placeholder.format(enchant.getLore())));
+			}
+
+		}
+		return enchantList;
 	}
 
 	private void updateMeta() {

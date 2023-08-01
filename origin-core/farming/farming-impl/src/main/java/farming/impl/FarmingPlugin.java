@@ -15,11 +15,11 @@ import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
 import enchants.impl.EnchantPlugin;
 import farming.impl.action.Messages;
-import farming.impl.commands.RegionCommands;
+import farming.impl.commands.FarmingCommands;
 import farming.impl.conf.BlocksConfig;
 import farming.impl.conf.GeneralConfig;
-import farming.impl.enchants.EnchantTypes;
 import farming.impl.events.FarmingEvents;
+import farming.impl.hoe.enchants.EnchantTypes;
 import lombok.Getter;
 import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
@@ -109,7 +109,7 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 
 	private void setupCommands() {
 		PaperCommandManager commands = new PaperCommandManager(this);
-		commands.registerCommand(new RegionCommands(blocksAPI.getBlockRegistry(), blocksAPI.getRegionRegistry()));
+		commands.registerCommand(new FarmingCommands(blocksAPI.getBlockRegistry(), blocksAPI.getRegionRegistry()));
 	}
 
 	private void setupBlocksYml() {

@@ -6,10 +6,7 @@ import blocks.block.regions.registry.RegionRegistry;
 import blocks.impl.BlocksPlugin;
 import blocks.impl.data.account.BlockAccount;
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
+import co.aikar.commands.annotation.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
@@ -17,21 +14,28 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import commons.versioning.VersionSender;
 import farming.impl.action.Messages;
+import farming.impl.hoe.OriginHoe;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.entity.Player;
 
 @CommandAlias("farming")
-public class RegionCommands extends BaseCommand {
+public class FarmingCommands extends BaseCommand {
 
 	private final BlockRegistry registry;
 	private final RegionRegistry regionRegistry;
 	private final VersionSender sender;
 
-	public RegionCommands(BlockRegistry registry, RegionRegistry regionRegistry) {
+	public FarmingCommands(BlockRegistry registry, RegionRegistry regionRegistry) {
 		this.registry = registry;
 		this.regionRegistry = regionRegistry;
 		this.sender = Messages.versionSender;
+	}
+
+	@Subcommand("tool give")
+	public void giveHoe(@Flags("other") Player target) {
+		OriginHoe hoe = new OriginHoe();
+		hoe.give(target);
 	}
 
 	@Subcommand("region register")

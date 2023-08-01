@@ -1,4 +1,4 @@
-package farming.impl.enchants.entity;
+package farming.impl.hoe.enchants.entity;
 
 import commons.entity.EntityHelper;
 import commons.util.BukkitUtil;

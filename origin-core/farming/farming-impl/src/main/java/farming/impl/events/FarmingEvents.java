@@ -21,6 +21,7 @@ import commons.events.impl.impl.DetachedSubscriber;
 import commons.hologram.InterpolatedHologram;
 import commons.interpolation.impl.InterpolationType;
 import commons.math.MathUtils;
+import farming.impl.hoe.OriginHoe;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.serialize.Position;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
@@ -74,6 +75,7 @@ public class FarmingEvents {
 						return;
 					}
 					if (ageable.getAge() == ageable.getMaximumAge()) {
+						if (!OriginHoe.isHoe(player.getInventory().getItemInMainHand())) return;
 						new BreakEvent("farming", block, event.getPlayer(), false).callEvent();
 						event.setCancelled(true);
 					}
@@ -122,6 +124,10 @@ public class FarmingEvents {
 			}
 
 			block.getDrops().clear();
+
+			if (OriginHoe.isHoe(player.getInventory().getItemInMainHand())) {
+				OriginHoe.updateBlocksBroken(player.getInventory().getItemInMainHand(), 1);
+			}
 
 		/*
 		if (!event.isCalledFromEnchant()) {
@@ -176,7 +182,6 @@ public class FarmingEvents {
 			}
 
 			Commons.commons().getAccounts().getAccount(player).addExperience(BigDecimal.valueOf(xp));
-
 		});
 	}
 

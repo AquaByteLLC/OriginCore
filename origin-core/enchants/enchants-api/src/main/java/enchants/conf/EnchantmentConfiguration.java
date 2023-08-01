@@ -106,7 +106,7 @@ public class EnchantmentConfiguration {
 			assert menuSection != null;
 			assert chanceSection != null;
 
-			baseSection.set(getAsRelative(lorePath), "%name% -> %level%");
+			baseSection.set(getAsRelative(lorePath), " &d&l| &d{name} &f-> &5{level}");
 			baseSection.set(getAsRelative(descriptionPath), List.of("Description of the enchant", "This enchant is super cool"));
 			baseSection.set(getAsRelative(maxLevelPath), 10);
 
@@ -119,7 +119,7 @@ public class EnchantmentConfiguration {
 			costSection.set(getAsRelative(maxCostPath), 10000.0);
 
 			menuSection.set(getAsRelative(itemTypePath), "DIAMOND_BLOCK");
-			menuSection.set(getAsRelative(itemDisplayNamePath), "&c&lMenuItem: &f%name%");
+			menuSection.set(getAsRelative(itemDisplayNamePath), "&c&lMenuItem: &f{name}");
 			menuSection.set(getAsRelative(itemLorePath), List.of("&b&lItems lore for the enchant", "%maxLevel%", "%maxChance%", "%currentChance%", "%currentLevel%", "%maxCost%", "%currentCost%"));
 
 			/*

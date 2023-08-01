@@ -1,0 +1,17 @@
+hoe:
+  item:
+    type: WOODEN_HOE
+    name: "&d&lOrigin &5&lHoe &f&l| &e[&f{blocks_broken}&e]"
+    lore:
+      - "&7 "
+      - "&d&lPrestige: &f☆☆☆☆☆"
+      - "{prestige_boosts}"
+      - "&7 "
+      - "&d&lEnchants: &f(&5{enchant_count}&f)"
+      - "{enchants}"
+      - "&7 "
+      - "&d&lAugments: &f(&5{augment_count}&f)"
+      - "{augments}"
+      - "&7 "
+      - "&d&lSkin: &F(&5{skin_equipped}&f)"
+      - "&7 "

@@ -4,6 +4,7 @@ import enchants.EnchantKey;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,6 +35,8 @@ public interface EnchantedItem {
 	BigDecimal getCost(EnchantKey enchantKey);
 
 	long getLevel(EnchantKey enchantKey);
+
+	List<String> getEnchants();
 
 	boolean activate(EnchantKey enchantKey);
 

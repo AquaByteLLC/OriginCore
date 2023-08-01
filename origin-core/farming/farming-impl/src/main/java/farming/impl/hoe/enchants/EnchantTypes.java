@@ -1,4 +1,4 @@
-package farming.impl.enchants;
+package farming.impl.hoe.enchants;
 
 import blocks.BlocksAPI;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
@@ -15,7 +15,7 @@ import enchants.impl.item.EnchantedItemImpl;
 import enchants.item.EnchantFactory;
 import enchants.item.EnchantTarget;
 import enchants.item.EnchantedItem;
-import farming.impl.enchants.entity.ExplosiveEntity;
+import farming.impl.hoe.enchants.entity.ExplosiveEntity;
 import farming.impl.util.LocationUtil;
 import me.lucko.helper.Schedulers;
 import org.bukkit.ChatColor;
@@ -56,7 +56,7 @@ public enum EnchantTypes implements EnchantKey {
 						new ExplosiveEntity(((CraftWorld) player.getWorld()).getHandle(), player, block, entity -> {
 							Schedulers.bukkit().runTask(plugin, () -> {
 
-								List<FixedAspectHolder> aspectList = LocationUtil.getBlocks(block, 100);
+								List<FixedAspectHolder> aspectList = LocationUtil.getBlocks(block, 4);
 								aspectList.forEach(holder -> {
 									if (holder.getBlock().getBlockData() instanceof Ageable ageable) {
 										if (BlocksAPI.inRegion(block.getLocation())) {
@@ -70,7 +70,7 @@ public enum EnchantTypes implements EnchantKey {
 						});
 					}
 				}
-			}), EnchantTarget.tools());
+			}), EnchantTarget.HOE);
 	private final String name;
 	private final NamespacedKey key;
 	private final EventSubscriber subscriber;
