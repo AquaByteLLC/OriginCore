@@ -4,11 +4,7 @@ import blocks.block.util.ClickCallback;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Player;
 
-/**
- * @author vadim
- */
 public interface IllusionBuilder {
 
 	IllusionBuilder fakeProjectedBlockData(BlockData fakeData);

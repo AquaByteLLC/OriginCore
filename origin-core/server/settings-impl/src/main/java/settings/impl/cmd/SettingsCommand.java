@@ -7,9 +7,6 @@ import commons.data.account.AccountProvider;
 import org.bukkit.entity.Player;
 import settings.impl.data.SettingsAccount;
 
-/**
- * @author vadim
- */
 @CommandAlias("settings|options|opts")
 public class SettingsCommand extends BaseCommand {
 

@@ -4,7 +4,6 @@ import settings.Settings;
 
 /**
  * A local {@link GlobalKey}, or, a {@link GlobalKey} but with only one {@linkplain GlobalKey#parts() path element}
- * @author vadim
  * @see GlobalKey#hasTail()
  * @see GlobalKey#getTail()
  * @see GlobalKey#withTail(LocalKey)

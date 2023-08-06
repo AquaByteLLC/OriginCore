@@ -10,8 +10,6 @@ import org.bukkit.block.data.BlockData;
 /**
  * Represents a fake block data projected to the client, regardless of what the actual block is on the server.
  * Also supports block overlays.
- *
- * @author vadim
  */
 public interface Projectable extends BlockAspect {
 

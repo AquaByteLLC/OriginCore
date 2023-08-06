@@ -3,9 +3,6 @@ package blocks.block.util;
 import net.minecraft.network.protocol.Packet;
 import org.bukkit.entity.Player;
 
-/**
- * @author vadim
- */
 public interface PacketReceiver {
 
 	/**

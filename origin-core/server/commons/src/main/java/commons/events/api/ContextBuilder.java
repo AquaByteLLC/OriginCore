@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 
 /**
  * Builder for {@link EventContext}.
- * @author vadim
  */
 public interface ContextBuilder {
 

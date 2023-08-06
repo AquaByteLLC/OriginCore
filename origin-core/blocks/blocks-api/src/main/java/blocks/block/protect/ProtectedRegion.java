@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a protected {@link Cuboid} region in {@link #getWorld() world}.
  * <p><b>NOTICE:</b> {@linkplain ProtectedBlock protected blocks} <i>always</i> take precedence over {@linkplain ProtectedRegion protected regions}!
- * @author vadim
  */
 public interface ProtectedRegion extends ProtectedObject {
 

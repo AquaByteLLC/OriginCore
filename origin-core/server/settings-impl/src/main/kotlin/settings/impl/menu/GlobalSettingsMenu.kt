@@ -14,9 +14,6 @@ import settings.impl.conf.Config
 import settings.registry.SettingsHolder
 import settings.setting.SettingSection
 
-/**
- * @author vadim
- */
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class GlobalSettingsMenu(private val plugin: SettingsPlugin, private val holder: SettingsHolder) : MenuAdapter<SettingSection>() {
 

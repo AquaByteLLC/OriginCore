@@ -10,9 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-/**
- * @author vadim
- */
 public class PluginEventRegistry implements EventRegistry {
 
 	private static class Subscription {

@@ -12,9 +12,6 @@ import org.bukkit.plugin.Plugin;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author vadim
- */
 public class PluginEventWrapper {
 
 	private final Plugin plugin;
@@ -39,7 +36,7 @@ public class PluginEventWrapper {
 		// - for Bukkit events you have to register it per event class
 		// - for Packet events it's best to only register one Injector per plyaer
 		events.addSubscriptionHook(event -> {
-			if (org.bukkit.event.Event.class.isAssignableFrom(event)) {
+			if (Event.class.isAssignableFrom(event)) {
 				bukkit.computeIfAbsent((Class<? extends Event>) event, e -> {
 					BukkitEventListener<?> el = new BukkitEventListener<>(e);
 					el.startListen(plugin, events);

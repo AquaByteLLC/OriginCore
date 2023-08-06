@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
  * Transient {@linkplain ProtectedBlock block} and {@linkplain ProtectedRegion region} protection API.<p>
  * This class is <u>not guaranteed</u> to protect from <i>every event</i>. It implements <i>most</i> events that pertain to block modifications.
  * Namely, almost all concrete children of {@link org.bukkit.event.block.BlockEvent}.
- * @author vadim
  */
 public interface ProtectionRegistry {
 

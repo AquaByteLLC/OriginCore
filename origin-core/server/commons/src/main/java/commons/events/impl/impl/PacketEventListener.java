@@ -29,7 +29,6 @@ import java.util.List;
 
 /**
  * Packet interceptor that {@linkplain EventRegistry#publish(EventContext, Object) publishes} Netty events.
- * @author vadim
  */
 public final class PacketEventListener implements EventListener {
 

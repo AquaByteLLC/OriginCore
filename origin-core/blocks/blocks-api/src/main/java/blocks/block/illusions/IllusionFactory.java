@@ -5,9 +5,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 
-/**
- * @author vadim
- */
 public interface IllusionFactory {
 
 	FakeBlock newFakeBlock(Location location, BlockData projected);

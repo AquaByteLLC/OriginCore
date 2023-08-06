@@ -4,9 +4,6 @@ import commons.events.api.ContextBuilder;
 import commons.events.api.EventContext;
 import org.bukkit.entity.Player;
 
-/**
- * @author vadim
- */
 class EventContextBuilder implements ContextBuilder {
 
 	private Player player = null;

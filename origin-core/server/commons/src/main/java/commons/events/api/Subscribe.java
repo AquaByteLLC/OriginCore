@@ -16,7 +16,6 @@ import java.lang.annotation.Target;
  * <p>The event must be the only other parameter, positioned <i>last</i> (or by itself if {@link EventContext} is omitted).
  * <p>
  * <p>If a method fails to pass any of the checks required to become a subscription, then it will do so silently and without warning.
- * @author vadim
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

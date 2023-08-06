@@ -3,9 +3,6 @@ package settings.setting.key;
 import org.jetbrains.annotations.Nullable;
 import settings.Settings;
 
-/**
- * @author vadim
- */
 public non-sealed interface GlobalKey extends SettingKey {
 
 	/**

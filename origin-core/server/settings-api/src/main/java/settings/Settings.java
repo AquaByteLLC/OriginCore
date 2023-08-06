@@ -1,21 +1,15 @@
 package settings;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import settings.registry.SettingsHolder;
-import settings.setting.Setting;
-import settings.setting.SettingOption;
-import settings.setting.builder.SettingsFactory;
 import settings.registry.SectionRegistry;
+import settings.registry.SettingsHolder;
 import settings.registry.SettingsRegistry;
+import settings.setting.builder.SettingsFactory;
 import settings.setting.key.GlobalKey;
 import settings.setting.key.LocalKey;
 
 import java.util.function.Function;
 
-/**
- * @author vadim
- */
 public class Settings {
 
 	private static Settings api;

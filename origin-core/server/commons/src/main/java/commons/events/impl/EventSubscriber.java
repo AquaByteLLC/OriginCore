@@ -7,7 +7,6 @@ import commons.events.api.Subscriber;
  * Represents a detached subscriber, designed for inline use of {@link EventRegistry#subscribeOne(Object, Subscriber, Class)}
  * without the need for {@linkplain commons.events.api.Subscribe subscriber candidate} methods.
  * <p><b>NOTE</b>: retain a <i>strong reference</i> (i.e. storing this instance in a field) to prevent it from being garbage collected and thereby being auto-unsubscribed
- * @author vadim
  * @see EventRegistry#subscribeOne(Object, Subscriber, Class)
  */
 public interface EventSubscriber {

@@ -2,9 +2,6 @@ package blocks.block.illusions;
 
 import org.bukkit.entity.Player;
 
-/**
- * @author vadim
- */
 public interface IllusionsAPI {
 
 	IllusionFactory factory();

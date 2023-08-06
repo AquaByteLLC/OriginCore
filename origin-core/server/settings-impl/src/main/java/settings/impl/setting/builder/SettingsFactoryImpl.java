@@ -6,9 +6,6 @@ import settings.setting.builder.SectionBuilder;
 import settings.setting.builder.SettingBuilder;
 import settings.setting.builder.SettingsFactory;
 
-/**
- * @author vadim
- */
 public class SettingsFactoryImpl implements SettingsFactory {
 
 	@Override

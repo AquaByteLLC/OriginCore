@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the potential modification of a protected object.
- * @author vadim
  */
 public interface ProtectedAction {
 

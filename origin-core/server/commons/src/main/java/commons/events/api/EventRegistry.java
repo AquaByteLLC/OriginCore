@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 
 /**
  * An event registry handles the subscription to and publication of unspecified event objects.
- * @author vadim
  */
 public interface EventRegistry {
 

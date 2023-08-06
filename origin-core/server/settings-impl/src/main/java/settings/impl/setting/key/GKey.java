@@ -10,9 +10,6 @@ import java.util.Objects;
 
 import static settings.impl.setting.key.SKey.*;
 
-/**
- * @author vadim
- */
 public class GKey implements GlobalKey {
 
 	private final String[] path;

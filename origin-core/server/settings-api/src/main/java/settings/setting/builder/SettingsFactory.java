@@ -1,11 +1,7 @@
 package settings.setting.builder;
 
-import commons.util.StringUtil;
 import settings.setting.SettingOption;
 
-/**
- * @author vadim
- */
 public interface SettingsFactory {
 
 	SectionBuilder newSectionBuilder();

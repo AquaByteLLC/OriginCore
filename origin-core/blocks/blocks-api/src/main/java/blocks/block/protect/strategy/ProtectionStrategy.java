@@ -2,9 +2,6 @@ package blocks.block.protect.strategy;
 
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author vadim
- */
 public interface ProtectionStrategy {
 
 	/**

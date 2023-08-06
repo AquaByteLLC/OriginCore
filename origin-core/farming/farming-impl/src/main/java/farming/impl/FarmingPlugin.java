@@ -4,9 +4,7 @@ import blocks.BlocksAPI;
 import blocks.block.aspects.regeneration.registry.RegenerationRegistry;
 import blocks.impl.BlocksPlugin;
 import blocks.impl.builder.OriginBlock;
-import blocks.impl.data.region.RegionsStorage;
 import co.aikar.commands.PaperCommandManager;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -21,6 +19,7 @@ import farming.impl.conf.BlocksConfig;
 import farming.impl.conf.GeneralConfig;
 import farming.impl.events.FarmingEvents;
 import farming.impl.hoe.enchants.EnchantTypes;
+import farming.impl.settings.FarmingSettings;
 import lombok.Getter;
 import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.LiteConfig;
@@ -29,8 +28,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class FarmingPlugin extends JavaPlugin implements ResourceProvider, OriginModule {
 
@@ -73,7 +70,7 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 		FarmingEvents.init(eventRegistry);
 		Messages.init();
 
-		//FarmingSettings.init(this);
+		FarmingSettings.init(this);
 
 		setupCommands();
 		setupBlocksYml();

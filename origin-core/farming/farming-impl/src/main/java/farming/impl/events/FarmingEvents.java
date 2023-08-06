@@ -11,6 +11,8 @@ import blocks.block.illusions.FakeBlock;
 import blocks.block.illusions.IllusionRegistry;
 import blocks.impl.BlocksPlugin;
 import blocks.impl.anim.entity.BlockEntity;
+import blocks.impl.aspect.effect.type.OriginParticle;
+import blocks.impl.aspect.effect.type.OriginSound;
 import blocks.impl.builder.OriginBlock;
 import blocks.impl.data.account.BlockAccount;
 import blocks.impl.events.BreakEvent;
@@ -22,6 +24,7 @@ import commons.hologram.InterpolatedHologram;
 import commons.interpolation.impl.InterpolationType;
 import commons.math.MathUtils;
 import farming.impl.hoe.OriginHoe;
+import farming.impl.settings.FarmingSettings;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.serialize.Position;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
@@ -129,27 +132,25 @@ public class FarmingEvents {
 				OriginHoe.updateBlocksBroken(player.getInventory().getItemInMainHand(), 1);
 			}
 
-		/*
-		if (!event.isCalledFromEnchant()) {
-			if (effectable != null) {
-				effectable.getEffects().forEach(effect -> {
-					if (effect.getEffectType() instanceof OriginParticle) {
-						if (FarmingSettings.CUSTOM_BLOCK_PARTICLES.isEnabled(player)) {
-							System.out.println("ENABLED");
-							effect.getEffectType().handleEffect(player, block.getLocation());
-						}
-					}
-					if (effect.getEffectType() instanceof OriginSound) {
-						if (FarmingSettings.CUSTOM_BLOCK_SOUNDS.isEnabled(player)) {
-							System.out.println("ENABLED");
-							effect.getEffectType().handleEffect(player, block.getLocation());
-						}
-					}
-				});
-			}
-		}
 
-		 */
+			if (!event.isCalledFromEnchant()) {
+				if (effectable != null) {
+					effectable.getEffects().forEach(effect -> {
+						if (effect.getEffectType() instanceof OriginParticle) {
+							if (FarmingSettings.CUSTOM_BLOCK_PARTICLES.isEnabled(player)) {
+								System.out.println("ENABLED");
+								effect.getEffectType().handleEffect(player, block.getLocation());
+							}
+						}
+						if (effect.getEffectType() instanceof OriginSound) {
+							if (FarmingSettings.CUSTOM_BLOCK_SOUNDS.isEnabled(player)) {
+								System.out.println("ENABLED");
+								effect.getEffectType().handleEffect(player, block.getLocation());
+							}
+						}
+					});
+				}
+			}
 
 			if (dropable != null) {
 				dropable.getDrops().forEach(drop -> {

@@ -17,7 +17,6 @@ import java.lang.invoke.MethodHandle;
 
 /**
  * Listener that {@linkplain EventRegistry#publish(EventContext, Object) publishes} Bukkit events.
- * @author vadim
  */
 public class BukkitEventListener<T extends Event> implements EventListener, EventExecutor, Listener {
 

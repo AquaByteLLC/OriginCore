@@ -2,9 +2,6 @@ package blocks.block.illusions;
 
 import blocks.block.util.PacketReceiver;
 
-/**
- * @author vadim
- */
 public interface Illusion {
 
 	/**

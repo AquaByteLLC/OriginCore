@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Default implementations for {@link ProtectionStrategy}.
- * @author vadim
  */
 public enum ProtectionStrategies implements ProtectionStrategy {
 

@@ -4,9 +4,6 @@ import commons.events.api.EventRegistry;
 import commons.events.api.Subscriber;
 import commons.events.impl.EventSubscriber;
 
-/**
- * @author vadim
- */
 public class DetachedSubscriber<T> implements EventSubscriber {
 
 	private final Class<T> clazz;

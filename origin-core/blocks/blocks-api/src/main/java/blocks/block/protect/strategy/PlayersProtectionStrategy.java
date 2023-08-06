@@ -3,9 +3,6 @@ package blocks.block.protect.strategy;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author vadim
- */
 class PlayersProtectionStrategy implements ProtectionStrategy {
 
 	@Override

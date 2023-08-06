@@ -7,9 +7,6 @@ import java.util.Objects;
 
 import static settings.impl.setting.key.SKey.*;
 
-/**
- * @author vadim
- */
 public class LKey implements LocalKey {
 
 	private final String identifier;

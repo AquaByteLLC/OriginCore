@@ -4,9 +4,6 @@ import commons.events.api.EventContext;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author vadim
- */
 class PlayerEventContext implements EventContext {
 
 	private final @Nullable Player player;

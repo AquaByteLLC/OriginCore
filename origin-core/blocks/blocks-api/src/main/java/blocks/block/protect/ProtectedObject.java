@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a {@linkplain ProtectedBlock block} or {@linkplain ProtectedRegion region} in a world.
- * @author vadim
  */
 public interface ProtectedObject {
 

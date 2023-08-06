@@ -4,9 +4,6 @@ import blocks.block.aspects.location.BlockLike;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author vadim
- */
 public interface ProtectedBlock extends ProtectedObject, BlockLike {
 
 	/**

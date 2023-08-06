@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 
 /**
  * Extra information about an event. Accepting this class as a {@linkplain Subscribe paramter} is optional.
- * @author vadim
  */
 public interface EventContext {
 

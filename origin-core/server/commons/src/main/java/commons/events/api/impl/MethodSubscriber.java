@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
  * <li><p>{@code void onEvent(Event event)}</li>
  * </ul>
  * Behaviour for methods not matching the aforementioned signatures is <b>undefined</b>.
- * @author vadim
  */
 class MethodSubscriber implements Subscriber<Object> {
 

@@ -6,9 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-/**
- * @author vadim
- */
 class OwnedProtectionStrategy extends PlayerOwned implements ProtectionStrategy {
 
 	OwnedProtectionStrategy(UUID uuid) {

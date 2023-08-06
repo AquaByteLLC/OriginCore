@@ -26,4 +26,5 @@ dependencies {
     compileOnly(project(":blocks-api"))
     compileOnly(project(":settings-api"))
     compileOnly(project(":blocks-impl"))
+    compileOnly(project(":tools"))
 }

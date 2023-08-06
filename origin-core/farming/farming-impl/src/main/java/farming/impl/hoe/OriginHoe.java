@@ -6,6 +6,7 @@ import enchants.item.EnchantedItem;
 import farming.impl.FarmingPlugin;
 import farming.impl.conf.GeneralConfig;
 import me.vadim.util.conf.wrapper.Placeholder;
+import me.vadim.util.conf.wrapper.Placeholders;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import me.vadim.util.item.Text;
 import net.md_5.bungee.api.ChatColor;
@@ -16,7 +17,9 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OriginHoe {
 
@@ -82,38 +85,30 @@ public class OriginHoe {
 	public static void updateHoe(ItemStack stack) {
 		if (!isHoe(stack)) return;
 		stack.editMeta(meta -> {
-			List<String> loreList = cfg.getConfiguration().getStringList("hoe.item.lore");
-			List<String> newList = new ArrayList<>();
-
-			for (String s : loreList) {
-				newList.add(StringUtil.colorize(s));
-			}
+			List<String> loreList = new ArrayList<>(cfg.getConfiguration().getStringList("hoe.item.lore"));
+			final String displayName = Text.colorize(cfg.getConfiguration().getString("hoe.item.name"));
 
 			EnchantedItem enchantedItem = new EnchantedItemImpl(stack);
-			StringBuilder enchantString = new StringBuilder();
 			PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
-			for (String s : enchantedItem.getEnchants()) enchantString.append("""
-     
-					%s""".formatted(s));
-
 			Placeholder placeholder = StringPlaceholder.builder()
-					.set("enchants", enchantString.toString())
+					.set("enchants", String.join("\n", enchantedItem.getEnchants()))
 					.set("enchant_count", String.valueOf(enchantedItem.getEnchants().size()))
 					.set("blocks_broken", String.valueOf(pdc.get(BLOCKS_BROKEN, PersistentDataType.INTEGER)))
 					.set("skin_equipped", "None")
 					.set("augment_count", String.valueOf(0))
 					.set("augments", "None")
 					.set("prestige_boosts", "None")
-			.build();
+					.build();
 
 			System.out.println(pdc.get(BLOCKS_BROKEN, PersistentDataType.INTEGER));
 
-			final List<String> lore = new ArrayList<>();
-			for (String s : meta.getLore()) lore.add(placeholder.format(s));
+			loreList = Placeholders.reformat(placeholder, loreList).stream()
+					.flatMap(it -> Arrays.stream(it.split("\n")))
+					.map(StringUtil::colorize).collect(Collectors.toList());
 
-			meta.setLore(lore);
-			meta.setDisplayName(placeholder.format(meta.getDisplayName()));
+			meta.setLore(loreList);
+			meta.setDisplayName(placeholder.format(displayName));
 		});
 	}
 }
