@@ -1,16 +1,16 @@
 package levels.registry;
 
 import levels.Level;
-import levels.conf.LevelsYml;
+import levels.conf.LevelsConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ILevelRegistry {
+public interface LevelRegistry {
 
 	void create(Level level);
 
-	void createAll(LevelsYml configuration);
+	void createAll(LevelsConfig configuration);
 
 	void remove(Level level);
 

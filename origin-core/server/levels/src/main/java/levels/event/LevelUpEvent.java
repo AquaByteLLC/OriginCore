@@ -7,7 +7,8 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 public class LevelUpEvent extends Event {
-	private final int level;
+
+	private final int newLevel;
 	private final Player player;
 	private boolean isCancelled;
 	@Getter
@@ -16,10 +17,10 @@ public class LevelUpEvent extends Event {
 	private static final HandlerList HANDLERS_LIST = new HandlerList();
 	@Getter private final String calling;
 
-	public LevelUpEvent(String calling, Player player, int level, boolean calledFromEnchant) {
-		this.level = level;
-		this.player = player;
-		this.calling = calling;
+	public LevelUpEvent(String calling, Player player, int newLevel, boolean calledFromEnchant) {
+		this.newLevel          = newLevel;
+		this.player            = player;
+		this.calling           = calling;
 		this.calledFromEnchant = calledFromEnchant;
 	}
 
@@ -27,8 +28,8 @@ public class LevelUpEvent extends Event {
 		return player;
 	}
 
-	public int getLevel() {
-		return level;
+	public int getNewLevel() {
+		return newLevel;
 	}
 
 	public void setCancelled(boolean cancelled) {
@@ -52,4 +53,5 @@ public class LevelUpEvent extends Event {
 	public boolean callEvent() {
 		return super.callEvent();
 	}
+
 }

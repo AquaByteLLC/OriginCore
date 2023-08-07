@@ -1,24 +1,25 @@
 package levels.registry.impl;
 
 import levels.Level;
-import levels.conf.LevelsYml;
-import levels.registry.ILevelRegistry;
+import levels.conf.LevelsConfig;
+import levels.registry.LevelRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LevelRegistry implements ILevelRegistry {
+public class LevelRegistryImpl implements LevelRegistry {
 
 	private final List<Level> levels;
 
-	public LevelRegistry() {
+	public LevelRegistryImpl() {
 		this.levels = new ArrayList<>();
 	}
 
-	public LevelRegistry(LevelsYml yml) {
-		this.levels = new ArrayList<>();
-		createAll(yml);
+	public static LevelRegistry load(LevelsConfig config) {
+		LevelRegistry registry = new LevelRegistryImpl();
+		registry.createAll(config);
+		return registry;
 	}
 
 	@Override
@@ -27,7 +28,7 @@ public class LevelRegistry implements ILevelRegistry {
 	}
 
 	@Override
-	public void createAll(LevelsYml configuration) {
+	public void createAll(LevelsConfig configuration) {
 		configuration.getLevels().forEach(this::create);
 	}
 

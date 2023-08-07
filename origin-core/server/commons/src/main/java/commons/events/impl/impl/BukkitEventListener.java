@@ -31,7 +31,7 @@ public class BukkitEventListener<T extends Event> implements EventListener, Even
 	@Override
 	public void startListen(Plugin plugin, EventRegistry events) {
 		this.events = events;
-		plugin.getServer().getPluginManager().registerEvent(clazz, this, EventPriority.MONITOR, this, plugin, false);
+		plugin.getServer().getPluginManager().registerEvent(clazz, this, EventPriority.HIGH, this, plugin, false);
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class BukkitEventListener<T extends Event> implements EventListener, Even
 			events.publish(context, event);
 			boolean finalCancelState = context.isCancelled();
 			if (event instanceof Cancellable cancellable)
-				if(initialCancelState != finalCancelState) // due to Bukkit stupidity, isCancelled may not reflect all conditions updated inside setCancelled (see PlayerInteractEvent)
+				if(initialCancelState != finalCancelState) // due to Bukkit stupidity, isCancelled may not reflect all conditions updated inside setCancelled (e.g. PlayerInteractEvent)
 					cancellable.setCancelled(finalCancelState); // event.setCancelled(event.isCancelled()) may actually change the state so only change it if it has been modified
 		} catch (EventExecutionException e) {
 			ReflectUtil.serr("WARN: exception while processing event " + event.getClass().getCanonicalName());
