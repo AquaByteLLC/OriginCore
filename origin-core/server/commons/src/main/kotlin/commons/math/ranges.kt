@@ -1,7 +1,6 @@
-package animation.math
+package commons.math
 
 import commons.interpolation.Interpolation
-import commons.math.MathUtils
 
 
 public fun <T : Comparable<T>> T.coerceAtMost(maximumValue: T): T {

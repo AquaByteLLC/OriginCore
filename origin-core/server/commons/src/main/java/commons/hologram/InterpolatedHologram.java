@@ -1,9 +1,9 @@
 package commons.hologram;
 
-import animation.math.RangeUntilKt;
-import animation.math.RangesKt;
 import commons.CommonsPlugin;
 import commons.interpolation.impl.InterpolationType;
+import commons.math.RangeUntilKt;
+import commons.math.RangesKt;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import me.lucko.helper.Schedulers;
