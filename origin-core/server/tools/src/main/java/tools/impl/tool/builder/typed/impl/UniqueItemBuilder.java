@@ -20,6 +20,7 @@ import tools.impl.tool.impl.AugmentedTool;
 import tools.impl.tool.impl.EnchantedTool;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -29,6 +30,8 @@ public class UniqueItemBuilder extends GeneralToolBuilder {
 
 
 	private final Map<String, Pair<String, Object>> placeholderData = new HashMap<>();
+	public static final Map<String, Pair<String, List<String>>> initial = new ConcurrentHashMap<>();
+	public static final NamespacedKey uniqueIdentifier = new NamespacedKey("builder", "id");
 	private Placeholder pl;
 	private AugmentedTool augmentedTool;
 	private EnchantedTool enchantedTool;
@@ -94,6 +97,16 @@ public class UniqueItemBuilder extends GeneralToolBuilder {
 			plBuilder.set(stringObjectPair.getFirst(), String.valueOf(stringObjectPair.getSecond()));
 		}));
 		this.pl = plBuilder.build();
+
+		editMeta(meta -> {
+			final PersistentDataContainer pdc = meta.getPersistentDataContainer();
+			if (!pdc.has(uniqueIdentifier)) {
+				final String uid = UUID.randomUUID().toString();
+				pdc.set(uniqueIdentifier, PersistentDataType.STRING, uid);
+				initial.put(uid, Pair.of(meta.getDisplayName(), meta.getLore()));
+			}
+		});
+
 		return super.build();
 	}
 
@@ -169,6 +182,7 @@ public class UniqueItemBuilder extends GeneralToolBuilder {
 
 			meta.setLore(loreList);
 			meta.setDisplayName(pl.format(displayName));
+
 		});
 	}
 }
