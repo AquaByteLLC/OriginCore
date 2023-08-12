@@ -4,10 +4,6 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import me.lucko.helper.text3.Text;
 import me.lucko.helper.text3.TextComponent;
-import me.lucko.helper.text3.event.HoverEvent;
-import me.lucko.helper.text3.format.TextColor;
-import me.vadim.util.menu.Menu;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
@@ -15,12 +11,7 @@ import tools.impl.attribute.BaseAttributeCommand;
 import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
 import tools.impl.attribute.registry.impl.BaseAttributeRegistry;
-import tools.impl.tool.impl.EnchantedTool;
 import tools.impl.tool.type.IEnchantedTool;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @CommandAlias("enchants")
 public class EnchantCommands extends BaseCommand implements BaseAttributeCommand<Enchant, CustomEnchantFactory> {
@@ -81,7 +72,7 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 	@CommandCompletion("@enchants")
 	public void disenchantItem(Player player, AttributeKey key) {
 		if (key == null) {
-			Text.sendMessage(player, Messages.ENCHANT_DOESNT_EXIT);
+			// Text.sendMessage(player, Messages.ENCHANT_DOESNT_EXIT);
 			return;
 		}
 
