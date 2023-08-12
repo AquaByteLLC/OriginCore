@@ -19,8 +19,16 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class SkinnedTool implements ISkinnedTool {
-	private final ItemStack itemStack;
 
+	/**
+	 * What needs to be done as of now for skins is to create a general cooldown handler,
+	 * this will allow for handling custom abilitites and only allowing the events to be called when the ability is off
+	 * cooldown.
+	 *
+	 * Perhaps add an ability registry which can then be binded to a skin? Need to think of a nice way to do a builder for abilitites.
+	 */
+
+	private final ItemStack itemStack;
 	private static BaseAttributeRegistry<Skin> getRegistry() {
 		return ToolsPlugin.getPlugin().getSkinRegistry();
 	}
@@ -115,7 +123,7 @@ public class SkinnedTool implements ISkinnedTool {
 
 	@Override
 	public boolean hasSkin(AttributeKey skinKey) {
-		return readContainer().get(hasSkin, PersistentDataType.STRING).equals(skinKey.getName());
+		return readContainer().get(hasSkin, PersistentDataType.STRING).equals(skinKey.getName()) && (itemStack.getItemMeta().getCustomModelData() == getRegistry().getByKey(skinKey).getModelData());
 	}
 
 	public static boolean canSkin(ItemStack item) {
