@@ -50,7 +50,7 @@ public class AugmentConfiguration extends AttributeConfiguration {
 
 		if (configuration.isConfigurationSection(enchantsSectionReplaced)) return;
 
-		buildAndSave(file -> {
+		writeAndSave(file -> {
 			final ConfigurationSection enchantsSection = getOrCreate(configuration, enchantsSectionReplaced);
 			final ConfigurationSection baseSection = getOrCreate(configuration, baseSectionReplaced);
 			final ConfigurationSection boostSection = getOrCreate(configuration, boostSectionReplaced);

@@ -2,6 +2,7 @@ package tools.impl.attribute.enchants.impl;
 
 import commons.events.impl.EventSubscriber;
 import lombok.SneakyThrows;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.enchants.Enchant;
@@ -11,6 +12,7 @@ import tools.impl.target.ToolTarget;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class CustomEnchantBuilder implements EnchantBuilder {
 	private final AttributeKey key;
@@ -94,7 +96,8 @@ public class CustomEnchantBuilder implements EnchantBuilder {
 		return this;
 	}
 
-	public Enchant build(EventSubscriber handleEnchant, ToolTarget... targets) {
+	public Enchant build(EventSubscriber handleEnchant, Consumer<FileConfiguration> writer, ToolTarget... targets) {
+		this.config.writeAndSave(writer);
 		return new CustomEnchant(
 				key,
 				List.of(targets),

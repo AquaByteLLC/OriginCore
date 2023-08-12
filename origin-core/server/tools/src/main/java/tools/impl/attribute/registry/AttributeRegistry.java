@@ -8,7 +8,7 @@ import tools.impl.attribute.AttributeKey;
 import java.util.List;
 
 public interface AttributeRegistry<T> {
-	@NotNull List<T> getAllEnchants();
+	@NotNull List<T> getAllAttributes();
 
 	void register(T attribute);
 

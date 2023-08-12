@@ -24,8 +24,8 @@ import tools.impl.tool.type.IAugmentedTool;
 import java.util.List;
 
 public class AugmentEvents implements Listener {
-	private EventRegistry registry;
-	final BaseAttributeRegistry<Augment> augmentRegistry;
+	private final EventRegistry registry;
+	private final BaseAttributeRegistry<Augment> augmentRegistry;
 
 	public AugmentEvents(EventRegistry registry) {
 		this.registry = registry;
@@ -49,9 +49,11 @@ public class AugmentEvents implements Listener {
 		if (!(event.getClickedInventory() instanceof PlayerInventory)) return;
 
 		if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
-			final ApplyAugmentEvent applyEvent = new ApplyAugmentEvent("augments", key, who, clicked, cursor);
-			applyEvent.callEvent();
-			event.setCancelled(true);
+			if (isApplicable(clicked, cursor)) {
+				final ApplyAugmentEvent applyEvent = new ApplyAugmentEvent("augments", key, who, clicked, cursor);
+				applyEvent.callEvent();
+				event.setCancelled(true);
+			}
 		}
 
 	}

@@ -1,20 +1,20 @@
 package tools.impl.attribute.augments.impl;
 
 import commons.events.impl.EventSubscriber;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.AugmentBuilder;
-import tools.impl.conf.AttributeConfiguration;
 import tools.impl.target.ToolTarget;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ToolAugmentBuilder implements AugmentBuilder {
-	private AttributeKey key;
+	private final AttributeKey key;
 	private EventSubscriber handle;
-	private AttributeConfiguration configuration;
 	private List<ToolTarget> targets;
 	private long maxBoost, minBoost;
 	private List<String> information;
@@ -64,7 +64,8 @@ public class ToolAugmentBuilder implements AugmentBuilder {
 	}
 
 	@Override
-	public Augment build(EventSubscriber handleEnchant, ToolTarget... targets) {
-		return new ToolAugment(key, handleEnchant, configuration, Arrays.stream(targets).toList(), maxBoost, minBoost, information, appliedLore, augmentStack);
+	public Augment build(EventSubscriber handleEnchant, Consumer<FileConfiguration> writer, ToolTarget... targets) {
+		this.config.writeAndSave(writer);
+		return new ToolAugment(key, handleEnchant, config, Arrays.stream(targets).toList(), maxBoost, minBoost, information, appliedLore, augmentStack);
 	}
 }

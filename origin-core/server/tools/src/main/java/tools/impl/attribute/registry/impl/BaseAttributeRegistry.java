@@ -26,7 +26,7 @@ public class BaseAttributeRegistry<T extends BaseAttribute> implements Attribute
 	}
 
 	@Override
-	public @NotNull List<T> getAllEnchants() {
+	public @NotNull List<T> getAllAttributes() {
 		return new ArrayList<>(attributes.values());
 	}
 

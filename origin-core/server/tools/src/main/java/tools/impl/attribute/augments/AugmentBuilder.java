@@ -1,8 +1,11 @@
 package tools.impl.attribute.augments;
 
 import commons.events.impl.EventSubscriber;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import tools.impl.target.ToolTarget;
+
+import java.util.function.Consumer;
 
 public interface AugmentBuilder {
 
@@ -16,5 +19,5 @@ public interface AugmentBuilder {
 
 	AugmentBuilder setAppliedLore(String lore);
 
-	Augment build(EventSubscriber handleEnchant, ToolTarget... targets);
+	Augment build(EventSubscriber handleEnchant, Consumer<FileConfiguration> writer, ToolTarget... targets);
 }
