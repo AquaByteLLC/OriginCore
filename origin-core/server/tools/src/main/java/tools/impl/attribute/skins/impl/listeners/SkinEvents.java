@@ -19,7 +19,7 @@ import tools.impl.attribute.skins.impl.events.RemoveSkinEvent;
 import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
 import tools.impl.tool.impl.SkinnedTool;
-import tools.impl.tool.type.IAugmentedTool;
+import tools.impl.tool.type.ISkinnedTool;
 
 import java.util.List;
 
@@ -105,7 +105,7 @@ public class SkinEvents implements Listener {
 
 		if (clickedSkinnedTool.isSkinnable()) {
 			if (clickedSkinnedTool.getSkin() == null) {
-				return cursor == IAugmentedTool.makeApplier(type);
+				return cursor == ISkinnedTool.makeApplier(type);
 			}
 		}
 		return false;
