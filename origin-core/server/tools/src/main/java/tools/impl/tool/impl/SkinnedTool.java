@@ -23,7 +23,7 @@ public class SkinnedTool implements ISkinnedTool {
 	/**
 	 * What needs to be done as of now for skins is to create a general cooldown handler,
 	 * this will allow for handling custom abilitites and only allowing the events to be called when the ability is off
-	 * cooldown.
+	 * cooldown. n
 	 *
 	 * Perhaps add an ability registry which can then be binded to a skin? Need to think of a nice way to do a builder for abilitites.
 	 */

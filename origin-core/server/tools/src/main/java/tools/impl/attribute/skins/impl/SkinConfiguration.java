@@ -10,6 +10,7 @@ import tools.impl.attribute.AttributeKey;
 import tools.impl.conf.AttributeConfiguration;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static tools.impl.attribute.skins.impl.SkinConfiguration.SkinConfigPaths.*;
 
@@ -21,6 +22,7 @@ public class SkinConfiguration extends AttributeConfiguration {
 		String base = skins + ".%key%";
 		String menuSectionPath = base + ".menuItem";
 		String modelSectionPath = base + ".model";
+		String cooldownSectionPath = base + ".cooldowns";
 
 		// PATHS
 		String lorePath = base + ".appliedLore";
@@ -33,6 +35,10 @@ public class SkinConfiguration extends AttributeConfiguration {
 		String itemDisplayNamePath = menuSectionPath + ".displayName";
 		String itemTypePath = menuSectionPath + ".type";
 		String itemLorePath = menuSectionPath + ".lore";
+
+		// COOLDOWN SECTION STUFF
+		String cooldownPath = cooldownSectionPath + ".length";
+		String timeUnitPath = cooldownSectionPath + ".unit";
 	}
 
 	private final FileConfiguration configuration;
@@ -44,6 +50,7 @@ public class SkinConfiguration extends AttributeConfiguration {
 		final String menuSectionReplaced = getAndReplace(menuSectionPath, key.getName());
 		final String modelSectionReplaced = getAndReplace(modelSectionPath, key.getName());
 		final String baseSectionReplaced = getAndReplace(base, key.getName());
+		final String cooldownSectionReplaced = getAndReplace(cooldownSectionPath, key.getName());
 		final String skinsSectionReplaced = skins;
 
 		if (configuration.isConfigurationSection(skinsSectionReplaced)) return;
@@ -51,17 +58,20 @@ public class SkinConfiguration extends AttributeConfiguration {
 		writeAndSave(file -> {
 			final ConfigurationSection skinsSection = getOrCreate(configuration, skinsSectionReplaced);
 			final ConfigurationSection baseSection = getOrCreate(configuration, baseSectionReplaced);
+			final ConfigurationSection cooldownSection = getOrCreate(configuration, cooldownSectionReplaced);
 			final ConfigurationSection modelSection = getOrCreate(configuration, modelSectionReplaced);
 			final ConfigurationSection menuSection = getOrCreate(configuration, menuSectionReplaced);
 
 			baseSection.set(getAsRelative(lorePath), "&7[&f{name} &eis currently applied &7]");
 			baseSection.set(getAsRelative(descriptionPath), List.of("Description of the skin", "This skin is super cool"));
-
 			modelSection.set(getAsRelative(modelDataPath), 50);
 
 			menuSection.set(getAsRelative(itemTypePath), "DIAMOND_BLOCK");
 			menuSection.set(getAsRelative(itemDisplayNamePath), "&c&lApply item: &f{name}");
 			menuSection.set(getAsRelative(itemLorePath), List.of("&f{name} &f {information}%"));
+
+			cooldownSection.set(getAsRelative(cooldownPath), 30);
+			cooldownSection.set(getAsRelative(timeUnitPath), TimeUnit.SECONDS.toString());
 		});
 	}
 
@@ -80,6 +90,16 @@ public class SkinConfiguration extends AttributeConfiguration {
 	public int getModelData() {
 		final String modelData = getAndReplace(modelDataPath, getKey().getName());
 		return configuration.getInt(modelData);
+	}
+
+	public int getCooldownDuration() {
+		final String cooldown = getAndReplace(cooldownPath, getKey().getName());
+		return configuration.getInt(cooldown);
+	}
+
+	public TimeUnit getCooldownUnit() {
+		final String unitPath = getAndReplace(timeUnitPath, getKey().getName());
+		return TimeUnit.valueOf(configuration.getString(unitPath));
 	}
 
 	public ItemStack getMenuItem() {

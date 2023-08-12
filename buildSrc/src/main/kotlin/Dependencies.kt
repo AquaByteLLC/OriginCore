@@ -24,7 +24,7 @@ object Versions {
     const val VIA_VERSION_VER = "4.7.0"
     const val JAKARTA_VER = "4.0.0"
     const val APACHE_VER = "4.5.13"
-    const val SHELFTOR_VER = "0.2"
+    const val SHELFTOR_VER = "0.1"
     const val BINDABLES_VER = "v0.2"
 }
 
@@ -58,4 +58,5 @@ object Dependencies {
     const val JAKARTA = "jakarta.xml.bind:jakarta.xml.bind-api:${Versions.JAKARTA_VER}"
     const val APACHE_HTTP = "org.apache.httpcomponents:httpmime:${Versions.APACHE_VER}"
     const val SHELFTOR = "dev.oop778.shelftor:shelftor-core:${Versions.SHELFTOR_VER}"
+    const val SHELFTOR_API = "dev.oop778.shelftor:shelftor-api:${Versions.SHELFTOR_VER}"
 }

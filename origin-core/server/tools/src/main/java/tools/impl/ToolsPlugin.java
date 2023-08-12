@@ -6,6 +6,8 @@ import commons.events.impl.impl.DetachedSubscriber;
 import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import org.bukkit.event.player.PlayerJoinEvent;
+import tools.impl.ability.cache.impl.AttributeCache;
+import tools.impl.ability.cache.types.PlayerBasedCachedAttribute;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.ToolAugmentFactory;
 import tools.impl.attribute.enchants.Enchant;
@@ -26,6 +28,7 @@ public class ToolsPlugin extends ExtendedJavaPlugin {
 
 	@Getter private BaseAttributeRegistry<Skin> skinRegistry;
 	@Getter private ToolSkinFactory skinFactory;
+	@Getter private AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> skinCache;
 	private DetachedSubscriber<PlayerJoinEvent> playerJoinEventDetachedSubscriber;
 
 	@Override
@@ -42,6 +45,7 @@ public class ToolsPlugin extends ExtendedJavaPlugin {
 
 		this.skinRegistry = new BaseAttributeRegistry<>(registry);
 		this.skinFactory = new ToolSkinFactory();
+		this.skinCache = new AttributeCache<>();
 
 		playerJoinEventDetachedSubscriber = new DetachedSubscriber<>(PlayerJoinEvent.class, ((context, event) -> {
 		}));

@@ -9,6 +9,7 @@ import tools.impl.attribute.skins.SkinBuilder;
 import tools.impl.target.ToolTarget;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class ToolSkinBuilder implements SkinBuilder {
@@ -21,11 +22,15 @@ public class ToolSkinBuilder implements SkinBuilder {
 	private String appliedLore;
 	private ItemStack skinStack;
 	private final SkinConfiguration config;
+	private TimeUnit timeUnit;
+	private int time;
 
 	public ToolSkinBuilder(AttributeKey key) {
 		this.key = key;
 		this.config = new SkinConfiguration(key);
 
+		this.timeUnit = config.getCooldownUnit();
+		this.time = config.getCooldownDuration();
 		this.appliedLore = config.getAugmentAppliedLore();
 		this.information = config.getDescription();
 		this.skinStack = config.getMenuItem();
@@ -59,6 +64,6 @@ public class ToolSkinBuilder implements SkinBuilder {
 	@Override
 	public Skin build(EventSubscriber handleEnchant, Consumer<FileConfiguration> writer, ToolTarget... targets) {
 		this.config.writeAndSave(writer);
-		return new ToolSkin(key, handleEnchant, config, List.of(targets), information, appliedLore, skinStack, modelData);
+		return new ToolSkin(key, handleEnchant, config, timeUnit, time, List.of(targets), information, appliedLore, skinStack, modelData);
 	}
 }
