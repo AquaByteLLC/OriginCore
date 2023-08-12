@@ -33,9 +33,7 @@ public enum GeneralAugmentTypes implements AttributeKey {
 				 */
 				event.getPlayer().sendMessage(StringUtil.colorize("&eWorking!"));
 			}
-		}), writer -> {
-
-	}, ToolTarget.all());
+		}), writer -> {}, ToolTarget.all());
 
 	private final String name;
 	private final NamespacedKey key;

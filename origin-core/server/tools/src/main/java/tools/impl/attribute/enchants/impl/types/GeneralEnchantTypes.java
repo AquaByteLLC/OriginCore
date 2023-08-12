@@ -5,6 +5,7 @@ import commons.events.impl.impl.DetachedSubscriber;
 import commons.util.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -16,31 +17,35 @@ import tools.impl.attribute.registry.impl.BaseAttributeRegistry;
 import tools.impl.target.ToolTarget;
 import tools.impl.tool.impl.EnchantedTool;
 
+import java.util.function.Consumer;
+
 public enum GeneralEnchantTypes implements AttributeKey {
 
 	PLAYER_SPEED_BOOST("Speed Boost",
-		subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
-			final ItemStack playersItem = ctx.getPlayer().getInventory().getItemInMainHand();
-			if (playersItem.getType().isAir()) return;
-			final EnchantedTool item = new EnchantedTool(playersItem);
+			subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
+				final ItemStack playersItem = ctx.getPlayer().getInventory().getItemInMainHand();
+				if (playersItem.getType().isAir()) return;
+				final EnchantedTool item = new EnchantedTool(playersItem);
 
-			if (item.activate(key)) {
+				if (item.activate(key)) {
 				/*
 				Modify player speed
 				 */
-				event.getPlayer().sendMessage(StringUtil.colorize("&eWorking!"));
-			}
-		}), ToolTarget.all());
+					event.getPlayer().sendMessage(StringUtil.colorize("&eWorking!"));
+				}
+			}), writer -> {}, ToolTarget.all());
 
 	private final String name;
 	private final NamespacedKey key;
 	private final EventSubscriber subscriber;
+	private final Consumer<FileConfiguration> writer;
 	private final ToolTarget[] targets;
 
-	GeneralEnchantTypes(String name, EventSubscriber subscriber, ToolTarget... targets) {
+	GeneralEnchantTypes(String name, EventSubscriber subscriber, Consumer<FileConfiguration> writer, ToolTarget... targets) {
 		this.name = name;
 		this.key = name2key(name);
 		this.subscriber = subscriber;
+		this.writer = writer;
 		this.targets = targets;
 	}
 
@@ -81,6 +86,6 @@ public enum GeneralEnchantTypes implements AttributeKey {
 			throw new UnsupportedOperationException();
 		init = true;
 		for (GeneralEnchantTypes value : values())
-			registry.register(factory.newAttributeBuilder(value).build(value.subscriber, value.targets));
+			registry.register(factory.newAttributeBuilder(value).build(value.subscriber, value.writer, value.targets));
 	}
 }
