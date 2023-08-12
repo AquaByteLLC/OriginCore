@@ -3,6 +3,7 @@ package tools.impl.attribute.enchants.impl;
 import me.lucko.helper.item.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import tools.impl.attribute.AttributeFactory;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.enchants.EnchantBuilder;
@@ -27,6 +28,7 @@ public class CustomEnchantFactory implements AttributeFactory<IEnchantedTool, En
 	}
 
 	@Override
+	@Contract("null -> null; !null -> !null")
 	public IEnchantedTool wrapItemStack(ItemStack item) {
 		return item == null ? null : new EnchantedTool(item);
 	}

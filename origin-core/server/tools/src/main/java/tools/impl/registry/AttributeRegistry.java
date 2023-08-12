@@ -1,4 +1,4 @@
-package tools.impl.attribute.registry;
+package tools.impl.registry;
 
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;

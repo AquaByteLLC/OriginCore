@@ -14,7 +14,7 @@ import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
-import tools.impl.attribute.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.progression.ProgressionType;
 import tools.impl.tool.IBaseTool;
 import tools.impl.tool.type.IEnchantedTool;

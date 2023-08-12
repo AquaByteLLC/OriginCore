@@ -11,7 +11,7 @@ import tools.impl.ToolsPlugin;
 import tools.impl.attribute.BaseAttributeCommand;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.ToolAugmentFactory;
-import tools.impl.attribute.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.tool.type.IAugmentedTool;
 
 @CommandAlias("augments")

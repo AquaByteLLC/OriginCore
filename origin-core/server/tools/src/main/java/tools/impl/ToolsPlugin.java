@@ -10,7 +10,9 @@ import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.ToolAugmentFactory;
 import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
-import tools.impl.attribute.registry.impl.BaseAttributeRegistry;
+import tools.impl.attribute.skins.Skin;
+import tools.impl.attribute.skins.impl.ToolSkinFactory;
+import tools.impl.registry.impl.BaseAttributeRegistry;
 
 public class ToolsPlugin extends ExtendedJavaPlugin {
 
@@ -21,6 +23,9 @@ public class ToolsPlugin extends ExtendedJavaPlugin {
 
 	@Getter private BaseAttributeRegistry<Augment> augmentRegistry;
 	@Getter private ToolAugmentFactory augmentFactory;
+
+	@Getter private BaseAttributeRegistry<Skin> skinRegistry;
+	@Getter private ToolSkinFactory skinFactory;
 	private DetachedSubscriber<PlayerJoinEvent> playerJoinEventDetachedSubscriber;
 
 	@Override
@@ -31,6 +36,12 @@ public class ToolsPlugin extends ExtendedJavaPlugin {
 
 		this.enchantRegistry = new BaseAttributeRegistry<>(registry);
 		this.enchantFactory = new CustomEnchantFactory();
+
+		this.augmentRegistry = new BaseAttributeRegistry<>(registry);
+		this.augmentFactory = new ToolAugmentFactory();
+
+		this.skinRegistry = new BaseAttributeRegistry<>(registry);
+		this.skinFactory = new ToolSkinFactory();
 
 		playerJoinEventDetachedSubscriber = new DetachedSubscriber<>(PlayerJoinEvent.class, ((context, event) -> {
 		}));

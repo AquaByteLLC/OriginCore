@@ -1,4 +1,4 @@
-package tools.impl.attribute.registry.impl;
+package tools.impl.registry.impl;
 
 import commons.events.api.EventRegistry;
 import org.bukkit.NamespacedKey;
@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.BaseAttribute;
-import tools.impl.attribute.registry.AttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;

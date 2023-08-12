@@ -3,6 +3,7 @@ package tools.impl.attribute.augments.impl;
 import me.lucko.helper.item.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import tools.impl.attribute.AttributeFactory;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.augments.AugmentBuilder;
@@ -27,6 +28,7 @@ public class ToolAugmentFactory implements AttributeFactory<IAugmentedTool, Augm
 	}
 
 	@Override
+	@Contract("null -> null; !null -> !null")
 	public IAugmentedTool wrapItemStack(ItemStack item) {
 		return item == null ? null : new AugmentedTool(item);
 	}

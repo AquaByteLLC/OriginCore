@@ -10,7 +10,7 @@ import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.BaseAttributeCommand;
 import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
-import tools.impl.attribute.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.tool.type.IEnchantedTool;
 
 @CommandAlias("enchants")

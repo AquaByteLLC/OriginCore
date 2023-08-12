@@ -13,7 +13,7 @@ import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.Consumer3;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.ToolAugmentFactory;
-import tools.impl.attribute.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.target.ToolTarget;
 import tools.impl.tool.impl.AugmentedTool;
 

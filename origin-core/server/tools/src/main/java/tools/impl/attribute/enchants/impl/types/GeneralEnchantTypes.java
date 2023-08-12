@@ -13,7 +13,7 @@ import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.Consumer3;
 import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
-import tools.impl.attribute.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.target.ToolTarget;
 import tools.impl.tool.impl.EnchantedTool;
 

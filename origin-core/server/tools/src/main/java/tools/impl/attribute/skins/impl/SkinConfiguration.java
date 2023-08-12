@@ -1,4 +1,4 @@
-package tools.impl.attribute.augments.impl;
+package tools.impl.attribute.skins.impl;
 
 import me.lucko.helper.item.ItemStackBuilder;
 import org.bukkit.Material;
@@ -11,25 +11,23 @@ import tools.impl.conf.AttributeConfiguration;
 
 import java.util.List;
 
-import static tools.impl.attribute.augments.impl.AugmentConfiguration.AugmentConfigPaths.*;
+import static tools.impl.attribute.skins.impl.SkinConfiguration.SkinConfigPaths.*;
 
-public class AugmentConfiguration extends AttributeConfiguration {
-
-	public interface AugmentConfigPaths {
+public class SkinConfiguration extends AttributeConfiguration {
+	public interface SkinConfigPaths {
 
 		// BASES
-		String augments = "Augments";
-		String base = augments + ".%key%";
+		String skins = "Skins";
+		String base = skins + ".%key%";
 		String menuSectionPath = base + ".menuItem";
-		String boostSectionPath = base + ".boost";
+		String modelSectionPath = base + ".model";
 
 		// PATHS
 		String lorePath = base + ".appliedLore";
 		String descriptionPath = base + ".description";
 
-		// BOOST SECTION STUFF
-		String maxBoostPath = boostSectionPath + ".max";
-		String minBoostPath = boostSectionPath + ".min";
+		// MODEL SECTION STUFF
+		String modelDataPath = modelSectionPath + ".data";
 
 		// MENU SECTION STUFF
 		String itemDisplayNamePath = menuSectionPath + ".displayName";
@@ -39,32 +37,31 @@ public class AugmentConfiguration extends AttributeConfiguration {
 
 	private final FileConfiguration configuration;
 
-	public AugmentConfiguration(AttributeKey key) {
-		super(key, "augments");
+	public SkinConfiguration(AttributeKey key) {
+		super(key, "skins");
 		this.configuration = getConf().getFileConfiguration();
 
 		final String menuSectionReplaced = getAndReplace(menuSectionPath, key.getName());
-		final String boostSectionReplaced = getAndReplace(boostSectionPath, key.getName());
+		final String modelSectionReplaced = getAndReplace(modelSectionPath, key.getName());
 		final String baseSectionReplaced = getAndReplace(base, key.getName());
-		final String augmentSectionReplaced = augments;
+		final String skinsSectionReplaced = skins;
 
-		if (configuration.isConfigurationSection(augmentSectionReplaced)) return;
+		if (configuration.isConfigurationSection(skinsSectionReplaced)) return;
 
 		writeAndSave(file -> {
-			final ConfigurationSection augmentsSection = getOrCreate(configuration, augmentSectionReplaced);
+			final ConfigurationSection skinsSection = getOrCreate(configuration, skinsSectionReplaced);
 			final ConfigurationSection baseSection = getOrCreate(configuration, baseSectionReplaced);
-			final ConfigurationSection boostSection = getOrCreate(configuration, boostSectionReplaced);
+			final ConfigurationSection modelSection = getOrCreate(configuration, modelSectionReplaced);
 			final ConfigurationSection menuSection = getOrCreate(configuration, menuSectionReplaced);
 
-			baseSection.set(getAsRelative(lorePath), "&7[&e{name} &f &e{boost}&7]");
-			baseSection.set(getAsRelative(descriptionPath), List.of("Description of the augment", "This augment is super cool"));
+			baseSection.set(getAsRelative(lorePath), "&7[&f{name} &eis currently applied &7]");
+			baseSection.set(getAsRelative(descriptionPath), List.of("Description of the skin", "This skin is super cool"));
 
-			boostSection.set(getAsRelative(minBoostPath), 0);
-			boostSection.set(getAsRelative(maxBoostPath), 50);
+			modelSection.set(getAsRelative(modelDataPath), 50);
 
 			menuSection.set(getAsRelative(itemTypePath), "DIAMOND_BLOCK");
 			menuSection.set(getAsRelative(itemDisplayNamePath), "&c&lApply item: &f{name}");
-			menuSection.set(getAsRelative(itemLorePath), List.of("&f{name} &f {boost}%"));
+			menuSection.set(getAsRelative(itemLorePath), List.of("&f{name} &f {information}%"));
 		});
 	}
 
@@ -80,16 +77,9 @@ public class AugmentConfiguration extends AttributeConfiguration {
 		return configuration.getStringList(descriptionPath);
 	}
 
-	public long getMaxBoost() {
-		final String path = maxBoostPath;
-		final String maxBoostPath = getAndReplace(path, getKey().getName());
-		return configuration.getLong(maxBoostPath);
-	}
-
-	public long getMinBoost() {
-		final String path = minBoostPath;
-		final String minBoostPath = getAndReplace(path, getKey().getName());
-		return configuration.getLong(minBoostPath);
+	public int getModelData() {
+		final String modelData = getAndReplace(modelDataPath, getKey().getName());
+		return configuration.getInt(modelData);
 	}
 
 	public ItemStack getMenuItem() {

@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 public class UniqueItemBuilder extends GeneralToolBuilder {
 
-
 	private final Map<String, Pair<String, Object>> placeholderData = new HashMap<>();
 	public static final Map<String, Pair<String, List<String>>> initial = new ConcurrentHashMap<>();
 	public static final NamespacedKey uniqueIdentifier = new NamespacedKey("builder", "id");
