@@ -9,7 +9,9 @@ import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.PlaceholderMessage;
 import me.vadim.util.conf.wrapper.Placeholders;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
+import me.vadim.util.item.ItemBuilder;
 import me.vadim.util.item.Text;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -21,6 +23,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class LevelsConfig extends BukkitConfig {
@@ -47,18 +52,18 @@ public class LevelsConfig extends BukkitConfig {
 
 	public List<LevelReward> getRewards(int level) {
 		final ArrayList<LevelReward> pickedCommands = new ArrayList<>();
-		final List<String> commandList = getCommandList(level);
+		final List<String>           commandList    = getCommandList(level);
 
-		while(pickedCommands.size() < getCommandCount(level)) {
+		while (pickedCommands.size() < getCommandCount(level)) {
 			final Random random = new Random();
 			random.setSeed(System.currentTimeMillis());
 
-			final int num = random.nextInt(commandList.size());
+			final int    num  = random.nextInt(commandList.size());
 			final String pick = commandList.get(num);
 
 			final LevelReward reward = new RewardImpl(pick, String.join("\n", getRewardNames(level)));
 
-			if(!pickedCommands.contains(reward)) pickedCommands.add(reward);
+			if (!pickedCommands.contains(reward)) pickedCommands.add(reward);
 		}
 		return pickedCommands;
 	}
@@ -101,9 +106,9 @@ public class LevelsConfig extends BukkitConfig {
 		for (String id : getConfiguration().getConfigurationSection("levels").getKeys(false)) {
 			final int num = Integer.parseInt(id);
 
-			final double requiredExperience = getRequiredExperience(num);
-			final int commandCount = getCommandCount(num);
-			final List<LevelReward> rewards = getRewards(num);
+			final double            requiredExperience = getRequiredExperience(num);
+			final int               commandCount       = getCommandCount(num);
+			final List<LevelReward> rewards            = getRewards(num);
 
 			levels.add(new LevelImpl(requiredExperience, rewards, commandCount, num));
 		}
@@ -113,4 +118,48 @@ public class LevelsConfig extends BukkitConfig {
 		}
 		return levels;
 	}
+
+	private static final Pattern MODEL_DATA = Pattern.compile("([^()]+)(\\(\\d+\\))?");
+
+	private ItemBuilder getMaterialModelData(String path, String name) {
+		String mat  = getConfigurationAccessor().getString(path);
+		name += " MATERIAL(modeldata)";
+		if (mat == null)
+			logError(path, name);
+		assert mat != null;
+
+		Matcher matcher = MODEL_DATA.matcher(mat);
+		matcher.matches();
+
+		Material material = Material.matchMaterial(matcher.group(1));
+		if (material == null)
+			logError(path, name);
+		assert material != null;
+
+		ItemBuilder builder = ItemBuilder.create(material);
+
+		try {
+			int model = Integer.parseInt(matcher.group(2).replaceAll("\\D", ""));
+			builder.customModelData(model);
+		} catch (NumberFormatException x) {
+			logError(path, name);
+		} catch (IllegalStateException | NullPointerException ignored) {
+
+		}
+
+		return builder;
+	}
+
+	public ItemBuilder getNextLevelButton(boolean legacy) {
+		return getMaterialModelData(legacy ? "legacy.menu.next_level_button" : "nonlegacy.menu.next_level_button", "next level button");
+	}
+
+	public ItemBuilder getLockedLevelButton(boolean legacy) {
+		return getMaterialModelData(legacy ? "legacy.menu.locked_level_button" : "nonlegacy.menu.locked_level_button", "next level button");
+	}
+
+	public ItemBuilder getUnlockedLevelButton(boolean legacy) {
+		return getMaterialModelData(legacy ? "legacy.menu.unlocked_level_button" : "nonlegacy.menu.unlocked_level_button", "next level button");
+	}
+
 }

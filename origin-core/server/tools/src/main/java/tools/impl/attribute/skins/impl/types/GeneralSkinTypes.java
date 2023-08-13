@@ -52,13 +52,17 @@ public enum GeneralSkinTypes implements AttributeKey {
 								.usePolicy(TimedExpiringPolicy.create(10, TimeUnit.SECONDS, false))
 								.build();
 
-						abilityCreator.setExpiringShelf(shelf).setExpirationHandler(($) -> {
-							$.getPlayer().sendMessage("Seems that the ability ran out!");
-						}).setWhileInCache(($) -> {
-							$.getPlayer().sendMessage("Still in the cache so the event is functioning!");
-						}).setWhileNotInCache(($) -> {
-							$.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!");
-						}).create(BlockBreakEvent.class, playerCachedAttribute);
+						abilityCreator.setExpiringShelf(shelf)
+									  .setExpirationHandler(($) -> {
+										  $.getPlayer().sendMessage("Seems that the ability ran out!");
+									  })
+									  .setWhileInCache(($) -> {
+										  $.getPlayer().sendMessage("Still in the cache so the event is functioning!");
+									  })
+									  .setWhileNotInCache(($) -> {
+										  $.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!");
+									  })
+									  .create(BlockBreakEvent.class, playerCachedAttribute);
 
 						event.getPlayer().sendMessage(StringUtil.colorize("&eWorking!"));
 					}

@@ -1,5 +1,5 @@
-group = "enchants.impl"
-sharedProjectData.main_cls = "$group.EnchantPlugin"
+group = "levels"
+sharedProjectData.main_cls = "$group.LevelsPlugin"
 
 setupKotlin()
 setupShadowJar()
@@ -14,6 +14,8 @@ dependencies {
     compileOnly(Dependencies.LUCKO_HELPER)
     compileOnly(Dependencies.LUCKO_SQL)
     compileOnly(Dependencies.GUICE)
+    compileOnly(Dependencies.ORMLITE_CORE)
+    compileOnly(Dependencies.ORMLITE_JDBC)
     compileOnly(Dependencies.LFC_SHARED)
     compileOnly(Dependencies.LFC_BUKKIT)
     compileOnly(Dependencies.ITEMS)

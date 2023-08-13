@@ -1,5 +1,7 @@
 package tools.impl.ability.builder.impl;
 
+import commons.events.api.EventContext;
+import commons.events.api.Subscribe;
 import commons.events.impl.impl.DetachedSubscriber;
 import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
 import org.bukkit.event.Event;
@@ -11,7 +13,7 @@ import java.util.function.Consumer;
 
 public class AbilityCreator<T extends ExpiringAttribute, A extends CachedAttribute<T>> implements IAbilityCreator<T, A> {
 
-	private ExpiringShelf<A>  cache;
+	private ExpiringShelf<A> cache;
 	private Consumer<A> whileIn;
 	private Consumer<A> whileOut;
 	private DetachedSubscriber<?> subscriber;
@@ -46,8 +48,13 @@ public class AbilityCreator<T extends ExpiringAttribute, A extends CachedAttribu
 		this.cache.onExpire(expirationHandler);
 
 		this.subscriber = new DetachedSubscriber<>(clazz, ((context, event) -> {
-			if (cache.contains(attribute)) whileIn.accept(attribute);
-		    else whileOut.accept(attribute);
+			if (this.subscriber != null) {
+				if (cache.contains(attribute))
+					whileIn.accept(attribute);
+				else
+					whileOut.accept(attribute);
+			}
+			this.subscriber = null;
 		}));
 	}
 

@@ -1,6 +1,6 @@
-package levels.menus
+package commons.menu
 
-import levels.menu.MenuSorter
+import commons.menu.MenuSorter
 import me.vadim.util.menu.MenuList
 import me.vadim.util.menu.button
 import me.vadim.util.menu.impl.ListMenu
@@ -16,12 +16,14 @@ class ProgressionMenuYX<T>(plugin: Plugin, menu: MenuList<T>, private val opts: 
 	ListMenu<T>(plugin, menu.template, menu.transformer, menu.fill, menu.next, menu.back, menu.select, menu.page, menu.items) {
 
 	override fun generate() {
+		val list = items.toList()
+		val ct = MenuSorter.ctYX(opts)
+
 		this.fill = include(*MenuSorter.slotsYX(opts))
 		super.generate()
 
-		for ((i, chunk) in items.chunked(MenuSorter.ctYX(opts)).withIndex()) {
+		for ((i, chunk) in list.chunked(ct).withIndex()) {
 			val sort = MenuSorter.sortYX(chunk, opts)
-
 			sort.forEach { (slot, t) ->
 				pages[i].apply {
 					button(transformer(t)) {
@@ -31,7 +33,10 @@ class ProgressionMenuYX<T>(plugin: Plugin, menu: MenuList<T>, private val opts: 
 					} into slot
 				}
 			}
+			pages[i].generate()
 		}
+
+		items = list.toMutableList()
 	}
 
 }

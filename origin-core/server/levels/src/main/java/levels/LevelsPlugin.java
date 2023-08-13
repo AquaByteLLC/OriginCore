@@ -13,6 +13,8 @@ import levels.cmd.LevelsCommand;
 import levels.conf.LevelsConfig;
 import levels.conf.action.LevelEffects;
 import levels.conf.action.LevelMessages;
+import levels.data.LevelsAccount;
+import levels.data.LevelsAccountStorage;
 import levels.registry.LevelRegistry;
 import levels.registry.impl.LevelRegistryImpl;
 import me.vadim.util.conf.ConfigurationManager;
@@ -29,9 +31,11 @@ public class LevelsPlugin extends JavaPlugin implements ResourceProvider, Origin
 	private PaperCommandManager commands;
 	private LevelRegistry levelRegistry;
 
+	private LevelsAccountStorage accounts;
+
 	@Override
-	public AccountStorage<?> getAccounts() {
-		return null;
+	public AccountStorage<LevelsAccount> getAccounts() {
+		return accounts;
 	}
 
 	@Override
@@ -53,15 +57,16 @@ public class LevelsPlugin extends JavaPlugin implements ResourceProvider, Origin
 		lfc.register(LevelsConfig.class, LevelsConfig::new);
 		lfc.reload();
 
-		Commons.commons().registerModule(this);
-
 		SessionProvider db = Commons.db();
 		EventRegistry events  = Commons.events();
 
 		levelRegistry = LevelRegistryImpl.load(config());
+		accounts = new LevelsAccountStorage(Commons.db(), levelRegistry);
 
 		commands = new PaperCommandManager(this);
-		commands.registerCommand(new LevelsCommand());
+		commands.registerCommand(new LevelsCommand(this));
+
+		Commons.commons().registerModule(this);
 	}
 
 

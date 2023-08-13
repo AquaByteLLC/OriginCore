@@ -1,11 +1,15 @@
-package levels.menu;
+package commons.menu;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import lombok.ToString;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class MenuSorter {
 
@@ -17,6 +21,13 @@ public class MenuSorter {
 	//   [9..17],
 	//   <etc>
 	// ]
+
+	static {
+		int i = 0;
+		for (int y = 0; y < slots.length; y++)
+			for (int x = 0; x < slots[y].length; x++)
+				 slots[y][x] = i++;
+	}
 
 	@SuppressWarnings("ConstantValue")
 	public static <T> List<List<T>> chunked(List<T> list, int size) {
@@ -43,6 +54,7 @@ public class MenuSorter {
 		return chunked;
 	}
 
+	@ToString
 	public static final class ProgressionOptions {
 
 		final int min, max;
@@ -89,7 +101,7 @@ public class MenuSorter {
 		boolean nxtY = false;
 
 		int i = 0;
-		while (y < Y || x <= opts.e) {
+		while (y < Y && x <= opts.e) {
 			consumer.process(x, y, i++);
 
 			if (incX)
@@ -121,7 +133,10 @@ public class MenuSorter {
 
 	public static <T> BiMap<Integer, T> sortYX(List<T> sort, ProgressionOptions opts) {
 		BiMap<Integer, T> ofSlots = HashBiMap.create();
-		foreachYX(opts, (x, y, i) -> ofSlots.put(slots[y][x], sort.get(i)));
+		foreachYX(opts, (x, y, i) -> {
+			if (i < sort.size())
+				ofSlots.put(slots[y][x], sort.get(i));
+		});
 		return ofSlots;
 	}
 

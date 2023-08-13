@@ -7,6 +7,7 @@ import levels.Level;
 import levels.LevelsPlugin;
 import levels.conf.LevelsConfig;
 import levels.conf.action.LevelMessages;
+import levels.data.LevelsAccount;
 import levels.event.ExperienceGainEvent;
 import levels.event.LevelUpEvent;
 import levels.reward.LevelReward;
@@ -29,9 +30,9 @@ public class LevelEvents {
 	@Subscribe
 	public void onXpGain(ExperienceGainEvent event) {
 		if (event.getCalling().equals("commons")) {
-			final PlayerDefaultAccount account = Commons.commons().getAccounts().getAccount(event.getPlayer());
+			final LevelsAccount account = plugin.getAccounts().getAccount(event.getPlayer());
 
-			final int lvl = account.getLevel().intValueExact();
+			final int lvl = account.getLevel();
 
 			if ((lvl) >= plugin.getLevelRegistry().getLevels().size()) {
 				return;
@@ -39,8 +40,8 @@ public class LevelEvents {
 
 			final Level playerLevel = plugin.getLevelRegistry().getLevels().get(lvl);
 
-			while (event.getAmount() >= playerLevel.getRequiredExperience() && !(account.getLevel().intValueExact() >= plugin.getLevelRegistry().getLevels().size())) {
-				account.addLevel(BigInteger.ONE);
+			while (event.getAmount() >= playerLevel.getRequiredExperience() && !(account.getLevel() >= plugin.getLevelRegistry().getLevels().size())) {
+				account.addLevel(1);
 			}
 		}
 	}
@@ -61,8 +62,8 @@ public class LevelEvents {
 	@Subscribe
 	public void onBreak(BlockBreakEvent event) {
 		event.getPlayer().sendMessage("Hey, giving XP!");
-		final PlayerDefaultAccount account = Commons.commons().getAccounts().getAccount(event.getPlayer());
-		account.addExperience(BigDecimal.valueOf(20));
+		final LevelsAccount account = plugin.getAccounts().getAccount(event.getPlayer());
+		account.addExperience(20f);
 	}
 	
 }

@@ -1,6 +1,10 @@
 legacy:
   menu:
     title: "Levels Legacy"
+    next_level_button: YELLOW_CONCRETE
+    locked_level_button: RED_CONCRETE
+    unlocked_level_button: LIME_CONCRETE
+
   locked_Level:
     type: RED_DYE
     name: "&4&l[&c&l!&4&l] #ff5555&lL#f84e4e&lo#f14747&lc#ea4040&lk#e33939&le#dc3232&ld #d52b2b&lU#cd2323&lp#c61c1c&lg#bf1515&lr#b80e0e&la#b10707&ld#aa0000&le &7(None)"
@@ -40,6 +44,11 @@ legacy:
 nonlegacy:
   menu:
     title: "Levels Modern"
+    # MATERIAL(modeldata), modeldata optional
+    next_level_button: YELLOW_CONCRETE(1)
+    locked_level_button: RED_CONCRETE(1)
+    unlocked_level_button: LIME_CONCRETE(1)
+    
   locked_Level:
     type: RED_DYE
     name: "&4&l[&c&l!&4&l] #ff5555&lL#f84e4e&lo#f14747&lc#ea4040&lk#e33939&le#dc3232&ld #d52b2b&lU#cd2323&lp#c61c1c&lg#bf1515&lr#b80e0e&la#b10707&ld#aa0000&le &7(None)"
