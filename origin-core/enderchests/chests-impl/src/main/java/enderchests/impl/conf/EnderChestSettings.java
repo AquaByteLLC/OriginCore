@@ -67,7 +67,6 @@ public enum EnderChestSettings implements EnumeratedSetting {
 			builder.addSetting(value.setting);
 
 		builder.setMenuItem(Commons.config().getEChestsSettingsIcon());
-
 		//builder.setName(String.valueOf(Commons.config().getEChestsSettingsIcon().displayName()));
 		//builder.setDescription(Commons.config().getEChestsSettingsIcon().getLore().toArray(String[]::new));
 

@@ -63,22 +63,21 @@ class EnderChestMenu(private val plugin: EnderChestsPlugin, private val player: 
 
 	override val menu: MenuList<NetworkColor> = template.toList(queryItems(), transformer = {
 		val color = it.chatColor.toString() + StringUtil.convertToUserFriendlyCase(it.name) + ChatColor.WHITE
-		val builder = config().selectColorItem.format(colors[it], StringPlaceholder.of("color", color))
 		val account = accounts.getAccount(player)
+		val pl = StringPlaceholder.builder()
+			.set("color", color)
+			.set("slots", registry.getNetwork(it, account.offlineOwner).slotsUsed)
+			.set("limit", account.slotLimit)
+			.build()
 
-		if (account.atSlotLimit(it)) { // the code your eyes are about to witness is unholy to the Lord
-			val pl = StringPlaceholder.builder()
-				.set("color", color)
-				.set("slots", registry.getNetwork(it, account.offlineOwner).slotsUsed.toString())
-				.set("limit", account.slotLimit.toString())
-				.build()
+		val builder = config().selectColorItem.format(colors[it], pl)
+		if (account.atSlotLimit(it)) // the code your eyes are about to witness is unholy to the Lord
 			builder.allFlags().enchantment(Enchantment.MENDING, 1).editMeta { meta ->
 				var list = meta.lore
 				if (list == null) list = mutableListOf()
 				list.addAll(config().slotLimitLore.map { L -> L.format(pl) }.toList())
 				meta.lore = list.map { L -> pl.format(L) }
 			}
-		}
 
 		builder.build()
 	}) {
