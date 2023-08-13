@@ -1,38 +1,54 @@
 package tools.impl;
 
+import co.aikar.commands.PaperCommandManager;
 import commons.Commons;
 import commons.events.api.EventRegistry;
-import commons.events.impl.impl.DetachedSubscriber;
 import lombok.Getter;
-import me.lucko.helper.plugin.ExtendedJavaPlugin;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.Material;
+import org.bukkit.plugin.java.JavaPlugin;
 import tools.impl.ability.cache.impl.AttributeCache;
 import tools.impl.ability.cache.types.PlayerBasedCachedAttribute;
+import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.ToolAugmentFactory;
+import tools.impl.attribute.augments.impl.commands.AugmentCommands;
+import tools.impl.attribute.augments.impl.listeners.AugmentEvents;
+import tools.impl.attribute.augments.impl.types.GeneralAugmentTypes;
 import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
+import tools.impl.attribute.enchants.impl.commands.EnchantCommands;
+import tools.impl.attribute.enchants.impl.types.GeneralEnchantTypes;
 import tools.impl.attribute.skins.Skin;
 import tools.impl.attribute.skins.impl.ToolSkinFactory;
+import tools.impl.attribute.skins.impl.commands.SkinCommands;
+import tools.impl.attribute.skins.impl.listeners.SkinEvents;
+import tools.impl.attribute.skins.impl.types.GeneralSkinTypes;
+import tools.impl.attribute.skins.impl.types.shelf.Shelves;
 import tools.impl.registry.impl.BaseAttributeRegistry;
 
-public class ToolsPlugin extends ExtendedJavaPlugin {
+public class ToolsPlugin extends JavaPlugin {
 
 	@Getter
 	private static ToolsPlugin plugin;
-	@Getter private BaseAttributeRegistry<Enchant> enchantRegistry;
-	@Getter private CustomEnchantFactory enchantFactory;
+	@Getter
+	private BaseAttributeRegistry<Enchant> enchantRegistry;
+	@Getter
+	private CustomEnchantFactory enchantFactory;
 
-	@Getter private BaseAttributeRegistry<Augment> augmentRegistry;
-	@Getter private ToolAugmentFactory augmentFactory;
+	@Getter
+	private BaseAttributeRegistry<Augment> augmentRegistry;
+	@Getter
+	private ToolAugmentFactory augmentFactory;
 
-	@Getter private BaseAttributeRegistry<Skin> skinRegistry;
-	@Getter private ToolSkinFactory skinFactory;
-	@Getter private AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> skinCache;
-	private DetachedSubscriber<PlayerJoinEvent> playerJoinEventDetachedSubscriber;
+	@Getter
+	private BaseAttributeRegistry<Skin> skinRegistry;
+	@Getter
+	private ToolSkinFactory skinFactory;
+	@Getter
+	private AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> skinCache;
 
 	@Override
-	protected void enable() {
+	public void onEnable() {
 		plugin = this;
 
 		final EventRegistry registry = Commons.events();
@@ -47,7 +63,40 @@ public class ToolsPlugin extends ExtendedJavaPlugin {
 		this.skinFactory = new ToolSkinFactory();
 		this.skinCache = new AttributeCache<>();
 
-		playerJoinEventDetachedSubscriber = new DetachedSubscriber<>(PlayerJoinEvent.class, ((context, event) -> {
-		}));
+		GeneralSkinTypes.init(skinRegistry, skinFactory);
+		GeneralAugmentTypes.init(augmentRegistry, augmentFactory);
+		GeneralEnchantTypes.init(enchantRegistry, enchantFactory);
+		Shelves.init();
+
+		final PaperCommandManager commands = new PaperCommandManager(this);
+
+		commands.getCommandContexts().registerContext(AttributeKey.class, c -> enchantRegistry.keyFromName(c.popFirstArg()));
+		commands.getCommandCompletions().registerCompletion("enchants", c -> {
+			Material holding = c.getPlayer().getItemInHand().getType();
+			return enchantRegistry.getAllAttributes().stream().filter(e -> e.targetsItem(holding)).map(Enchant::getKey).map(AttributeKey::getName).toList();
+		});
+		commands.registerCommand(new EnchantCommands());
+
+		commands.getCommandContexts().registerContext(AttributeKey.class, c -> skinRegistry.keyFromName(c.popFirstArg()));
+		commands.getCommandCompletions().registerCompletion("skins", c -> {
+			Material holding = c.getPlayer().getItemInHand().getType();
+			return skinRegistry.getAllAttributes().stream().filter(e -> e.targetsItem(holding)).map(Skin::getKey).map(AttributeKey::getName).toList();
+		});
+		commands.registerCommand(new SkinCommands());
+
+		commands.getCommandContexts().registerContext(AttributeKey.class, c -> augmentRegistry.keyFromName(c.popFirstArg()));
+		commands.getCommandCompletions().registerCompletion("augments", c -> {
+			Material holding = c.getPlayer().getItemInHand().getType();
+			return augmentRegistry.getAllAttributes().stream().filter(e -> e.targetsItem(holding)).map(Augment::getKey).map(AttributeKey::getName).toList();
+		});
+		commands.registerCommand(new AugmentCommands());
+
+		new AugmentEvents(registry);
+		new SkinEvents(registry);
+	}
+
+	@Override
+	public void onDisable() {
+
 	}
 }

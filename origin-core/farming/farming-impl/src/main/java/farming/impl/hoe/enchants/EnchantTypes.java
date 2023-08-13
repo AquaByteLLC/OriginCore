@@ -6,15 +6,8 @@ import blocks.block.builder.FixedAspectHolder;
 import blocks.impl.BlocksPlugin;
 import blocks.impl.data.account.BlockAccount;
 import blocks.impl.events.BreakEvent;
-import commons.events.api.EventContext;
 import commons.events.impl.EventSubscriber;
 import commons.events.impl.impl.DetachedSubscriber;
-import enchants.EnchantKey;
-import enchants.EnchantRegistry;
-import enchants.impl.item.EnchantedItemImpl;
-import enchants.item.EnchantFactory;
-import enchants.item.EnchantTarget;
-import enchants.item.EnchantedItem;
 import farming.impl.hoe.enchants.entity.ExplosiveEntity;
 import farming.impl.util.LocationUtil;
 import me.lucko.helper.Schedulers;
@@ -22,16 +15,25 @@ import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import tools.impl.attribute.AttributeKey;
+import tools.impl.attribute.Consumer3;
+import tools.impl.attribute.enchants.Enchant;
+import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
+import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.target.ToolTarget;
+import tools.impl.tool.impl.EnchantedTool;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 ;
 
-public enum EnchantTypes implements EnchantKey {
+public enum EnchantTypes implements AttributeKey {
 
 	EXPLOSION("Explosion",
 			subscribe(BreakEvent.class, (key, ctx, event) -> {
@@ -42,7 +44,7 @@ public enum EnchantTypes implements EnchantKey {
 
 				if (playersItem.getType().isAir()) return;
 
-				final EnchantedItem item = new EnchantedItemImpl(playersItem);
+				final EnchantedTool item = new EnchantedTool(playersItem);
 				final Player player = ctx.getPlayer();
 				final Block block = player.getTargetBlockExact(5);
 
@@ -70,17 +72,19 @@ public enum EnchantTypes implements EnchantKey {
 						});
 					}
 				}
-			}), EnchantTarget.HOE);
+			}), writer -> {}, ToolTarget.HOE);
 	private final String name;
 	private final NamespacedKey key;
 	private final EventSubscriber subscriber;
-	private final EnchantTarget[] targets;
+	private final ToolTarget[] targets;
+	private final Consumer<FileConfiguration> writer;
 
-	EnchantTypes(String name, EventSubscriber subscriber, EnchantTarget... targets) {
+	EnchantTypes(String name, EventSubscriber subscriber, Consumer<FileConfiguration> writer, ToolTarget... targets) {
 		this.name = name;
 		this.key = name2key(name);
 		this.subscriber = subscriber;
 		this.targets = targets;
+		this.writer = writer;
 	}
 
 	@Override
@@ -106,13 +110,7 @@ public enum EnchantTypes implements EnchantKey {
 		return new DetachedSubscriber<>(clazz, (ctx, event) -> cons.consume(values()[vf], ctx, event));
 	}
 
-
-	@FunctionalInterface
-	private interface Consumer3<T> {
-		void consume(EnchantKey key, EventContext context, T event);
-	}
-
-	public static @Nullable EnchantKey fromName(String name) {
+	public static @Nullable AttributeKey fromName(String name) {
 		for (EnchantTypes value : values())
 			if (value.name.equalsIgnoreCase(name))
 				return value;
@@ -121,12 +119,12 @@ public enum EnchantTypes implements EnchantKey {
 
 	private static boolean init = false;
 
-	public static void init(EnchantRegistry registry, EnchantFactory factory) {
+	public static void init(BaseAttributeRegistry<Enchant> registry, CustomEnchantFactory factory) {
 		if (init)
 			throw new UnsupportedOperationException();
 		init = true;
 		for (EnchantTypes value : values())
-			registry.register(factory.newEnchantBuilder(value).build(value.subscriber, value.targets));
+			registry.register(factory.newAttributeBuilder(value).build(value.subscriber, value.writer, value.targets));
 	}
 
 }

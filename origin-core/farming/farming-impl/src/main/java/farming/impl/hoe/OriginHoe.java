@@ -1,25 +1,20 @@
 package farming.impl.hoe;
 
-import commons.util.StringUtil;
-import enchants.impl.item.EnchantedItemImpl;
-import enchants.item.EnchantedItem;
 import farming.impl.FarmingPlugin;
 import farming.impl.conf.GeneralConfig;
-import me.vadim.util.conf.wrapper.Placeholder;
-import me.vadim.util.conf.wrapper.Placeholders;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
-import me.vadim.util.item.Text;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import tools.impl.ToolsPlugin;
+import tools.impl.attribute.enchants.impl.types.GeneralEnchantTypes;
+import tools.impl.attribute.skins.impl.types.GeneralSkinTypes;
+import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
+import tools.impl.tool.impl.AugmentedTool;
+import tools.impl.tool.impl.EnchantedTool;
+import tools.impl.tool.impl.SkinnedTool;
 
 public class OriginHoe {
 
@@ -27,15 +22,51 @@ public class OriginHoe {
 	private static final NamespacedKey ORIGIN_HOE = new NamespacedKey("farming", "hoe.tool");
 
 	private final ItemStack baseItem;
-	private final EnchantedItem enchantItem;
 	private static final GeneralConfig cfg = FarmingPlugin.lfc.open(GeneralConfig.class);
 
 	public OriginHoe() {
 		this.baseItem = cfg.getHoe();
-		this.enchantItem = new EnchantedItemImpl(baseItem);
 	}
 
 	public void give(Player player) {
+		ItemStack stack = UniqueItemBuilder.create(baseItem)
+				.asSpecialTool(SkinnedTool.class, item -> {
+					item.makeSkinnable();
+					item.addSkin(GeneralSkinTypes.FLAMINGO_PICKAXE);
+				}).asSpecialTool(EnchantedTool.class, item -> {
+					item.makeEnchantable();
+					item.addEnchant(GeneralEnchantTypes.PLAYER_SPEED_BOOST, 10);
+				}).asSpecialTool(AugmentedTool.class, item -> {
+					item.makeAugmentable(1);
+				}).createCustomDataUpdate("gtb", "blocks", PersistentDataType.INTEGER, 0, BlockBreakEvent.class, (ctx, breakEvent) -> {
+					final Player playea = breakEvent.getPlayer();
+					final ItemStack playerHand = playea.getInventory().getItemInMainHand();
+
+					if (playerHand.getItemMeta() == null) return;
+
+					final UniqueItemBuilder temp = UniqueItemBuilder.fromStack(playerHand);
+					final NamespacedKey key = new NamespacedKey("gtb", "blocks");
+
+					if (playerHand.getItemMeta().getPersistentDataContainer().has(key)) {
+						int current = temp.getData("gtb", "blocks", PersistentDataType.INTEGER);
+						temp.createCustomData("gtb", "blocks", PersistentDataType.INTEGER, (current + 1));
+					}
+
+					final EnchantedTool tool = new EnchantedTool(playerHand);
+					final AugmentedTool otherTool = new AugmentedTool(playerHand);
+					final SkinnedTool anotherTool = new SkinnedTool(playerHand);
+
+					UniqueItemBuilder.updateItem(playerHand, StringPlaceholder.builder()
+							.set("enchants", String.join("\n", tool.getEnchants()))
+							.set("augments", String.join("\n", otherTool.getAugments()))
+							.set("skin", anotherTool.getSkin() == null ? "None applied" : ToolsPlugin.getPlugin().getSkinRegistry().getByKey(anotherTool.getSkin()).getAppliedLore())
+							.set("blocks", String.valueOf(temp.getData("gtb", "blocks", PersistentDataType.INTEGER)))
+							.build()
+					);
+
+				}).create().build();
+		player.getInventory().addItem(stack);
+		/*
 		enchantItem.makeEnchantable();
 
 		baseItem.editMeta(meta -> {
@@ -62,7 +93,11 @@ public class OriginHoe {
 		System.out.println("It is a hoe: " + isHoe(baseItem));
 
 		player.getInventory().addItem(baseItem);
+
+		 */
 	}
+
+	/*
 
 	public static boolean isHoe(ItemStack stack) {
 		return stack.getItemMeta().getPersistentDataContainer().has(ORIGIN_HOE);
@@ -111,4 +146,6 @@ public class OriginHoe {
 			meta.setDisplayName(placeholder.format(displayName));
 		});
 	}
+
+	 */
 }

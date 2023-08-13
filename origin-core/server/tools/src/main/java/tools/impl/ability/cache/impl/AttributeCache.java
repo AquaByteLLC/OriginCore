@@ -15,7 +15,6 @@ public class AttributeCache<T extends ExpiringAttribute, A extends CachedAttribu
 	public ExpiringShelf<A> getCache() {
 		return Shelf.<A>builder()
 				.concurrent()
-				.weak()
 				.expiring().
 				usePolicy(TimedExpiringPolicy.create(($) -> {
 					final TimeUnit unit = $.getAttribute().getTimeUnit();

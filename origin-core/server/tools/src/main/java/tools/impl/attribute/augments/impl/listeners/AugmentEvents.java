@@ -38,12 +38,18 @@ public class AugmentEvents implements Listener {
 		final ItemStack cursor = event.getCursor();
 		final ItemStack clicked = event.getCurrentItem();
 
+		if (!hasMeta(clicked, cursor)) return;
 		final PersistentDataContainer cursorPdc = cursor.getItemMeta().getPersistentDataContainer();
 
 		final String type = cursorPdc.get(AugmentedTool.applierKey, PersistentDataType.STRING);
 
+		if (type.isBlank()) return;
+		if (type.isEmpty()) return;;
+
 		final AugmentedTool clickedAugmentedTool = new AugmentedTool(clicked);
 		final AttributeKey key = augmentRegistry.keyFromName(type);
+
+		if (key == null) return;
 
 		if (!(event.getWhoClicked() instanceof Player who)) return;
 		if (!(event.getClickedInventory() instanceof PlayerInventory)) return;
@@ -111,7 +117,7 @@ public class AugmentEvents implements Listener {
 
 		if (clickedAugmentedTool.isAugmentable()) {
 			if (clickedAugmentedTool.hasOpenSlot()) {
-				return cursor == IAugmentedTool.makeApplier(type);
+				return cursor == new IAugmentedTool.Applier().stack(type);
 			}
 		}
 

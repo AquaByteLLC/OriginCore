@@ -17,13 +17,11 @@ import blocks.impl.builder.OriginBlock;
 import blocks.impl.data.account.BlockAccount;
 import blocks.impl.events.BreakEvent;
 import blocks.impl.events.RegenEvent;
-import commons.Commons;
 import commons.events.api.EventRegistry;
 import commons.events.impl.impl.DetachedSubscriber;
 import commons.hologram.InterpolatedHologram;
 import commons.interpolation.impl.InterpolationType;
 import commons.math.MathUtils;
-import farming.impl.hoe.OriginHoe;
 import farming.impl.settings.FarmingSettings;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.serialize.Position;
@@ -39,7 +37,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -78,7 +75,7 @@ public class FarmingEvents {
 						return;
 					}
 					if (ageable.getAge() == ageable.getMaximumAge()) {
-						if (!OriginHoe.isHoe(player.getInventory().getItemInMainHand())) return;
+						// if (!OriginHoe.isHoe(player.getInventory().getItemInMainHand())) return;
 						new BreakEvent("farming", block, event.getPlayer(), false).callEvent();
 						event.setCancelled(true);
 					}
@@ -127,10 +124,10 @@ public class FarmingEvents {
 			}
 
 			block.getDrops().clear();
-
-			if (OriginHoe.isHoe(player.getInventory().getItemInMainHand())) {
-				OriginHoe.updateBlocksBroken(player.getInventory().getItemInMainHand(), 1);
-			}
+//
+//			if (OriginHoe.isHoe(player.getInventory().getItemInMainHand())) {
+//				OriginHoe.updateBlocksBroken(player.getInventory().getItemInMainHand(), 1);
+//			}
 
 
 			if (!event.isCalledFromEnchant()) {
@@ -182,7 +179,8 @@ public class FarmingEvents {
 						InterpolationType.circle);
 			}
 
-			Commons.commons().getAccounts().getAccount(player).addExperience(BigDecimal.valueOf(xp));
+
+			// Commons.commons().getAccounts().getAccount(player).addExperience(BigDecimal.valueOf(xp));
 		});
 	}
 

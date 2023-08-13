@@ -7,6 +7,7 @@ import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Nullable;
 import tools.impl.ToolsPlugin;
 import tools.impl.ability.cache.impl.AttributeCache;
 import tools.impl.ability.cache.types.PlayerBasedCachedAttribute;
@@ -26,12 +27,13 @@ import java.util.stream.Collectors;
  * What needs to be done as of now for skins is to create a general cooldown handler,
  * this will allow for handling custom abilitites and only allowing the events to be called when the ability is off
  * cooldown. n
- *
+ * <p>
  * Perhaps add an ability registry which can then be binded to a skin? Need to think of a nice way to do a builder for abilitites.
  */
 public class SkinnedTool implements ISkinnedTool {
 
 	private final ItemStack itemStack;
+
 	private static BaseAttributeRegistry<Skin> getRegistry() {
 		return ToolsPlugin.getPlugin().getSkinRegistry();
 	}
@@ -112,7 +114,10 @@ public class SkinnedTool implements ISkinnedTool {
 	}
 
 	@Override
-	public AttributeKey getSkin() {
+	public @Nullable AttributeKey getSkin() {
+		if (readContainer().get(hasSkin, PersistentDataType.STRING) == null) {
+			return null;
+		}
 		return getRegistry().keyFromName(readContainer().get(hasSkin, PersistentDataType.STRING));
 	}
 
@@ -126,13 +131,14 @@ public class SkinnedTool implements ISkinnedTool {
 
 	@Override
 	public boolean hasSkin(AttributeKey skinKey) {
+		if (!itemStack.getItemMeta().hasCustomModelData()) return false;
 		return readContainer().get(hasSkin, PersistentDataType.STRING).equals(skinKey.getName()) && (itemStack.getItemMeta().getCustomModelData() == getRegistry().getByKey(skinKey).getModelData());
 	}
 
 	public boolean activate(Player player, AttributeKey skinKey) {
 		if (hasSkin(skinKey)) {
 			final AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> cache = ToolsPlugin.getPlugin().getSkinCache();
-			final Skin                                                   skin  = ToolsPlugin.getPlugin().getSkinRegistry().getByKey(skinKey);
+			final Skin skin = ToolsPlugin.getPlugin().getSkinRegistry().getByKey(skinKey);
 			final PlayerCachedAttribute<Skin> playerCachedAttribute = new PlayerCachedAttribute<>(player, skin);
 			return !cache.getCache().contains(playerCachedAttribute);
 		}
@@ -156,6 +162,8 @@ public class SkinnedTool implements ISkinnedTool {
 	}
 
 	public static void setCanSkin(PersistentDataContainer container, boolean canSkin) {
+		System.out.println("Required Key: " + reqKey);
+		System.out.println("Container: " + container);
 		if (canSkin)
 			container.set(reqKey, PersistentDataType.STRING, reqValue);
 		else

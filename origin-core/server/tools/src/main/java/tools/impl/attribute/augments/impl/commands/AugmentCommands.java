@@ -37,7 +37,7 @@ public class AugmentCommands extends BaseCommand implements BaseAttributeCommand
 
 	@Subcommand("give")
 	public void giveAugment(@Flags("other") Player player, String type) {
-		final ItemStack augment = IAugmentedTool.makeApplier(type);
+		final ItemStack augment = new IAugmentedTool.Applier().stack(type);
 		player.getInventory().addItem(augment);
 	}
 

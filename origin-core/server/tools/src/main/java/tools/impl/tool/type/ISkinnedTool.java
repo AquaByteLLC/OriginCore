@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public interface ISkinnedTool extends IBaseTool {
 
 	NamespacedKey reqKey = new NamespacedKey("skins", "_skinnable");
-	NamespacedKey hasSkin = new NamespacedKey("skins", "hasSkin");
+	NamespacedKey hasSkin = new NamespacedKey("skins", "has_skin");
 	NamespacedKey applierKey = new NamespacedKey("skins", "applicable");
 
 	String reqValue = "isSkinnable";

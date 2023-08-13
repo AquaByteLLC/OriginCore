@@ -3,12 +3,10 @@ package tools.impl.attribute.skins.impl.types;
 import commons.events.impl.EventSubscriber;
 import commons.events.impl.impl.DetachedSubscriber;
 import commons.util.StringUtil;
-import dev.oop778.shelftor.api.expiring.policy.implementation.TimedExpiringPolicy;
-import dev.oop778.shelftor.api.shelf.Shelf;
-import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -25,12 +23,13 @@ import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.target.ToolTarget;
 import tools.impl.tool.impl.SkinnedTool;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import static tools.impl.attribute.skins.impl.types.shelf.Shelves.flamingoShelf;
 
 public enum GeneralSkinTypes implements AttributeKey {
 
-	FLAMINGO_PICKAXE("Flamingo Pickaxe",
+	FLAMINGO_PICKAXE("FlamingoPickaxe",
 			subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
 				final ItemStack playersItem = ctx.getPlayer().getInventory().getItemInMainHand();
 				if (playersItem.getType().isAir()) return;
@@ -38,34 +37,26 @@ public enum GeneralSkinTypes implements AttributeKey {
 				final AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> cache = ToolsPlugin.getPlugin().getSkinCache();
 				final Skin skin = ToolsPlugin.getPlugin().getSkinRegistry().getByKey(key);
 				final PlayerCachedAttribute<Skin> playerCachedAttribute = new PlayerCachedAttribute<>(ctx.getPlayer(), skin);
+				final Player player = ctx.getPlayer();
 
-				if (item.hasSkin(key)) {
-					if (cache.getCache().contains(playerCachedAttribute)) {
-						/*
-						Handle Ability...
-						 */
-						final AbilityCreator<Skin, PlayerCachedAttribute<Skin>> abilityCreator = new AbilityCreator<>();
-						final ExpiringShelf<PlayerCachedAttribute<Skin>> shelf = Shelf.<PlayerCachedAttribute<Skin>>builder()
-								.weak()
-								.concurrent()
-								.expiring()
-								.usePolicy(TimedExpiringPolicy.create(10, TimeUnit.SECONDS, false))
-								.build();
+				final AbilityCreator<Skin, PlayerCachedAttribute<Skin>> abilityCreator = new AbilityCreator<>();
 
-						abilityCreator.setExpiringShelf(shelf)
-									  .setExpirationHandler(($) -> {
-										  $.getPlayer().sendMessage("Seems that the ability ran out!");
-									  })
-									  .setWhileInCache(($) -> {
-										  $.getPlayer().sendMessage("Still in the cache so the event is functioning!");
-									  })
-									  .setWhileNotInCache(($) -> {
-										  $.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!");
-									  })
-									  .create(BlockBreakEvent.class, playerCachedAttribute);
+				abilityCreator.setExpiringShelf(flamingoShelf)
+						.setExpirationHandler(($) -> {
+							$.getPlayer().sendMessage("Seems that the ability ran out!");
+						})
+						.setWhileInCache(($) -> {
+							$.getPlayer().sendMessage("Still in the cache so the event is functioning!");
+						})
+						.setWhileNotInCache(($) -> {
+							$.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!");
+						})
+						.create(BlockBreakEvent.class, playerCachedAttribute);
 
-						event.getPlayer().sendMessage(StringUtil.colorize("&eWorking!"));
-					}
+				if (item.activate(player, key)) {
+					flamingoShelf.add(playerCachedAttribute);
+					cache.add(playerCachedAttribute);
+					event.getPlayer().sendMessage(StringUtil.colorize("&eWorking!"));
 				}
 			}), writer -> {
 	}, ToolTarget.PICK);

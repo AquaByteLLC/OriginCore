@@ -50,7 +50,7 @@ public class BaseAttributeRegistry<T extends BaseAttribute> implements Attribute
 	public @NotNull T getByKey(AttributeKey key) {
 		T attribute = attributes.get(key);
 		if (attribute == null)
-			throw new IllegalArgumentException("invalid enchant key " + key);
+			throw new IllegalArgumentException("invalid key " + key);
 		return attribute;
 	}
 

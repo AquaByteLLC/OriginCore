@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 public interface IAugmentedTool extends IBaseTool {
 
 	NamespacedKey reqKey = new NamespacedKey("augments", "_augmentable");
-	NamespacedKey amountKey = new NamespacedKey("augments", "slotsOpen");
+	NamespacedKey amountKey = new NamespacedKey("augments", "slots_open");
 	NamespacedKey applierKey = new NamespacedKey("augments", "applicable");
-	NamespacedKey applierData = new NamespacedKey("augments", "applicableAmount");
+	NamespacedKey applierData = new NamespacedKey("augments", "applicable_amount");
 
 	String reqValue = "isAugmentable";
 
@@ -55,32 +55,34 @@ public interface IAugmentedTool extends IBaseTool {
 
 	boolean activate(AttributeKey augmentKey);
 
-	static long random(AttributeKey key) {
-		final BaseAttributeRegistry<Augment> registry = ToolsPlugin.getPlugin().getAugmentRegistry();
-		final Augment augment = registry.getByKey(key);
-		final long min = augment.getMinimumBoost();
-		final long max = augment.getMaximumBoost();
-		return MathUtils.random(min, max);
-	}
+	public class Applier {
+		public long random(AttributeKey key) {
+			final BaseAttributeRegistry<Augment> registry = ToolsPlugin.getPlugin().getAugmentRegistry();
+			final Augment augment = registry.getByKey(key);
+			final long min = augment.getMinimumBoost();
+			final long max = augment.getMaximumBoost();
+			return MathUtils.random(min, max);
+		}
 
-	static ItemStack makeApplier(String type) {
-		final BaseAttributeRegistry<Augment> registry = ToolsPlugin.getPlugin().getAugmentRegistry();
-		final AttributeKey key = registry.keyFromName(type);
-		final Augment augment = registry.getByKey(key);
-		final long boost = random(key);
+		public ItemStack stack(String type) {
+			final BaseAttributeRegistry<Augment> registry = ToolsPlugin.getPlugin().getAugmentRegistry();
+			final AttributeKey key = registry.keyFromName(type);
+			final Augment augment = registry.getByKey(key);
+			final long boost = random(key);
 
-		final Placeholder pl = StringPlaceholder.builder()
-				.set("boost", StringUtil.formatNumber(boost))
-				.set("name", key.getName()).set("information", StringUtil.colorize(String.join("\n", augment.getInformation())))
-				.set("appliedLore", StringUtil.colorize(augment.getAppliedLore()))
-				.set("targets", StringUtil.colorize(augment.getAttributeTargets().stream().map(Enum::name).collect(Collectors.joining("\n")))).build();
+			final Placeholder pl = StringPlaceholder.builder()
+					.set("boost", StringUtil.formatNumber(boost))
+					.set("name", key.getName()).set("information", StringUtil.colorize(String.join("\n", augment.getInformation())))
+					.set("appliedLore", StringUtil.colorize(augment.getAppliedLore()))
+					.set("targets", StringUtil.colorize(augment.getAttributeTargets().stream().map(Enum::name).collect(Collectors.joining("\n")))).build();
 
-		final ItemStack item = augment.getAugmentStack();
-		IBaseTool.writeContainer(item, pdc -> pdc.set(applierKey, PersistentDataType.STRING, type));
-		IBaseTool.writeContainer(item, pdc -> pdc.set(applierData, PersistentDataType.LONG, boost));
+			final ItemStack item = augment.getAugmentStack();
+			IBaseTool.writeContainer(item, pdc -> pdc.set(applierKey, PersistentDataType.STRING, type));
+			IBaseTool.writeContainer(item, pdc -> pdc.set(applierData, PersistentDataType.LONG, boost));
 
-		BukkitUtil.formatItem(pl, item);
+			BukkitUtil.formatItem(pl, item);
 
-		return item;
+			return item;
+		}
 	}
 }

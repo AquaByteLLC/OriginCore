@@ -4,13 +4,25 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import me.lucko.helper.text3.Text;
 import me.lucko.helper.text3.TextComponent;
+import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.BaseAttributeCommand;
 import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
+import tools.impl.attribute.enchants.impl.types.GeneralEnchantTypes;
+import tools.impl.attribute.skins.impl.types.GeneralSkinTypes;
 import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
+import tools.impl.tool.impl.AugmentedTool;
+import tools.impl.tool.impl.EnchantedTool;
+import tools.impl.tool.impl.SkinnedTool;
 import tools.impl.tool.type.IEnchantedTool;
 
 @CommandAlias("enchants")
@@ -49,11 +61,45 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 
 	@Subcommand("test")
 	public void testItem(Player player) {
-		IEnchantedTool item = factory.newAttributeItem(builder -> {
-			builder.name("&b&lTesting");
-		});
-		item.removeAllEnchants();
-		player.getInventory().addItem(item.getItemStack());
+		ItemStack stack = UniqueItemBuilder.create(Material.DIAMOND_PICKAXE)
+				.displayName("&cTesting")
+				.lore("&c{enchants}", "&d{augments}", "&e{skin}", "&f{blocks}")
+				.asSpecialTool(SkinnedTool.class, item -> {
+					item.makeSkinnable();
+					item.addSkin(GeneralSkinTypes.FLAMINGO_PICKAXE);
+				}).asSpecialTool(EnchantedTool.class, item -> {
+					item.makeEnchantable();
+					item.addEnchant(GeneralEnchantTypes.PLAYER_SPEED_BOOST, 10);
+				}).asSpecialTool(AugmentedTool.class, item -> {
+					item.makeAugmentable(1);
+				}).createCustomDataUpdate("gtb", "blocks", PersistentDataType.INTEGER, 0, BlockBreakEvent.class, (ctx, breakEvent) -> {
+					final Player playea = breakEvent.getPlayer();
+					final ItemStack playerHand = playea.getInventory().getItemInMainHand();
+
+					if (playerHand.getItemMeta() == null) return;
+
+					final UniqueItemBuilder temp = UniqueItemBuilder.fromStack(playerHand);
+					final NamespacedKey key = new NamespacedKey("gtb", "blocks");
+
+					if (playerHand.getItemMeta().getPersistentDataContainer().has(key)) {
+						int current = temp.getData("gtb", "blocks", PersistentDataType.INTEGER);
+						temp.createCustomData("gtb", "blocks", PersistentDataType.INTEGER, (current + 1));
+					}
+
+					final EnchantedTool tool = new EnchantedTool(playerHand);
+					final AugmentedTool otherTool = new AugmentedTool(playerHand);
+					final SkinnedTool anotherTool = new SkinnedTool(playerHand);
+
+					UniqueItemBuilder.updateItem(playerHand, StringPlaceholder.builder()
+							.set("enchants", String.join("\n", tool.getEnchants()))
+							.set("augments", String.join("\n", otherTool.getAugments()))
+							.set("skin", anotherTool.getSkin() == null ? "None applied" : ToolsPlugin.getPlugin().getSkinRegistry().getByKey(anotherTool.getSkin()).getAppliedLore())
+							.set("blocks", String.valueOf(temp.getData("gtb", "blocks", PersistentDataType.INTEGER)))
+							.build()
+					);
+
+				}).create().build();
+		player.getInventory().addItem(stack);
 	}
 
 	@Subcommand("admin disenchant all")
@@ -98,7 +144,8 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 		if (enchantedItem == null) return;
 
 		enchantedItem.addEnchant(key, levelCount);
-		if (levelCount > enchant.getMaxLevel()) Text.sendMessage(player, TextComponent.make(make -> make.append("max")));
+		if (levelCount > enchant.getMaxLevel())
+			Text.sendMessage(player, TextComponent.make(make -> make.append("max")));
 		// Text.sendMessage(player, Messages.ENCHANT_ADDED);
 	}
 

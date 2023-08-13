@@ -16,7 +16,7 @@ public class AttributeConfiguration {
 
 	public AttributeConfiguration(AttributeKey key, String parent) {
 		this.key = key;
-		this.conf = new SettableConfig(key.getName(), parent, ToolsPlugin.getPlugin());
+		this.conf = new SettableConfig(key.getName() + ".yml", parent, ToolsPlugin.getPlugin());
 	}
 
 	public void writeAndSave(Consumer<FileConfiguration> consumer) {

@@ -5,6 +5,7 @@ import commons.util.StringUtil;
 import me.lucko.helper.text3.Text;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -17,6 +18,7 @@ import tools.impl.tool.IBaseTool;
 import tools.impl.tool.type.IAugmentedTool;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -139,7 +141,13 @@ public class AugmentedTool implements IAugmentedTool {
 
 	@Override
 	public Set<AttributeKey> getAllAugments() {
-		return null;
+		Set<AttributeKey> augments = new HashSet<>();
+		for (NamespacedKey nsk : readContainer().getKeys()) {
+			AttributeKey key = getRegistry().adaptKey(nsk);
+			if (key == null) continue;
+			augments.add(key);
+		}
+		return augments;
 	}
 
 	@Override

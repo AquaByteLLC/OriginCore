@@ -1,9 +1,8 @@
 package tools.impl.ability.builder.impl;
 
-import commons.events.api.EventContext;
-import commons.events.api.Subscribe;
 import commons.events.impl.impl.DetachedSubscriber;
 import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
+import lombok.Setter;
 import org.bukkit.event.Event;
 import tools.impl.ability.builder.IAbilityCreator;
 import tools.impl.ability.cache.CachedAttribute;
@@ -16,7 +15,7 @@ public class AbilityCreator<T extends ExpiringAttribute, A extends CachedAttribu
 	private ExpiringShelf<A> cache;
 	private Consumer<A> whileIn;
 	private Consumer<A> whileOut;
-	private DetachedSubscriber<?> subscriber;
+	@Setter private DetachedSubscriber<?> subscriber;
 	private ExpiringShelf.ExpirationHandler<A> expirationHandler;
 
 	@Override

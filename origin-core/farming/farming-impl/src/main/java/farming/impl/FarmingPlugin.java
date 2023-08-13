@@ -12,7 +12,6 @@ import commons.Commons;
 import commons.OriginModule;
 import commons.data.account.AccountStorage;
 import commons.events.api.EventRegistry;
-import enchants.impl.EnchantPlugin;
 import farming.impl.action.Messages;
 import farming.impl.commands.FarmingCommands;
 import farming.impl.conf.BlocksConfig;
@@ -26,6 +25,7 @@ import me.vadim.util.conf.LiteConfig;
 import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import tools.impl.ToolsPlugin;
 
 import java.io.IOException;
 
@@ -64,9 +64,9 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 
 		injector = Guice.createInjector(new FarmingModule(this, lfc, blocksAPI));
 
-		EnchantPlugin enchantPlugin = EnchantPlugin.get().getInstance(EnchantPlugin.class);
+		// EnchantPlugin enchantPlugin = EnchantPlugin.get().getInstance(EnchantPlugin.class);
 
-		EnchantTypes.init(enchantPlugin.getRegistry(), enchantPlugin.getFactory());
+		EnchantTypes.init(ToolsPlugin.getPlugin().getEnchantRegistry(), ToolsPlugin.getPlugin().getEnchantFactory());
 		FarmingEvents.init(eventRegistry);
 		Messages.init();
 
