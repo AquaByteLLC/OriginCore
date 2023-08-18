@@ -11,8 +11,8 @@ import tools.impl.ToolsPlugin;
 import tools.impl.attribute.BaseAttributeCommand;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.ToolAugmentFactory;
+import tools.impl.attribute.augments.impl.item.AugmentApplier;
 import tools.impl.registry.impl.BaseAttributeRegistry;
-import tools.impl.tool.type.IAugmentedTool;
 
 @CommandAlias("augments")
 public class AugmentCommands extends BaseCommand implements BaseAttributeCommand<Augment, ToolAugmentFactory> {
@@ -37,7 +37,7 @@ public class AugmentCommands extends BaseCommand implements BaseAttributeCommand
 
 	@Subcommand("give")
 	public void giveAugment(@Flags("other") Player player, String type) {
-		final ItemStack augment = new IAugmentedTool.Applier().stack(type);
+		final ItemStack augment =  new AugmentApplier().stack(type);
 		player.getInventory().addItem(augment);
 	}
 

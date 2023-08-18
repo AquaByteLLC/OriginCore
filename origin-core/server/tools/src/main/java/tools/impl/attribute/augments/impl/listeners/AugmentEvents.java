@@ -16,10 +16,10 @@ import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.events.ApplyAugmentEvent;
 import tools.impl.attribute.augments.impl.events.RemoveAugmentEvent;
+import tools.impl.attribute.augments.impl.item.AugmentApplier;
 import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
 import tools.impl.tool.impl.AugmentedTool;
-import tools.impl.tool.type.IAugmentedTool;
 
 import java.util.List;
 
@@ -117,7 +117,7 @@ public class AugmentEvents implements Listener {
 
 		if (clickedAugmentedTool.isAugmentable()) {
 			if (clickedAugmentedTool.hasOpenSlot()) {
-				return cursor == new IAugmentedTool.Applier().stack(type);
+				return cursor == new AugmentApplier().stack(type);
 			}
 		}
 
