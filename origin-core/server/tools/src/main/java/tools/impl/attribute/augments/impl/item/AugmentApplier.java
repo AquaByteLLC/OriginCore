@@ -24,9 +24,10 @@ public class AugmentApplier {
 		final BaseAttributeRegistry<Augment> registry = ToolsPlugin.getPlugin().getAugmentRegistry();
 		final AttributeKey key = registry.keyFromName(type);
 		final Augment augment = registry.getByKey(key);
-		final long min = augment.getMinimumBoost();
-		final long max = augment.getMaximumBoost();
-		final long boost = MathUtils.random(min, max);
+
+		long min = augment.getMinimumBoost();
+		long max = augment.getMaximumBoost();
+		long boost = MathUtils.random(min, max);
 
 		final Placeholder pl = StringPlaceholder.builder()
 				.set("boost", StringUtil.formatNumber(boost))

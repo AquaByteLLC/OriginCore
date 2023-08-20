@@ -1,3 +1,4 @@
+/*
 package commons.menu
 
 import commons.menu.MenuSorter
@@ -40,3 +41,4 @@ class ProgressionMenuYX<T>(plugin: Plugin, menu: MenuList<T>, private val opts: 
 	}
 
 }
+ */

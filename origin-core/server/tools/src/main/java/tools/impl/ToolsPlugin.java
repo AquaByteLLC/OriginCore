@@ -72,21 +72,21 @@ public class ToolsPlugin extends JavaPlugin {
 
 		commands.getCommandContexts().registerContext(AttributeKey.class, c -> enchantRegistry.keyFromName(c.popFirstArg()));
 		commands.getCommandCompletions().registerCompletion("enchants", c -> {
-			Material holding = c.getPlayer().getItemInHand().getType();
+			Material holding = c.getPlayer().getInventory().getItemInMainHand().getType();
 			return enchantRegistry.getAllAttributes().stream().filter(e -> e.targetsItem(holding)).map(Enchant::getKey).map(AttributeKey::getName).toList();
 		});
 		commands.registerCommand(new EnchantCommands());
 
 		commands.getCommandContexts().registerContext(AttributeKey.class, c -> skinRegistry.keyFromName(c.popFirstArg()));
 		commands.getCommandCompletions().registerCompletion("skins", c -> {
-			Material holding = c.getPlayer().getItemInHand().getType();
+			Material holding = c.getPlayer().getInventory().getItemInMainHand().getType();
 			return skinRegistry.getAllAttributes().stream().filter(e -> e.targetsItem(holding)).map(Skin::getKey).map(AttributeKey::getName).toList();
 		});
 		commands.registerCommand(new SkinCommands());
 
 		commands.getCommandContexts().registerContext(AttributeKey.class, c -> augmentRegistry.keyFromName(c.popFirstArg()));
 		commands.getCommandCompletions().registerCompletion("augments", c -> {
-			Material holding = c.getPlayer().getItemInHand().getType();
+			Material holding = c.getPlayer().getInventory().getItemInMainHand().getType();
 			return augmentRegistry.getAllAttributes().stream().filter(e -> e.targetsItem(holding)).map(Augment::getKey).map(AttributeKey::getName).toList();
 		});
 		commands.registerCommand(new AugmentCommands());

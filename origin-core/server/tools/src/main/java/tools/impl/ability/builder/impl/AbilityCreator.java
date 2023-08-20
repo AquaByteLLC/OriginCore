@@ -1,5 +1,6 @@
 package tools.impl.ability.builder.impl;
 
+import commons.Commons;
 import commons.events.impl.impl.DetachedSubscriber;
 import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
 import lombok.Setter;
@@ -53,8 +54,11 @@ public class AbilityCreator<T extends ExpiringAttribute, A extends CachedAttribu
 				else
 					whileOut.accept(attribute);
 			}
+			this.subscriber.unbind(Commons.events());
 			this.subscriber = null;
 		}));
+
+		this.subscriber.bind(Commons.events());
 	}
 
 }

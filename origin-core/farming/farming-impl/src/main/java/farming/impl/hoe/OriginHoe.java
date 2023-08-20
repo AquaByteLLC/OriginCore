@@ -2,19 +2,9 @@ package farming.impl.hoe;
 
 import farming.impl.FarmingPlugin;
 import farming.impl.conf.GeneralConfig;
-import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
-import tools.impl.ToolsPlugin;
-import tools.impl.attribute.enchants.impl.types.GeneralEnchantTypes;
-import tools.impl.attribute.skins.impl.types.GeneralSkinTypes;
-import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
-import tools.impl.tool.impl.AugmentedTool;
-import tools.impl.tool.impl.EnchantedTool;
-import tools.impl.tool.impl.SkinnedTool;
 
 public class OriginHoe {
 
@@ -29,6 +19,7 @@ public class OriginHoe {
 	}
 
 	public void give(Player player) {
+		/*
 		ItemStack stack = UniqueItemBuilder.create(baseItem)
 				.asSpecialTool(SkinnedTool.class, item -> {
 					item.makeSkinnable();
@@ -95,6 +86,7 @@ public class OriginHoe {
 		player.getInventory().addItem(baseItem);
 
 		 */
+
 	}
 
 	/*

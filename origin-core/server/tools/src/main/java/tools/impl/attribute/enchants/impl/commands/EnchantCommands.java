@@ -2,6 +2,7 @@ package tools.impl.attribute.enchants.impl.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.text3.Text;
 import me.lucko.helper.text3.TextComponent;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
@@ -61,9 +62,10 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 
 	@Subcommand("test")
 	public void testItem(Player player) {
-		ItemStack stack = UniqueItemBuilder.create(Material.DIAMOND_PICKAXE)
-				.displayName("&cTesting")
-				.lore("&c{enchants}", "&d{augments}", "&e{skin}", "&f{blocks}")
+		ItemStack stack = ItemStackBuilder.of(Material.LEATHER_HORSE_ARMOR).lore("&c{enchants}", "&d{augments}", "&e{skin}", "&f{blocks}")
+				.name("&cTesting").build();
+
+		stack = new UniqueItemBuilder(stack)
 				.asSpecialTool(SkinnedTool.class, item -> {
 					item.makeSkinnable();
 					item.addSkin(GeneralSkinTypes.FLAMINGO_PICKAXE);
@@ -93,12 +95,26 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 					UniqueItemBuilder.updateItem(playerHand, StringPlaceholder.builder()
 							.set("enchants", String.join("\n", tool.getEnchants()))
 							.set("augments", String.join("\n", otherTool.getAugments()))
-							.set("skin", anotherTool.getSkin() == null ? "None applied" : ToolsPlugin.getPlugin().getSkinRegistry().getByKey(anotherTool.getSkin()).getAppliedLore())
+							.set("skin", (anotherTool.getApplied("&cNo Skin")))
 							.set("blocks", String.valueOf(temp.getData("gtb", "blocks", PersistentDataType.INTEGER)))
 							.build()
 					);
 
 				}).create().build();
+
+		final UniqueItemBuilder temp = UniqueItemBuilder.fromStack(stack);
+		final EnchantedTool tool = new EnchantedTool(stack);
+		final AugmentedTool otherTool = new AugmentedTool(stack);
+		final SkinnedTool anotherTool = new SkinnedTool(stack);
+
+		UniqueItemBuilder.updateItem(stack, StringPlaceholder.builder()
+				.set("enchants", String.join("\n", tool.getEnchants()))
+				.set("augments", String.join("\n", otherTool.getAugments()))
+				.set("skin", (anotherTool.getApplied("&cNo Skin")))
+				.set("blocks", String.valueOf(temp.getData("gtb", "blocks", PersistentDataType.INTEGER)))
+				.build()
+		);
+
 		player.getInventory().addItem(stack);
 	}
 

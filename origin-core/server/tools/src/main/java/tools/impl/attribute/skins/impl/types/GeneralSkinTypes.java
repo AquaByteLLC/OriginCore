@@ -33,6 +33,7 @@ public enum GeneralSkinTypes implements AttributeKey {
 			subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
 				final ItemStack playersItem = ctx.getPlayer().getInventory().getItemInMainHand();
 				if (playersItem.getType().isAir()) return;
+
 				final SkinnedTool item = new SkinnedTool(playersItem);
 				final AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> cache = ToolsPlugin.getPlugin().getSkinCache();
 				final Skin skin = ToolsPlugin.getPlugin().getSkinRegistry().getByKey(key);
@@ -46,20 +47,27 @@ public enum GeneralSkinTypes implements AttributeKey {
 							$.getPlayer().sendMessage("Seems that the ability ran out!");
 						})
 						.setWhileInCache(($) -> {
-							$.getPlayer().sendMessage("Still in the cache so the event is functioning!");
+							if ($.getPlayer().getInventory().getItemInMainHand() == playersItem) {
+								$.getPlayer().sendMessage("Still in the cache so the event is functioning!");
+							}
 						})
 						.setWhileNotInCache(($) -> {
-							$.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!");
+							if ($.getPlayer().getInventory().getItemInMainHand() == playersItem) {
+								$.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!");
+							}
 						})
 						.create(BlockBreakEvent.class, playerCachedAttribute);
 
-				if (item.activate(player, key)) {
+				System.out.println("Hi");
+
+				if (item.activate(playerCachedAttribute, key)) {
 					flamingoShelf.add(playerCachedAttribute);
 					cache.add(playerCachedAttribute);
+					System.out.println("Hallo");
 					event.getPlayer().sendMessage(StringUtil.colorize("&eWorking!"));
 				}
 			}), writer -> {
-	}, ToolTarget.PICK);
+	}, ToolTarget.all());
 
 	private final String name;
 	private final NamespacedKey key;

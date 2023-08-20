@@ -2,6 +2,7 @@ package tools.impl.tool.impl;
 
 import commons.util.BukkitUtil;
 import commons.util.StringUtil;
+import me.lucko.helper.item.ItemStackBuilder;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.inventory.ItemStack;
@@ -18,7 +19,6 @@ import tools.impl.attribute.skins.impl.ToolSkinFactory;
 import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.tool.IBaseTool;
 import tools.impl.tool.type.ISkinnedTool;
-import org.bukkit.entity.Player;
 
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  */
 public class SkinnedTool implements ISkinnedTool {
 
-	private final ItemStack itemStack;
+	private ItemStack itemStack;
 
 	private static BaseAttributeRegistry<Skin> getRegistry() {
 		return ToolsPlugin.getPlugin().getSkinRegistry();
@@ -85,12 +85,13 @@ public class SkinnedTool implements ISkinnedTool {
 		writeContainer(pdc -> {
 			if (canSkin(pdc)) {
 				if (getSkin() != null) return;
+				System.out.println("We are setting it here");
 
 				pdc.set(hasSkin, PersistentDataType.STRING, skinKey.getName());
 
-				itemStack.editMeta(meta -> {
-					meta.setCustomModelData(skin.getModelData());
-				});
+				this.itemStack = ItemStackBuilder.of(itemStack).transformMeta(meta -> {
+					meta.setCustomModelData(getRegistry().getByKey(skinKey).getModelData());
+				}).build();
 
 			}
 		});
@@ -100,7 +101,13 @@ public class SkinnedTool implements ISkinnedTool {
 	@Override
 	public void removeSkin() {
 		if (getSkin() == null) return;
+
+		this.itemStack = ItemStackBuilder.of(itemStack).transformMeta(meta -> {
+			meta.setCustomModelData(0);
+		}).build();
+
 		writeContainer(pdc -> pdc.remove(hasSkin));
+
 	}
 
 	@Override
@@ -121,6 +128,11 @@ public class SkinnedTool implements ISkinnedTool {
 		return getRegistry().keyFromName(readContainer().get(hasSkin, PersistentDataType.STRING));
 	}
 
+	public String getApplied(String replacementForNull) {
+		Skin skin = getRegistry().getByKey(getSkin());
+		return String.format(getSkin() == null ? replacementForNull : StringPlaceholder.builder().set("name", skin.getKey().getName()).build().format(skin.getAppliedLore()));
+	}
+
 	private PersistentDataContainer readContainer() {
 		return this.itemStack.getItemMeta().getPersistentDataContainer();
 	}
@@ -135,11 +147,11 @@ public class SkinnedTool implements ISkinnedTool {
 		return readContainer().get(hasSkin, PersistentDataType.STRING).equals(skinKey.getName()) && (itemStack.getItemMeta().getCustomModelData() == getRegistry().getByKey(skinKey).getModelData());
 	}
 
-	public boolean activate(Player player, AttributeKey skinKey) {
+	public boolean activate(PlayerCachedAttribute<Skin> playerCachedAttribute, AttributeKey skinKey) {
 		if (hasSkin(skinKey)) {
 			final AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> cache = ToolsPlugin.getPlugin().getSkinCache();
 			final Skin skin = ToolsPlugin.getPlugin().getSkinRegistry().getByKey(skinKey);
-			final PlayerCachedAttribute<Skin> playerCachedAttribute = new PlayerCachedAttribute<>(player, skin);
+			System.out.println(!cache.getCache().contains(playerCachedAttribute) + " Testing It");
 			return !cache.getCache().contains(playerCachedAttribute);
 		}
 		return false;

@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 public enum GeneralEnchantTypes implements AttributeKey {
 
-	PLAYER_SPEED_BOOST("Speed Boost",
+	PLAYER_SPEED_BOOST("SpeedBoost",
 			subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
 				final ItemStack playersItem = ctx.getPlayer().getInventory().getItemInMainHand();
 				if (playersItem.getType().isAir()) return;

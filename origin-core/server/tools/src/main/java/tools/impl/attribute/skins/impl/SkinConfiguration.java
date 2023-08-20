@@ -67,7 +67,7 @@ public class SkinConfiguration extends AttributeConfiguration {
 			modelSection.set(getAsRelative(modelDataPath), 50);
 
 			menuSection.set(getAsRelative(itemTypePath), "DIAMOND_BLOCK");
-			menuSection.set(getAsRelative(itemDisplayNamePath), "&c&lApply item: &f{name}");
+			menuSection.set(getAsRelative(itemDisplayNamePath), "&c&lApply item: &f" + key.getName());
 			menuSection.set(getAsRelative(itemLorePath), List.of("&f{name} &f {information}%"));
 
 			cooldownSection.set(getAsRelative(cooldownPath), 30);

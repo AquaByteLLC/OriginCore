@@ -1,3 +1,4 @@
+/*
 package levels.menus
 
 import commons.menu.MenuAdapter
@@ -57,3 +58,4 @@ class ModernLevelsMenu(private val plugin: LevelsPlugin, private val owner: Play
 
 	override fun queryItems(): MutableList<Level> = reg.levels
 }
+ */

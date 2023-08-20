@@ -66,8 +66,8 @@ class EnderChestMenu(private val plugin: EnderChestsPlugin, private val player: 
 		val account = accounts.getAccount(player)
 		val pl = StringPlaceholder.builder()
 			.set("color", color)
-			.set("slots", registry.getNetwork(it, account.offlineOwner).slotsUsed)
-			.set("limit", account.slotLimit)
+			.set("slots", registry.getNetwork(it, account.offlineOwner).slotsUsed.toString())
+			.set("limit", account.slotLimit.toString())
 			.build()
 
 		val builder = config().selectColorItem.format(colors[it], pl)

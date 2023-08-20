@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 public enum GeneralAugmentTypes implements AttributeKey {
 
-	EXPERIENCE_BOOST("Experience Boost",
+	EXPERIENCE_BOOST("ExperienceBoost",
 		subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
 			final ItemStack playersItem = ctx.getPlayer().getInventory().getItemInMainHand();
 			if (playersItem.getType().isAir()) return;
