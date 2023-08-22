@@ -62,7 +62,7 @@ public class SkinConfiguration extends AttributeConfiguration {
 			final ConfigurationSection modelSection = getOrCreate(configuration, modelSectionReplaced);
 			final ConfigurationSection menuSection = getOrCreate(configuration, menuSectionReplaced);
 
-			baseSection.set(getAsRelative(lorePath), "&7[&f{name} &eis currently applied &7]");
+			baseSection.set(getAsRelative(lorePath), "&7[&f{name} &eis currently applied&7]");
 			baseSection.set(getAsRelative(descriptionPath), List.of("Description of the skin", "This skin is super cool"));
 			modelSection.set(getAsRelative(modelDataPath), 50);
 

@@ -25,6 +25,7 @@ import tools.impl.attribute.skins.impl.listeners.SkinEvents;
 import tools.impl.attribute.skins.impl.types.GeneralSkinTypes;
 import tools.impl.attribute.skins.impl.types.shelf.Shelves;
 import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
 
 public class ToolsPlugin extends JavaPlugin {
 
@@ -93,6 +94,8 @@ public class ToolsPlugin extends JavaPlugin {
 
 		new AugmentEvents(registry);
 		new SkinEvents(registry);
+
+		UniqueItemBuilder.getEvents().forEach(event -> event.bind(registry));
 	}
 
 	@Override

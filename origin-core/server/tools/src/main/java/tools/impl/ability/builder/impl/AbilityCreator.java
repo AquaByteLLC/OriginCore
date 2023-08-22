@@ -3,7 +3,6 @@ package tools.impl.ability.builder.impl;
 import commons.Commons;
 import commons.events.impl.impl.DetachedSubscriber;
 import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
-import lombok.Setter;
 import org.bukkit.event.Event;
 import tools.impl.ability.builder.IAbilityCreator;
 import tools.impl.ability.cache.CachedAttribute;
@@ -14,9 +13,8 @@ import java.util.function.Consumer;
 public class AbilityCreator<T extends ExpiringAttribute, A extends CachedAttribute<T>> implements IAbilityCreator<T, A> {
 
 	private ExpiringShelf<A> cache;
-	private Consumer<A> whileIn;
-	private Consumer<A> whileOut;
-	@Setter private DetachedSubscriber<?> subscriber;
+	private Consumer<? extends Event> whileIn;
+	private Consumer<? extends Event> whileOut;
 	private ExpiringShelf.ExpirationHandler<A> expirationHandler;
 
 	@Override
@@ -26,14 +24,16 @@ public class AbilityCreator<T extends ExpiringAttribute, A extends CachedAttribu
 	}
 
 	@Override
-	public IAbilityCreator<T, A> setWhileInCache(Consumer<A> whileIn) {
+	public <R extends Event> IAbilityCreator<T, A> setWhileInCache(Class<R> event, Consumer<R> whileIn) {
 		this.whileIn = whileIn;
+		new DetachedSubscriber<>(event, (ctx, e) -> whileIn.accept(e)).bind(Commons.events());
 		return this;
 	}
 
 	@Override
-	public IAbilityCreator<T, A> setWhileNotInCache(Consumer<A> whileOut) {
+	public <R extends Event> IAbilityCreator<T, A> setWhileNotInCache(Class<R> event, Consumer<R> whileOut) {
 		this.whileOut = whileOut;
+		new DetachedSubscriber<>(event, (ctx, e) -> whileOut.accept(e)).bind(Commons.events());
 		return this;
 	}
 
@@ -42,23 +42,4 @@ public class AbilityCreator<T extends ExpiringAttribute, A extends CachedAttribu
 		this.expirationHandler = handler;
 		return this;
 	}
-
-	@Override
-	public <R extends Event> void create(Class<R> clazz, A attribute) {
-		this.cache.onExpire(expirationHandler);
-
-		this.subscriber = new DetachedSubscriber<>(clazz, ((context, event) -> {
-			if (this.subscriber != null) {
-				if (cache.contains(attribute))
-					whileIn.accept(attribute);
-				else
-					whileOut.accept(attribute);
-			}
-			this.subscriber.unbind(Commons.events());
-			this.subscriber = null;
-		}));
-
-		this.subscriber.bind(Commons.events());
-	}
-
 }

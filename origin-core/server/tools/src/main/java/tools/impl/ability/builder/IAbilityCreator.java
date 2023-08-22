@@ -10,11 +10,9 @@ import java.util.function.Consumer;
 public interface IAbilityCreator<T extends ExpiringAttribute, A extends CachedAttribute<T>> {
 	IAbilityCreator<T, A> setExpiringShelf(ExpiringShelf<A> cache);
 
-	IAbilityCreator<T, A> setWhileInCache(Consumer<A> whileIn);
+	<R extends Event> IAbilityCreator<T, A> setWhileInCache(Class<R> event, Consumer<R> whileIn);
 
-	IAbilityCreator<T, A> setWhileNotInCache(Consumer<A> whileOut);
+	<R extends Event> IAbilityCreator<T, A> setWhileNotInCache(Class<R> event, Consumer<R> whileOut);
 
 	IAbilityCreator<T, A> setExpirationHandler(ExpiringShelf.ExpirationHandler<A> handler);
-
-	<R extends Event> void create(Class<R> clazz, A attribute);
 }

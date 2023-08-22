@@ -2,7 +2,6 @@ package tools.impl.tool.impl;
 
 import commons.util.BukkitUtil;
 import commons.util.StringUtil;
-import me.lucko.helper.item.ItemStackBuilder;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.inventory.ItemStack;
@@ -82,19 +81,11 @@ public class SkinnedTool implements ISkinnedTool {
 		if (!skin.targetsItem(itemStack.getType()))
 			return;
 
-		writeContainer(pdc -> {
-			if (canSkin(pdc)) {
-				if (getSkin() != null) return;
-				System.out.println("We are setting it here");
-
-				pdc.set(hasSkin, PersistentDataType.STRING, skinKey.getName());
-
-				this.itemStack = ItemStackBuilder.of(itemStack).transformMeta(meta -> {
-					meta.setCustomModelData(getRegistry().getByKey(skinKey).getModelData());
-				}).build();
-
-			}
-		});
+		if (canSkin(this.itemStack)) {
+			if (getSkin() != null) return;
+			writeContainer(pdc -> pdc.set(hasSkin, PersistentDataType.STRING, skinKey.getName()));
+			this.itemStack.editMeta(meta -> meta.setCustomModelData(skin.getModelData()));
+		}
 
 	}
 
@@ -102,9 +93,8 @@ public class SkinnedTool implements ISkinnedTool {
 	public void removeSkin() {
 		if (getSkin() == null) return;
 
-		this.itemStack = ItemStackBuilder.of(itemStack).transformMeta(meta -> {
-			meta.setCustomModelData(0);
-		}).build();
+		this.itemStack.editMeta(meta -> meta.setCustomModelData(0));
+
 
 		writeContainer(pdc -> pdc.remove(hasSkin));
 

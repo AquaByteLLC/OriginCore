@@ -1,0 +1,22 @@
+tool:
+  type: WOODEN_HOE
+  name: "&cTesting &f| &cBlocks: &f{blocks}"
+  lore:
+    - "&d&lEnchants"
+    - "{enchants}"
+    - "&d&lSkin: {skin}"
+    - "&d&lAugments"
+    - "{augments}"
+  augments:
+    canBeAugmented: true
+    startingSlots: 1
+    maxSlots: 4
+    starting:
+      - "EXPERIENCE_BOOST:47"
+  skins:
+    canBeSkinned: true
+    starting: "FLAMINGO_PICKAXE"
+  enchants:
+    canBeEnchanted: true
+    starting:
+      - "SPEED_BOOST:10"

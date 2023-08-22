@@ -1,6 +1,5 @@
 package tools.impl.attribute.augments.impl.item;
 
-import commons.math.MathUtils;
 import commons.util.BukkitUtil;
 import commons.util.StringUtil;
 import me.vadim.util.conf.wrapper.Placeholder;
@@ -13,6 +12,7 @@ import tools.impl.attribute.augments.Augment;
 import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.tool.IBaseTool;
 
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static tools.impl.tool.type.IAugmentedTool.applierData;
@@ -27,7 +27,7 @@ public class AugmentApplier {
 
 		long min = augment.getMinimumBoost();
 		long max = augment.getMaximumBoost();
-		long boost = MathUtils.random(min, max);
+		long boost = new Random().nextLong(min, max);
 
 		final Placeholder pl = StringPlaceholder.builder()
 				.set("boost", StringUtil.formatNumber(boost))

@@ -8,6 +8,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import tools.impl.ToolsPlugin;
@@ -37,50 +38,37 @@ public enum GeneralSkinTypes implements AttributeKey {
 				final SkinnedTool item = new SkinnedTool(playersItem);
 				final AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> cache = ToolsPlugin.getPlugin().getSkinCache();
 				final Skin skin = ToolsPlugin.getPlugin().getSkinRegistry().getByKey(key);
-				final PlayerCachedAttribute<Skin> playerCachedAttribute = new PlayerCachedAttribute<>(ctx.getPlayer(), skin);
+				final PlayerCachedAttribute<Skin> playerCachedAttribute = PlayerCachedAttribute.of(Skin.class, ctx.getPlayer(), skin);
+				System.out.println(playerCachedAttribute);
 				final Player player = ctx.getPlayer();
-
-				final AbilityCreator<Skin, PlayerCachedAttribute<Skin>> abilityCreator = new AbilityCreator<>();
-
-				abilityCreator.setExpiringShelf(flamingoShelf)
-						.setExpirationHandler(($) -> {
-							$.getPlayer().sendMessage("Seems that the ability ran out!");
-						})
-						.setWhileInCache(($) -> {
-							if ($.getPlayer().getInventory().getItemInMainHand() == playersItem) {
-								$.getPlayer().sendMessage("Still in the cache so the event is functioning!");
-							}
-						})
-						.setWhileNotInCache(($) -> {
-							if ($.getPlayer().getInventory().getItemInMainHand() == playersItem) {
-								$.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!");
-							}
-						})
-						.create(BlockBreakEvent.class, playerCachedAttribute);
-
-				System.out.println("Hi");
 
 				if (item.activate(playerCachedAttribute, key)) {
 					flamingoShelf.add(playerCachedAttribute);
 					cache.add(playerCachedAttribute);
-					System.out.println("Hallo");
-					event.getPlayer().sendMessage(StringUtil.colorize("&eWorking!"));
+					System.out.println(cache.getCache().contains(playerCachedAttribute) + " YES OR NO");
+					event.getPlayer().sendMessage(StringUtil.colorize("&eWorking! Skins"));
 				}
-			}), writer -> {
-	}, ToolTarget.all());
+			}), creator -> creator.setExpiringShelf(flamingoShelf)
+			.setExpirationHandler(($) -> $.getPlayer().sendMessage("Seems that the ability ran out!"))
+			.setWhileInCache(BlockBreakEvent.class, ($) -> $.getPlayer().sendMessage("Still in the cache so the event is functioning!"))
+			.setWhileNotInCache(PlayerMoveEvent.class, ($) -> $.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!")),
+			writer -> {
+			}, ToolTarget.all());
 
 	private final String name;
 	private final NamespacedKey key;
 	private final EventSubscriber subscriber;
 	private final Consumer<FileConfiguration> writer;
 	private final ToolTarget[] targets;
+	private final Consumer<AbilityCreator<Skin, PlayerCachedAttribute<Skin>>> creatorConsumer;
 
-	GeneralSkinTypes(String name, EventSubscriber subscriber, Consumer<FileConfiguration> writer, ToolTarget... targets) {
+	GeneralSkinTypes(String name, EventSubscriber subscriber, Consumer<AbilityCreator<Skin, PlayerCachedAttribute<Skin>>> creatorConsumer, Consumer<FileConfiguration> writer, ToolTarget... targets) {
 		this.name = name;
 		this.key = name2key(name);
 		this.writer = writer;
 		this.subscriber = subscriber;
 		this.targets = targets;
+		this.creatorConsumer = creatorConsumer;
 	}
 
 	@Override

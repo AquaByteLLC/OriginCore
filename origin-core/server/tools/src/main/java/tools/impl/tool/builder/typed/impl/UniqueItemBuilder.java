@@ -5,6 +5,7 @@ import commons.Commons;
 import commons.events.api.EventContext;
 import commons.events.impl.impl.DetachedSubscriber;
 import commons.util.StringUtil;
+import lombok.Getter;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.Placeholders;
@@ -30,12 +31,15 @@ import java.util.stream.Collectors;
 public class UniqueItemBuilder {
 
 	private final Map<String, Pair<String, Object>> placeholderData = new HashMap<>();
+	@Getter
+	private static final Map<String, Class<? extends Event>> namespaceUpdates = new HashMap<>();
 	public static final Map<String, Pair<String, List<String>>> initial = new ConcurrentHashMap<>();
 	public static final NamespacedKey uniqueIdentifier = new NamespacedKey("builder", "id");
 	private Placeholder pl;
 	private AugmentedTool augmentedTool;
 	private SkinnedTool skinnedTool;
 	private EnchantedTool enchantedTool;
+
 	private ItemStack item;
 
 	public UniqueItemBuilder(ItemStack item) {
@@ -162,9 +166,15 @@ public class UniqueItemBuilder {
 
 	public <T, Z, C extends Event> UniqueItemBuilder createCustomDataUpdate(String namespace, String keyName, PersistentDataType<T, Z> type, Z data, Class<C> clazz, BiConsumer<EventContext, C> builderConsumer) {
 		final ItemStack item = this.build();
-
-		new DetachedSubscriber<>(clazz, (builderConsumer::accept)).bind(Commons.events());
 		placeholderData.put(keyName, Pair.of(keyName, data));
+
+		if (namespaceUpdates.containsKey(namespace))
+			if (namespaceUpdates.get(namespace).equals(clazz))
+				return createCustomData(item, namespace, keyName, type, data);
+
+		namespaceUpdates.put(namespace, clazz);
+		new DetachedSubscriber<>(clazz, builderConsumer::accept).bind(Commons.events());
+
 		return createCustomData(item, namespace, keyName, type, data);
 	}
 

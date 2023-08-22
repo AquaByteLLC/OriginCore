@@ -6,4 +6,6 @@ import tools.impl.attribute.ExpiringAttribute;
 
 public interface PlayerBasedCachedAttribute<T extends ExpiringAttribute> extends CachedAttribute<T> {
 	Player getPlayer();
+
+
 }
