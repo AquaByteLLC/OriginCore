@@ -4,10 +4,15 @@ import commons.events.api.EventRegistry;
 import commons.events.api.Subscriber;
 import commons.events.impl.EventSubscriber;
 
+/**
+ * Default {@link EventSubscriber} impl. Callers must control the lifecycle of this subscriber.
+ *
+ * @param <T>
+ */
 public class DetachedSubscriber<T> implements EventSubscriber {
 
-	private final Class<T> clazz;
-	private final Subscriber<T> subscriber;
+	protected final Class<T> clazz;
+	protected final Subscriber<T> subscriber;
 
 	public DetachedSubscriber(Class<T> clazz, Subscriber<T> subscriber) {
 		this.clazz      = clazz;
