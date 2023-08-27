@@ -1,9 +1,6 @@
 package tools.impl.tool.builder.typed.impl;
 
 import com.mojang.datafixers.util.Pair;
-import commons.Commons;
-import commons.events.api.EventContext;
-import commons.events.impl.impl.DetachedSubscriber;
 import commons.util.StringUtil;
 import lombok.Getter;
 import me.lucko.helper.item.ItemStackBuilder;
@@ -12,7 +9,6 @@ import me.vadim.util.conf.wrapper.Placeholders;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import me.vadim.util.item.Text;
 import org.bukkit.NamespacedKey;
-import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -24,7 +20,6 @@ import tools.impl.tool.impl.SkinnedTool;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -32,15 +27,15 @@ public class UniqueItemBuilder {
 
 	private final Map<String, Pair<String, Object>> placeholderData = new HashMap<>();
 	@Getter
-	private static final Map<String, Class<? extends Event>> namespaceUpdates = new HashMap<>();
 	public static final Map<String, Pair<String, List<String>>> initial = new ConcurrentHashMap<>();
-	public static final NamespacedKey uniqueIdentifier = new NamespacedKey("builder", "id");
+	public static final NamespacedKey uniqueLore = new NamespacedKey("builder", "lore");
+	public static final NamespacedKey uniqueName = new NamespacedKey("builder", "name");
 	private Placeholder pl;
 	private AugmentedTool augmentedTool;
 	private SkinnedTool skinnedTool;
 	private EnchantedTool enchantedTool;
 
-	private ItemStack item;
+	private final ItemStack item;
 
 	public UniqueItemBuilder(ItemStack item) {
 		this.item = item;
@@ -48,6 +43,11 @@ public class UniqueItemBuilder {
 
 	public ItemStack build() {
 		return ItemStackBuilder.of(this.item).build();
+	}
+
+	public UniqueItemBuilder write(Consumer<PersistentDataContainer> consumer) {
+		IBaseTool.writeContainer(build(), consumer);
+		return this;
 	}
 
 	public UniqueItemBuilder removeData(String namespace, String keyName) {
@@ -105,10 +105,9 @@ public class UniqueItemBuilder {
 
 		this.item.editMeta((meta -> {
 			final PersistentDataContainer pdc = meta.getPersistentDataContainer();
-			if (!pdc.has(uniqueIdentifier)) {
-				final String uid = UUID.randomUUID().toString();
-				pdc.set(uniqueIdentifier, PersistentDataType.STRING, uid);
-				initial.put(uid, Pair.of(meta.getDisplayName(), meta.getLore()));
+			if (!pdc.has(uniqueLore) && !pdc.has(uniqueName)) {
+				pdc.set(uniqueLore, PersistentDataType.STRING, String.join("\n", meta.getLore()));
+				pdc.set(uniqueName, PersistentDataType.STRING, meta.getDisplayName());
 			}
 		}));
 		return this;
@@ -138,11 +137,11 @@ public class UniqueItemBuilder {
 	public static void updateItem(ItemStack stack, Placeholder pl) {
 		stack.editMeta(meta -> {
 			final PersistentDataContainer pdc = meta.getPersistentDataContainer();
-			final String uid = pdc.get(uniqueIdentifier, PersistentDataType.STRING);
-			if (uid.isBlank()) return;
 
-			final String name = initial.get(uid).getFirst();
-			final List<String> lore = initial.get(uid).getSecond();
+			if (!(pdc.has(uniqueName) && pdc.has(uniqueLore))) return;
+
+			final String name = pdc.get(uniqueName, PersistentDataType.STRING);
+			final List<String> lore = Arrays.asList(pdc.get(uniqueLore, PersistentDataType.STRING).split("\n"));
 
 			if (lore.isEmpty()) return;
 			if (name.isBlank()) return;
@@ -157,35 +156,6 @@ public class UniqueItemBuilder {
 			meta.setLore(loreList);
 			meta.setDisplayName(pl.format(displayName));
 		});
-	}
-
-	public <T, Z> UniqueItemBuilder createCustomData(String namespace, String keyName, PersistentDataType<T, Z> type, Z data) {
-		final ItemStack item = this.build();
-		return createCustomData(item, namespace, keyName, type, data);
-	}
-
-	public <T, Z, C extends Event> UniqueItemBuilder createCustomDataUpdate(String namespace, String keyName, PersistentDataType<T, Z> type, Z data, Class<C> clazz, BiConsumer<EventContext, C> builderConsumer) {
-		final ItemStack item = this.build();
-		placeholderData.put(keyName, Pair.of(keyName, data));
-
-		if (namespaceUpdates.containsKey(namespace))
-			if (namespaceUpdates.get(namespace).equals(clazz))
-				return createCustomData(item, namespace, keyName, type, data);
-
-		namespaceUpdates.put(namespace, clazz);
-		new DetachedSubscriber<>(clazz, builderConsumer::accept).bind(Commons.events());
-
-		return createCustomData(item, namespace, keyName, type, data);
-	}
-
-	public static <T, Z> UniqueItemBuilder createCustomData(ItemStack stack, String namespace, String keyName, PersistentDataType<T, Z> type, Z data) {
-		final UniqueItemBuilder builder = UniqueItemBuilder.fromStack(stack);
-		builder.item.editMeta(meta -> {
-			final PersistentDataContainer pdc = meta.getPersistentDataContainer();
-			final NamespacedKey key = new NamespacedKey(namespace, keyName);
-			pdc.set(key, type, data);
-		});
-		return builder;
 	}
 
 	public <T extends IBaseTool> UniqueItemBuilder asSpecialTool(Class<T> clazz, Consumer<T> customToolConsumer) {

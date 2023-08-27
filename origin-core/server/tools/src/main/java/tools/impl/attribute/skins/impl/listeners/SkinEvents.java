@@ -1,6 +1,5 @@
 package tools.impl.attribute.skins.impl.listeners;
 
-import com.mojang.datafixers.util.Pair;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import org.bukkit.entity.Player;
@@ -67,15 +66,10 @@ public class SkinEvents implements Listener {
 		final PersistentDataContainer cursorPdc = cursor.getItemMeta().getPersistentDataContainer();
 
 		final SkinnedTool clickedSkinnedTool = new SkinnedTool(clicked);
-		final String uid = clickedPdc.get(UniqueItemBuilder.uniqueIdentifier, PersistentDataType.STRING);
-
-		final Pair<String, List<String>> initData = UniqueItemBuilder.initial.get(uid);
-		final String displayName = initData.getFirst();
-		final List<String> lore = initData.getSecond();
 
 		if (isApplicable(clicked, cursor)) {
 			clickedSkinnedTool.addSkin(event.getSkinKey());
-			UniqueItemBuilder.updateItem(clicked, lore, displayName);
+			UniqueItemBuilder.updateItem(clicked, List.of(), "");
 		}
 	}
 
@@ -85,14 +79,9 @@ public class SkinEvents implements Listener {
 
 		final PersistentDataContainer clickedPdc = clicked.getItemMeta().getPersistentDataContainer();
 		final SkinnedTool clickedSkinnedTool = new SkinnedTool(clicked);
-		final String uid = clickedPdc.get(UniqueItemBuilder.uniqueIdentifier, PersistentDataType.STRING);
-
-		final Pair<String, List<String>> initData = UniqueItemBuilder.initial.get(uid);
-		final String displayName = initData.getFirst();
-		final List<String> lore = initData.getSecond();
 
 		clickedSkinnedTool.removeSkin();
-		UniqueItemBuilder.updateItem(clicked, lore, displayName);
+		UniqueItemBuilder.updateItem(clicked, List.of(), "");
 	}
 
 	private boolean isApplicable(ItemStack clicked, ItemStack cursor) {

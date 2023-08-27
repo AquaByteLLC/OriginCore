@@ -6,6 +6,7 @@ import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
 import tools.impl.ability.cache.IAttributeCache;
 import tools.impl.ability.cache.CachedAttribute;
 import tools.impl.attribute.ExpiringAttribute;
+import tools.impl.sched.CacheInvalidator;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +26,7 @@ public class AttributeCache<T extends ExpiringAttribute, A extends CachedAttribu
 					return new TimedExpiringPolicy.TimedExpirationData(unit, time, false);
 				})).expireCheckInterval(2)
 				.build();
+		CacheInvalidator.add(this.shelf);
 	}
 
 	@Override

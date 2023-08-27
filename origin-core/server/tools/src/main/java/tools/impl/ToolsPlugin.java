@@ -4,6 +4,8 @@ import co.aikar.commands.PaperCommandManager;
 import commons.Commons;
 import commons.events.api.EventRegistry;
 import lombok.Getter;
+import me.vadim.util.conf.LiteConfig;
+import me.vadim.util.conf.ResourceProvider;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import tools.impl.ability.cache.impl.AttributeCache;
@@ -24,34 +26,39 @@ import tools.impl.attribute.skins.impl.commands.SkinCommands;
 import tools.impl.attribute.skins.impl.listeners.SkinEvents;
 import tools.impl.attribute.skins.impl.types.GeneralSkinTypes;
 import tools.impl.attribute.skins.impl.types.shelf.Shelves;
+import tools.impl.conf.attr.EnchantMenuConfig;
 import tools.impl.registry.impl.BaseAttributeRegistry;
-import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
+import tools.impl.sched.CacheInvalidator;
 
-public class ToolsPlugin extends JavaPlugin {
+public class ToolsPlugin extends JavaPlugin implements ResourceProvider {
 
 	@Getter
 	private static ToolsPlugin plugin;
 	@Getter
-	private BaseAttributeRegistry<Enchant> enchantRegistry;
+	public BaseAttributeRegistry<Enchant> enchantRegistry;
 	@Getter
 	private CustomEnchantFactory enchantFactory;
 
 	@Getter
-	private BaseAttributeRegistry<Augment> augmentRegistry;
+	public BaseAttributeRegistry<Augment> augmentRegistry;
 	@Getter
 	private ToolAugmentFactory augmentFactory;
 
 	@Getter
-	private BaseAttributeRegistry<Skin> skinRegistry;
+	public BaseAttributeRegistry<Skin> skinRegistry;
 	@Getter
 	private ToolSkinFactory skinFactory;
 	@Getter
 	private AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> skinCache;
 
+	@Getter
+	private LiteConfig lfc;
+
 	@Override
 	public void onEnable() {
 		plugin = this;
 
+		this.lfc = new LiteConfig(this);
 		final EventRegistry registry = Commons.events();
 
 		this.enchantRegistry = new BaseAttributeRegistry<>(registry);
@@ -64,10 +71,12 @@ public class ToolsPlugin extends JavaPlugin {
 		this.skinFactory = new ToolSkinFactory();
 		this.skinCache = new AttributeCache<>();
 
+		lfc.register(EnchantMenuConfig.class, EnchantMenuConfig::new);
+		lfc.reload();
+
 		GeneralSkinTypes.init(skinRegistry, skinFactory);
 		GeneralAugmentTypes.init(augmentRegistry, augmentFactory);
 		GeneralEnchantTypes.init(enchantRegistry, enchantFactory);
-		Shelves.init();
 
 		final PaperCommandManager commands = new PaperCommandManager(this);
 
@@ -94,8 +103,8 @@ public class ToolsPlugin extends JavaPlugin {
 
 		new AugmentEvents(registry);
 		new SkinEvents(registry);
-
-		UniqueItemBuilder.getEvents().forEach(event -> event.bind(registry));
+		Shelves.init();
+		CacheInvalidator.init();
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import tools.impl.ToolsPlugin;
@@ -24,6 +23,7 @@ import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.target.ToolTarget;
 import tools.impl.tool.impl.SkinnedTool;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static tools.impl.attribute.skins.impl.types.shelf.Shelves.flamingoShelf;
@@ -48,11 +48,27 @@ public enum GeneralSkinTypes implements AttributeKey {
 					System.out.println(cache.getCache().contains(playerCachedAttribute) + " YES OR NO");
 					event.getPlayer().sendMessage(StringUtil.colorize("&eWorking! Skins"));
 				}
-			}), creator -> creator.setExpiringShelf(flamingoShelf)
+			}), (creator, key) -> creator.setExpiringShelf(flamingoShelf)
 			.setExpirationHandler(($) -> $.getPlayer().sendMessage("Seems that the ability ran out!"))
-			.setWhileInCache(BlockBreakEvent.class, ($) -> $.getPlayer().sendMessage("Still in the cache so the event is functioning!"))
-			.setWhileNotInCache(PlayerMoveEvent.class, ($) -> $.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!")),
+			.setWhileInCache(BlockBreakEvent.class, ($) -> {
+				final Skin skin = ToolsPlugin.getPlugin().getSkinRegistry().getByKey(key);
+				final PlayerCachedAttribute<Skin> playerCachedAttribute = PlayerCachedAttribute.of(Skin.class, $.getPlayer(), skin);
+
+				if (flamingoShelf.contains(playerCachedAttribute)) {
+					flamingoShelf.getSettings().expiringPolicies();
+					$.getPlayer().sendMessage("Inside cache ");
+				}
+			})
+			.setWhileNotInCache(BlockBreakEvent.class, ($) -> {
+				final Skin skin = ToolsPlugin.getPlugin().getSkinRegistry().getByKey(key);
+				final PlayerCachedAttribute<Skin> playerCachedAttribute = PlayerCachedAttribute.of(Skin.class, $.getPlayer(), skin);
+
+				if (!flamingoShelf.contains(playerCachedAttribute)) {
+					$.getPlayer().sendMessage("Not inside the cache so whatever was meant to be done inside isnt!");
+				}
+			}).build(),
 			writer -> {
+
 			}, ToolTarget.all());
 
 	private final String name;
@@ -60,9 +76,9 @@ public enum GeneralSkinTypes implements AttributeKey {
 	private final EventSubscriber subscriber;
 	private final Consumer<FileConfiguration> writer;
 	private final ToolTarget[] targets;
-	private final Consumer<AbilityCreator<Skin, PlayerCachedAttribute<Skin>>> creatorConsumer;
+	private final BiConsumer<AbilityCreator<Skin, PlayerCachedAttribute<Skin>>, AttributeKey> creatorConsumer;
 
-	GeneralSkinTypes(String name, EventSubscriber subscriber, Consumer<AbilityCreator<Skin, PlayerCachedAttribute<Skin>>> creatorConsumer, Consumer<FileConfiguration> writer, ToolTarget... targets) {
+	GeneralSkinTypes(String name, EventSubscriber subscriber, BiConsumer<AbilityCreator<Skin, PlayerCachedAttribute<Skin>>, AttributeKey> creatorConsumer, Consumer<FileConfiguration> writer, ToolTarget... targets) {
 		this.name = name;
 		this.key = name2key(name);
 		this.writer = writer;
@@ -108,6 +124,6 @@ public enum GeneralSkinTypes implements AttributeKey {
 			throw new UnsupportedOperationException();
 		init = true;
 		for (GeneralSkinTypes value : values())
-			registry.register(factory.newAttributeBuilder(value).build(value.subscriber, value.writer, value.targets));
+			registry.register(factory.newAttributeBuilder(value).build(value.subscriber, value.creatorConsumer, value.writer, value.targets));
 	}
 }

@@ -23,39 +23,39 @@ import org.jetbrains.annotations.Nullable;
 public enum EnchantTypes implements EnchantKey {
 
 	SPEED("Speed",
-		  subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
-			  final ItemStack playersItem = event.getPlayer().getInventory().getItemInMainHand();
+			subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
+				final ItemStack playersItem = event.getPlayer().getInventory().getItemInMainHand();
 
-			  if (playersItem.getType().isAir()) return;
+				if (playersItem.getType().isAir()) return;
 
-			  final EnchantedItem item = new EnchantedItemImpl(playersItem);
+				final EnchantedItem item = new EnchantedItemImpl(playersItem);
 
-			  if (item.activate(key))
-				  event.getPlayer().addPotionEffect(PotionEffectType.SPEED.createEffect(10 * 20, 0));
-		  }), EnchantTarget.tools()),
+				if (item.activate(key))
+					event.getPlayer().addPotionEffect(PotionEffectType.SPEED.createEffect(10 * 20, 0));
+			}), EnchantTarget.tools()),
 	JUMP("Jump",
-		 subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
-			  final ItemStack playersItem = event.getPlayer().getInventory().getItemInMainHand();
+			subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
+				final ItemStack playersItem = event.getPlayer().getInventory().getItemInMainHand();
 
-			  if (playersItem.getType().isAir()) return;
+				if (playersItem.getType().isAir()) return;
 
-			  final EnchantedItem item = new EnchantedItemImpl(playersItem);
+				final EnchantedItem item = new EnchantedItemImpl(playersItem);
 
-			  if (item.activate(key))
-				  event.getPlayer().addPotionEffect(PotionEffectType.JUMP.createEffect(10 * 20, 0));
-		  }), EnchantTarget.tools()),
+				if (item.activate(key))
+					event.getPlayer().addPotionEffect(PotionEffectType.JUMP.createEffect(10 * 20, 0));
+			}), EnchantTarget.tools()),
 	;
 
-	private final String          name;
-	private final NamespacedKey   key;
+	private final String name;
+	private final NamespacedKey key;
 	private final EventSubscriber subscriber;
 	private final EnchantTarget[] targets;
 
 	EnchantTypes(String name, EventSubscriber subscriber, EnchantTarget... targets) {
-		this.name       = name;
-		this.key        = name2key(name);
+		this.name = name;
+		this.key = name2key(name);
 		this.subscriber = subscriber;
-		this.targets    = targets;
+		this.targets = targets;
 	}
 
 	@Override
@@ -88,12 +88,13 @@ public enum EnchantTypes implements EnchantKey {
 
 	public static @Nullable EnchantKey fromName(String name) {
 		for (EnchantTypes value : values())
-			if(value.name.equalsIgnoreCase(name))
+			if (value.name.equalsIgnoreCase(name))
 				return value;
 		return null;
 	}
 
 	private static boolean init = false;
+
 	public static void init(EnchantRegistry registry, EnchantFactory factory) {
 		if (init)
 			throw new UnsupportedOperationException();

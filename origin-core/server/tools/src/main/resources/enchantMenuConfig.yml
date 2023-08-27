@@ -1,0 +1,16 @@
+menu:
+  title: "Manage Augments for {name}"
+  button:
+    locked:
+      name: "&cThis augment slot is locked for some reason!"
+      lore:
+        - "&c{description}"
+    notApplied:
+      name: "&cThere is no augment applied!"
+      lore:
+        - "&cNope, not applied!"
+    applied:
+      name: "&cYou've got the augment &f{name} &capplied"
+      lore:
+        - "&cName: &f{name}"
+        - "&cBoost: &f{boost}%"

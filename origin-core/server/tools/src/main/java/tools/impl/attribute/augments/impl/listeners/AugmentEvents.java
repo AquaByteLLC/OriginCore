@@ -1,8 +1,8 @@
 package tools.impl.attribute.augments.impl.listeners;
 
-import com.mojang.datafixers.util.Pair;
 import commons.events.api.EventRegistry;
-import commons.events.api.Subscribe;
+import commons.events.impl.impl.DetachedSubscriber;
+import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
@@ -20,91 +20,107 @@ import tools.impl.attribute.augments.impl.item.AugmentApplier;
 import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
 import tools.impl.tool.impl.AugmentedTool;
-
-import java.util.List;
+import tools.impl.tool.impl.EnchantedTool;
+import tools.impl.tool.impl.SkinnedTool;
 
 public class AugmentEvents implements Listener {
 	private final EventRegistry registry;
 	private final BaseAttributeRegistry<Augment> augmentRegistry;
+	private final DetachedSubscriber<ApplyAugmentEvent> applyAugmentEventDetachedSubscriber;
+	private final DetachedSubscriber<RemoveAugmentEvent> removeAugmentEventDetachedSubscriber;
+	private final DetachedSubscriber<InventoryClickEvent> inventoryClickEventDetachedSubscriber;
 
 	public AugmentEvents(EventRegistry registry) {
 		this.registry = registry;
 		this.augmentRegistry = ToolsPlugin.getPlugin().getAugmentRegistry();
-		registry.subscribeAll(this);
-	}
+		this.inventoryClickEventDetachedSubscriber = new DetachedSubscriber<>(InventoryClickEvent.class, ((context, event) -> {
+			final ItemStack cursor = event.getCursor();
+			final ItemStack clicked = event.getCurrentItem();
 
-	@Subscribe
-	public void onAttach(InventoryClickEvent event) {
-		final ItemStack cursor = event.getCursor();
-		final ItemStack clicked = event.getCurrentItem();
+			if (!hasMeta(clicked, cursor)) return;
+			final PersistentDataContainer cursorPdc = cursor.getItemMeta().getPersistentDataContainer();
 
-		if (!hasMeta(clicked, cursor)) return;
-		final PersistentDataContainer cursorPdc = cursor.getItemMeta().getPersistentDataContainer();
+			if (!cursorPdc.has(AugmentedTool.applierKey)) return;
+			final String type = cursorPdc.get(AugmentedTool.applierKey, PersistentDataType.STRING);
 
-		final String type = cursorPdc.get(AugmentedTool.applierKey, PersistentDataType.STRING);
+			System.out.println(type);
+			if (type.isBlank()) return;
+			if (type.isEmpty()) return;
 
-		if (type.isBlank()) return;
-		if (type.isEmpty()) return;;
+			final AugmentedTool clickedAugmentedTool = new AugmentedTool(clicked);
+			final AttributeKey key = augmentRegistry.keyFromName(type);
 
-		final AugmentedTool clickedAugmentedTool = new AugmentedTool(clicked);
-		final AttributeKey key = augmentRegistry.keyFromName(type);
+			if (key == null) return;
 
-		if (key == null) return;
+			if (!(event.getWhoClicked() instanceof Player who)) return;
+			if (!(event.getClickedInventory() instanceof PlayerInventory)) return;
 
-		if (!(event.getWhoClicked() instanceof Player who)) return;
-		if (!(event.getClickedInventory() instanceof PlayerInventory)) return;
-
-		if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
-			if (isApplicable(clicked, cursor)) {
-				final ApplyAugmentEvent applyEvent = new ApplyAugmentEvent("augments", key, who, clicked, cursor);
-				applyEvent.callEvent();
-				event.setCancelled(true);
+			if (event.getAction().equals(InventoryAction.SWAP_WITH_CURSOR)) {
+				System.out.println("Here");
+				if (isApplicable(clicked, cursor)) {
+					System.out.println("Here2");
+					final ApplyAugmentEvent applyEvent = new ApplyAugmentEvent("augments", key, who, clicked, cursor);
+					applyEvent.callEvent();
+					event.setCancelled(true);
+				}
 			}
-		}
+		}));
 
-	}
+		this.applyAugmentEventDetachedSubscriber = new DetachedSubscriber<>(ApplyAugmentEvent.class, ((context, event) -> {
+			final ItemStack clicked = event.getAppliedStack();
+			final ItemStack cursor = event.getApplierStack();
 
-	@Subscribe
-	public void onApply(ApplyAugmentEvent event) {
-		final ItemStack clicked = event.getAppliedStack();
-		final ItemStack cursor = event.getApplierStack();
+			final PersistentDataContainer clickedPdc = clicked.getItemMeta().getPersistentDataContainer();
+			final PersistentDataContainer cursorPdc = cursor.getItemMeta().getPersistentDataContainer();
 
-		final PersistentDataContainer clickedPdc = clicked.getItemMeta().getPersistentDataContainer();
-		final PersistentDataContainer cursorPdc = cursor.getItemMeta().getPersistentDataContainer();
+			final String type = cursorPdc.get(AugmentedTool.applierKey, PersistentDataType.STRING);
+			final long boost = cursorPdc.get(AugmentedTool.applierData, PersistentDataType.LONG);
+			final AugmentedTool clickedAugmentedTool = new AugmentedTool(clicked);
+			final AttributeKey key = augmentRegistry.keyFromName(type);
 
-		final String type = cursorPdc.get(AugmentedTool.applierKey, PersistentDataType.STRING);
-		final long boost = cursorPdc.get(AugmentedTool.applierData, PersistentDataType.LONG);
-		final AugmentedTool clickedAugmentedTool = new AugmentedTool(clicked);
+			if (isApplicable(clicked, cursor)) {
+				clickedAugmentedTool.addAugment(key, boost);
 
-		final AttributeKey key = augmentRegistry.keyFromName(type);
-		final String uid = clickedPdc.get(UniqueItemBuilder.uniqueIdentifier, PersistentDataType.STRING);
+				final UniqueItemBuilder temp = UniqueItemBuilder.fromStack(clicked);
+				final EnchantedTool tool = new EnchantedTool(clicked);
+				final SkinnedTool anotherTool = new SkinnedTool(clicked);
 
-		final Pair<String, List<String>> initData = UniqueItemBuilder.initial.get(uid);
-		final String displayName = initData.getFirst();
-		final List<String> lore = initData.getSecond();
+				UniqueItemBuilder.updateItem(clicked, StringPlaceholder.builder()
+						.set("enchants", String.join("\n", tool.getEnchants()))
+						.set("augments", String.join("\n", clickedAugmentedTool.getAugments()))
+						.set("skin", (anotherTool.getApplied("&cNo Skin")))
+						.set("blocks", String.valueOf(temp.getData("gtb", "blocks", PersistentDataType.INTEGER)))
+						.build()
+				);
 
-		if (isApplicable(clicked, cursor)) {
-			clickedAugmentedTool.addAugment(key, boost);
-			UniqueItemBuilder.updateItem(clicked, lore, displayName);
-		}
-	}
+			}
+		}));
 
-	@Subscribe
-	public void onRemove(RemoveAugmentEvent event) {
-		final ItemStack clicked = event.getRemovedStack();
+		this.removeAugmentEventDetachedSubscriber = new DetachedSubscriber<>(RemoveAugmentEvent.class, ((context, event) -> {
+			final ItemStack clicked = event.getRemovedStack();
 
-		final PersistentDataContainer clickedPdc = clicked.getItemMeta().getPersistentDataContainer();
-		final AugmentedTool clickedAugmentedTool = new AugmentedTool(clicked);
-		final String uid = clickedPdc.get(UniqueItemBuilder.uniqueIdentifier, PersistentDataType.STRING);
+			final PersistentDataContainer clickedPdc = clicked.getItemMeta().getPersistentDataContainer();
+			final AugmentedTool clickedAugmentedTool = new AugmentedTool(clicked);
 
-		final Pair<String, List<String>> initData = UniqueItemBuilder.initial.get(uid);
-		final String displayName = initData.getFirst();
-		final List<String> lore = initData.getSecond();
+			final AttributeKey key = event.getAugmentKey();
 
-		final AttributeKey key = event.getAugmentKey();
+			clickedAugmentedTool.removeAugment(key);
+			final UniqueItemBuilder temp = UniqueItemBuilder.fromStack(clicked);
+			final EnchantedTool tool = new EnchantedTool(clicked);
+			final SkinnedTool anotherTool = new SkinnedTool(clicked);
 
-		clickedAugmentedTool.removeAugment(key);
-		UniqueItemBuilder.updateItem(clicked, lore, displayName);
+			UniqueItemBuilder.updateItem(clicked, StringPlaceholder.builder()
+					.set("enchants", String.join("\n", tool.getEnchants()))
+					.set("augments", String.join("\n", clickedAugmentedTool.getAugments()))
+					.set("skin", (anotherTool.getApplied("&cNo Skin")))
+					.set("blocks", String.valueOf(temp.getData("gtb", "blocks", PersistentDataType.INTEGER)))
+					.build()
+			);
+		}));
+
+		this.inventoryClickEventDetachedSubscriber.bind(registry);
+		this.applyAugmentEventDetachedSubscriber.bind(registry);
+		this.removeAugmentEventDetachedSubscriber.bind(registry);
 	}
 
 	private boolean isApplicable(ItemStack clicked, ItemStack cursor) {
@@ -113,11 +129,17 @@ public class AugmentEvents implements Listener {
 		final PersistentDataContainer cursorPdc = cursor.getItemMeta().getPersistentDataContainer();
 
 		final AugmentedTool clickedAugmentedTool = new AugmentedTool(clicked);
+		if (!cursorPdc.has(AugmentedTool.applierKey)) return false;
+
 		final String type = cursorPdc.get(AugmentedTool.applierKey, PersistentDataType.STRING);
 
+		System.out.println("Here3");
 		if (clickedAugmentedTool.isAugmentable()) {
+			System.out.println("Here4");
 			if (clickedAugmentedTool.hasOpenSlot()) {
-				return cursor == new AugmentApplier().stack(type);
+				System.out.println("Here5");
+				System.out.println(type);
+				return (new AugmentApplier().hasKeys(type, cursor));
 			}
 		}
 

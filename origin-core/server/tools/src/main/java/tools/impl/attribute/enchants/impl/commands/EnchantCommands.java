@@ -6,10 +6,11 @@ import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.text3.Text;
 import me.lucko.helper.text3.TextComponent;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
+import me.vadim.util.menu.Menu;
+import menu.enchant.EnchantMenuBase;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import tools.impl.ToolsPlugin;
@@ -19,6 +20,7 @@ import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
 import tools.impl.attribute.enchants.impl.types.GeneralEnchantTypes;
 import tools.impl.attribute.skins.impl.types.GeneralSkinTypes;
+import tools.impl.conf.attr.EnchantMenuConfig;
 import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
 import tools.impl.tool.impl.AugmentedTool;
@@ -51,7 +53,9 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 	public void openMenu(Player player) {
 		IEnchantedTool item = arg2item(player);
 		if (item == null) return;
-
+		Menu menu = new EnchantMenuBase(ToolsPlugin.getPlugin(), item, ToolsPlugin.getPlugin().getLfc().open(EnchantMenuConfig.class)).getMenu();
+		menu.regen();
+		menu.open(player);
 		/*
 		Menu menu = new EnchantMenu(plugin, item).getMenu();
 		menu.regen();
@@ -62,7 +66,7 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 
 	@Subcommand("test")
 	public void testItem(Player player) {
-		ItemStack stack = ItemStackBuilder.of(Material.LEATHER_HORSE_ARMOR).lore("&c{enchants}", "&d{augments}", "&e{skin}", "&f{blocks}")
+		ItemStack stack = ItemStackBuilder.of(Material.WOODEN_PICKAXE).lore("&c{enchants}", "&d{augments}", "&e{skin}", "&f{blocks}")
 				.name("&cTesting").build();
 
 		stack = new UniqueItemBuilder(stack)
@@ -73,33 +77,10 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 					item.makeEnchantable();
 					item.addEnchant(GeneralEnchantTypes.PLAYER_SPEED_BOOST, 10);
 				}).asSpecialTool(AugmentedTool.class, item -> {
-					item.makeAugmentable(1);
-				}).createCustomDataUpdate("gtb", "blocks", PersistentDataType.INTEGER, 0, BlockBreakEvent.class, (ctx, breakEvent) -> {
-					final Player playea = breakEvent.getPlayer();
-					final ItemStack playerHand = playea.getInventory().getItemInMainHand();
-
-					if (playerHand.getItemMeta() == null) return;
-
-					final UniqueItemBuilder temp = UniqueItemBuilder.fromStack(playerHand);
+					item.makeAugmentable(2);
+				}).write(pdc -> {
 					final NamespacedKey key = new NamespacedKey("gtb", "blocks");
-
-					if (playerHand.getItemMeta().getPersistentDataContainer().has(key)) {
-						int current = temp.getData("gtb", "blocks", PersistentDataType.INTEGER);
-						temp.createCustomData("gtb", "blocks", PersistentDataType.INTEGER, (current + 1));
-					}
-
-					final EnchantedTool tool = new EnchantedTool(playerHand);
-					final AugmentedTool otherTool = new AugmentedTool(playerHand);
-					final SkinnedTool anotherTool = new SkinnedTool(playerHand);
-
-					UniqueItemBuilder.updateItem(playerHand, StringPlaceholder.builder()
-							.set("enchants", String.join("\n", tool.getEnchants()))
-							.set("augments", String.join("\n", otherTool.getAugments()))
-							.set("skin", (anotherTool.getApplied("&cNo Skin")))
-							.set("blocks", String.valueOf(temp.getData("gtb", "blocks", PersistentDataType.INTEGER)))
-							.build()
-					);
-
+					pdc.set(key, PersistentDataType.INTEGER, 0);
 				}).create().build();
 
 		final UniqueItemBuilder temp = UniqueItemBuilder.fromStack(stack);

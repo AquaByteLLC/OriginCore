@@ -82,7 +82,7 @@ public class EnchantConfiguration extends AttributeConfiguration {
 
 			menuSection.set(getAsRelative(itemTypePath), "DIAMOND_BLOCK");
 			menuSection.set(getAsRelative(itemDisplayNamePath), "&c&lMenuItem: &f{name}");
-			menuSection.set(getAsRelative(itemLorePath), List.of("&b&lItems lore for the enchant", "%maxLevel%", "%maxChance%", "%currentChance%", "%currentLevel%", "%maxCost%", "%currentCost%"));
+			menuSection.set(getAsRelative(itemLorePath), List.of("&b&lItems lore for the enchant", "{maxLevel}", "{maxChance}", "{currentChance}", "{currentLevel}", "{maxCost}", "{currentCost}"));
 		});
 	}
 

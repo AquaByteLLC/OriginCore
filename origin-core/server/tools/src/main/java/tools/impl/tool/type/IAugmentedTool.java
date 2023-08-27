@@ -21,6 +21,8 @@ public interface IAugmentedTool extends IBaseTool {
 
 	void addAugment(AttributeKey enchantKey, long boost);
 
+	int getOpenSlots();
+
 	void removeAugmentSlot(int amount);
 
 	void removeAugment(AttributeKey augmentKey);

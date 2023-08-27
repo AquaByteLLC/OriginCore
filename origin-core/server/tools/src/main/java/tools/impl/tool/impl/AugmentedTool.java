@@ -116,8 +116,8 @@ public class AugmentedTool implements IAugmentedTool {
 	public void makeAugmentable(int startingSlots) {
 		writeContainer(pdc -> {
 			setCanAugment(pdc, true);
-			setOpenSlots(startingSlots);
 		});
+		setOpenSlots(startingSlots);
 	}
 
 	@Override
@@ -135,6 +135,7 @@ public class AugmentedTool implements IAugmentedTool {
 		writeContainer(pdc -> pdc.set(amountKey, PersistentDataType.INTEGER, slots));
 	}
 
+	@Override
 	public int getOpenSlots() {
 		return readContainer().get(amountKey, PersistentDataType.INTEGER);
 	}

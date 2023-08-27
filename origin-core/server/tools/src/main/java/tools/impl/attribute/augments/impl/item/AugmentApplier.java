@@ -5,6 +5,7 @@ import commons.util.StringUtil;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
@@ -25,9 +26,10 @@ public class AugmentApplier {
 		final AttributeKey key = registry.keyFromName(type);
 		final Augment augment = registry.getByKey(key);
 
+		Random random = new Random(System.currentTimeMillis());
 		long min = augment.getMinimumBoost();
 		long max = augment.getMaximumBoost();
-		long boost = new Random().nextLong(min, max);
+		long boost = random.nextLong(min + 1, max);
 
 		final Placeholder pl = StringPlaceholder.builder()
 				.set("boost", StringUtil.formatNumber(boost))
@@ -40,7 +42,11 @@ public class AugmentApplier {
 		IBaseTool.writeContainer(item, pdc -> pdc.set(applierData, PersistentDataType.LONG, boost));
 
 		BukkitUtil.formatItem(pl, item);
-
 		return item;
+	}
+
+	public boolean hasKeys(String type, ItemStack stack) {
+		PersistentDataContainer container = stack.getItemMeta().getPersistentDataContainer();
+		return container.has(applierKey) && container.get(applierKey, PersistentDataType.STRING).equals(type);
 	}
 }

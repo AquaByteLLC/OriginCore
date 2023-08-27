@@ -15,4 +15,6 @@ public interface IAbilityCreator<T extends ExpiringAttribute, A extends CachedAt
 	<R extends Event> IAbilityCreator<T, A> setWhileNotInCache(Class<R> event, Consumer<R> whileOut);
 
 	IAbilityCreator<T, A> setExpirationHandler(ExpiringShelf.ExpirationHandler<A> handler);
+
+	void build();
 }
