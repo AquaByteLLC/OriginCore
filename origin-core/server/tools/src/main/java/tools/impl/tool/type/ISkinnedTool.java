@@ -10,7 +10,7 @@ import org.bukkit.persistence.PersistentDataType;
 import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.skins.Skin;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.IBaseTool;
 
 import java.util.stream.Collectors;
@@ -38,8 +38,8 @@ public interface ISkinnedTool extends IBaseTool {
 	boolean hasSkin(AttributeKey enchantKey);
 
 	static ItemStack makeApplier(String type) {
-		final BaseAttributeRegistry<Skin> registry = ToolsPlugin.getPlugin().getSkinRegistry();
-		final AttributeKey key = registry.keyFromName(type);
+		final AttributeRegistry<Skin> registry = ToolsPlugin.getPlugin().getSkinRegistry();
+		final AttributeKey            key      = registry.keyFromName(type);
 		final Skin skin = registry.getByKey(key);
 
 		final Placeholder pl = StringPlaceholder.builder()

@@ -19,7 +19,7 @@ import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.Consumer3;
 import tools.impl.attribute.skins.Skin;
 import tools.impl.attribute.skins.impl.ToolSkinFactory;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.target.ToolTarget;
 import tools.impl.tool.impl.SkinnedTool;
 
@@ -119,7 +119,7 @@ public enum GeneralSkinTypes implements AttributeKey {
 
 	private static boolean init = false;
 
-	public static void init(BaseAttributeRegistry<Skin> registry, ToolSkinFactory factory) {
+	public static void init(AttributeRegistry<Skin> registry, ToolSkinFactory factory) {
 		if (init)
 			throw new UnsupportedOperationException();
 		init = true;

@@ -26,7 +26,9 @@ import tools.impl.attribute.skins.impl.commands.SkinCommands;
 import tools.impl.attribute.skins.impl.listeners.SkinEvents;
 import tools.impl.attribute.skins.impl.types.GeneralSkinTypes;
 import tools.impl.attribute.skins.impl.types.shelf.Shelves;
-import tools.impl.conf.attr.EnchantMenuConfig;
+import tools.impl.cmd.TC;
+import tools.impl.conf.Config;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.sched.CacheInvalidator;
 
@@ -34,25 +36,49 @@ public class ToolsPlugin extends JavaPlugin implements ResourceProvider {
 
 	@Getter
 	private static ToolsPlugin plugin;
-	@Getter
-	public BaseAttributeRegistry<Enchant> enchantRegistry;
-	@Getter
+	private AttributeRegistry<Enchant> enchantRegistry;
 	private CustomEnchantFactory enchantFactory;
 
-	@Getter
-	public BaseAttributeRegistry<Augment> augmentRegistry;
-	@Getter
+	private AttributeRegistry<Augment> augmentRegistry;
 	private ToolAugmentFactory augmentFactory;
 
-	@Getter
-	public BaseAttributeRegistry<Skin> skinRegistry;
-	@Getter
+	private AttributeRegistry<Skin> skinRegistry;
 	private ToolSkinFactory skinFactory;
-	@Getter
 	private AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> skinCache;
 
-	@Getter
 	private LiteConfig lfc;
+
+	public CustomEnchantFactory getEnchantFactory() {
+		return enchantFactory;
+	}
+
+	public ToolAugmentFactory getAugmentFactory() {
+		return augmentFactory;
+	}
+
+	public ToolSkinFactory getSkinFactory() {
+		return skinFactory;
+	}
+
+	public AttributeRegistry<Enchant> getEnchantRegistry() {
+		return enchantRegistry;
+	}
+
+	public AttributeRegistry<Augment> getAugmentRegistry() {
+		return augmentRegistry;
+	}
+
+	public AttributeRegistry<Skin> getSkinRegistry() {
+		return skinRegistry;
+	}
+
+	public AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> getSkinCache() {
+		return skinCache;
+	}
+
+	public Config config() {
+		return lfc.open(Config.class);
+	}
 
 	@Override
 	public void onEnable() {
@@ -71,7 +97,7 @@ public class ToolsPlugin extends JavaPlugin implements ResourceProvider {
 		this.skinFactory = new ToolSkinFactory();
 		this.skinCache = new AttributeCache<>();
 
-		lfc.register(EnchantMenuConfig.class, EnchantMenuConfig::new);
+		lfc.register(Config.class, Config::new);
 		lfc.reload();
 
 		GeneralSkinTypes.init(skinRegistry, skinFactory);
@@ -100,6 +126,8 @@ public class ToolsPlugin extends JavaPlugin implements ResourceProvider {
 			return augmentRegistry.getAllAttributes().stream().filter(e -> e.targetsItem(holding)).map(Augment::getKey).map(AttributeKey::getName).toList();
 		});
 		commands.registerCommand(new AugmentCommands());
+
+		commands.registerCommand(new TC(this));
 
 		new AugmentEvents(registry);
 		new SkinEvents(registry);

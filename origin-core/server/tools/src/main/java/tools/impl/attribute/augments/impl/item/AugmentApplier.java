@@ -10,21 +10,20 @@ import org.bukkit.persistence.PersistentDataType;
 import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.augments.Augment;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.IBaseTool;
 
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static tools.impl.tool.type.IAugmentedTool.applierData;
-import static tools.impl.tool.type.IAugmentedTool.applierKey;
+import static tools.impl.tool.type.IAugmentedTool.*;
 
 public class AugmentApplier {
 
 	public ItemStack stack(String type) {
-		final BaseAttributeRegistry<Augment> registry = ToolsPlugin.getPlugin().getAugmentRegistry();
-		final AttributeKey key = registry.keyFromName(type);
-		final Augment augment = registry.getByKey(key);
+		final AttributeRegistry<Augment> registry = ToolsPlugin.getPlugin().getAugmentRegistry();
+		final AttributeKey               key      = registry.keyFromName(type);
+		final Augment                    augment  = registry.getByKey(key);
 
 		Random random = new Random(System.currentTimeMillis());
 		long min = augment.getMinimumBoost();

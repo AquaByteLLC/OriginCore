@@ -1,8 +1,8 @@
 package tools.impl.attribute;
 
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 
 public interface BaseAttributeCommand<T extends BaseAttribute, C extends AttributeFactory<?, ?>> {
-	BaseAttributeRegistry<T> getRegistry();
+	AttributeRegistry<T> getRegistry();
 	C getFactory();
 }

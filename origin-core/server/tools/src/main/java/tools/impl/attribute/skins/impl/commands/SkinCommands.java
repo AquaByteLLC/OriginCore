@@ -11,13 +11,13 @@ import tools.impl.ToolsPlugin;
 import tools.impl.attribute.BaseAttributeCommand;
 import tools.impl.attribute.skins.Skin;
 import tools.impl.attribute.skins.impl.ToolSkinFactory;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.type.ISkinnedTool;
 
 @CommandAlias("skins")
 public class SkinCommands extends BaseCommand implements BaseAttributeCommand<Skin, ToolSkinFactory> {
 
-	private final BaseAttributeRegistry<Skin> registry;
+	private final AttributeRegistry<Skin> registry;
 	private final ToolSkinFactory factory;
 
 	public SkinCommands() {
@@ -26,7 +26,7 @@ public class SkinCommands extends BaseCommand implements BaseAttributeCommand<Sk
 	}
 
 	@Override
-	public BaseAttributeRegistry<Skin> getRegistry() {
+	public AttributeRegistry<Skin> getRegistry() {
 		return this.registry;
 	}
 

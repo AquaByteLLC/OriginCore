@@ -17,7 +17,7 @@ import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.events.ApplyAugmentEvent;
 import tools.impl.attribute.augments.impl.events.RemoveAugmentEvent;
 import tools.impl.attribute.augments.impl.item.AugmentApplier;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
 import tools.impl.tool.impl.AugmentedTool;
 import tools.impl.tool.impl.EnchantedTool;
@@ -25,7 +25,7 @@ import tools.impl.tool.impl.SkinnedTool;
 
 public class AugmentEvents implements Listener {
 	private final EventRegistry registry;
-	private final BaseAttributeRegistry<Augment> augmentRegistry;
+	private final AttributeRegistry<Augment> augmentRegistry;
 	private final DetachedSubscriber<ApplyAugmentEvent> applyAugmentEventDetachedSubscriber;
 	private final DetachedSubscriber<RemoveAugmentEvent> removeAugmentEventDetachedSubscriber;
 	private final DetachedSubscriber<InventoryClickEvent> inventoryClickEventDetachedSubscriber;

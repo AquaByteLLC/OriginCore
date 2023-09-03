@@ -1,0 +1,50 @@
+general_menu:
+  augments_item:
+    type: BLAZE_POWDER
+    name: Augments Menu
+    lore: [click2open]
+  skins_item:
+    type: APPLE
+    name: Skins Menu
+    lore: [click2open]
+  enchants_item:
+    type: ENCHANTED_BOOK
+    name: Enchants Menu
+    lore: [click2open]
+    
+augment_menu:
+  title: "Manage Augments for {name}"
+  button:
+    locked:
+      name: "&cThis augment slot is locked for some reason!"
+      lore:
+        - "&c{description}"
+    notApplied:
+      name: "&cThere is no augment applied!"
+      lore:
+        - "&cNope, not applied!"
+    applied:
+      name: "&cYou've got the augment &f{name} &capplied"
+      lore:
+        - "&cName: &f{name}"
+        - "&cBoost: &f{boost}%"
+
+enchant_menu:
+  title: "Manage Enchants for {name}"
+  button:
+    upgrade:
+      name: "+{levels} Enchant Levels"
+      lore:
+        - "Upgrade Enchant {name}"
+        - "&cNet Cost: &f${netCost}"
+        - "&cNew Chance: &f{newChance}%"
+        - "&cNew Level &f{newLevel}&c/&f{maxLevel}"
+        - "&cMax Chance: &f{maxChance}%"
+        - "&cMax Cost: &f${maxCost}"
+        - "&cLevel: &f{currentLevel}&c/&f{maxLevel}"
+        - "&cCurrent Chance: &f{currentChance}%"
+        - "&cCurrent Cost: &f${currentCost}"
+        - "click to purchase"
+
+skin_menu:
+  title: "Manage Skins for {name}"

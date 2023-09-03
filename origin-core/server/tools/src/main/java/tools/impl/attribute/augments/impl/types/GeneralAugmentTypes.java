@@ -13,7 +13,7 @@ import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.Consumer3;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.ToolAugmentFactory;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.target.ToolTarget;
 import tools.impl.tool.impl.AugmentedTool;
 
@@ -81,7 +81,7 @@ public enum GeneralAugmentTypes implements AttributeKey {
 
 	private static boolean init = false;
 
-	public static void init(BaseAttributeRegistry<Augment> registry, ToolAugmentFactory factory) {
+	public static void init(AttributeRegistry<Augment> registry, ToolAugmentFactory factory) {
 		if (init)
 			throw new UnsupportedOperationException();
 		init = true;

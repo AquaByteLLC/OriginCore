@@ -1,7 +1,11 @@
 package tools.impl.attribute.enchants.impl.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.*;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.text3.Text;
 import me.lucko.helper.text3.TextComponent;
@@ -20,8 +24,7 @@ import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
 import tools.impl.attribute.enchants.impl.types.GeneralEnchantTypes;
 import tools.impl.attribute.skins.impl.types.GeneralSkinTypes;
-import tools.impl.conf.attr.EnchantMenuConfig;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
 import tools.impl.tool.impl.AugmentedTool;
 import tools.impl.tool.impl.EnchantedTool;
@@ -31,7 +34,7 @@ import tools.impl.tool.type.IEnchantedTool;
 @CommandAlias("enchants")
 public class EnchantCommands extends BaseCommand implements BaseAttributeCommand<Enchant, CustomEnchantFactory> {
 
-	private final BaseAttributeRegistry<Enchant> registry;
+	private final AttributeRegistry<Enchant> registry;
 	private final CustomEnchantFactory factory;
 
 	public EnchantCommands() {
@@ -40,7 +43,7 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 	}
 
 	@Override
-	public BaseAttributeRegistry<Enchant> getRegistry() {
+	public AttributeRegistry<Enchant> getRegistry() {
 		return this.registry;
 	}
 
@@ -53,15 +56,9 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 	public void openMenu(Player player) {
 		IEnchantedTool item = arg2item(player);
 		if (item == null) return;
-		Menu menu = new EnchantMenuBase(ToolsPlugin.getPlugin(), item, ToolsPlugin.getPlugin().getLfc().open(EnchantMenuConfig.class)).getMenu();
+		Menu menu = new EnchantMenuBase(ToolsPlugin.getPlugin(), item).getMenu();
 		menu.regen();
 		menu.open(player);
-		/*
-		Menu menu = new EnchantMenu(plugin, item).getMenu();
-		menu.regen();
-		menu.open(player);
-
-		 */
 	}
 
 	@Subcommand("test")

@@ -1,7 +1,7 @@
 package enderchests.impl
 
 import commons.data.account.AccountProvider
-import commons.menu.MenuAdapter
+import commons.menu.MenuListAdapter
 import commons.util.StringUtil
 import enderchests.ChestRegistry
 import enderchests.NetworkColor
@@ -19,7 +19,7 @@ import java.util.*
  * @author vadim
  */
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
-class EnderChestMenu(private val plugin: EnderChestsPlugin, private val player: UUID) : MenuAdapter<NetworkColor>() {
+class EnderChestMenu(private val plugin: EnderChestsPlugin, private val player: UUID) : MenuListAdapter<NetworkColor>() {
 
 	override val MENU_SIZE = 9 * 3
 	override val BACK_SLOT = 18

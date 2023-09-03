@@ -8,7 +8,7 @@ import tools.impl.ToolsPlugin;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.skins.Skin;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.IOriginTool;
 import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
 
@@ -40,7 +40,7 @@ public class OriginTool extends BukkitConfig implements IOriginTool {
 		final String path = "tool.enchants.starting";
 		final List<String> list = getConfiguration().getStringList(path);
 		final List<Pair<Enchant, Integer>> enchants = new LinkedList<>();
-		final BaseAttributeRegistry<Enchant> registry = ToolsPlugin.getPlugin().getEnchantRegistry();
+		final AttributeRegistry<Enchant>   registry = ToolsPlugin.getPlugin().getEnchantRegistry();
 
 		for (String str : list) {
 			final String[] strs = str.split(":");
@@ -56,7 +56,7 @@ public class OriginTool extends BukkitConfig implements IOriginTool {
 	@Override
 	public Skin getStartingSkin() {
 		final String path = "tool.skins.starting";
-		final BaseAttributeRegistry<Skin> registry = ToolsPlugin.getPlugin().getSkinRegistry();
+		final AttributeRegistry<Skin> registry = ToolsPlugin.getPlugin().getSkinRegistry();
 		this.skin = registry.getByKey(registry.keyFromName(getContent()));
 		return this.skin;
 	}
@@ -66,7 +66,7 @@ public class OriginTool extends BukkitConfig implements IOriginTool {
 		final String path = "tool.augments.starting";
 		final List<String> list = getConfiguration().getStringList(path);
 		final List<Pair<Augment, Long>> augments = new LinkedList<>();
-		final BaseAttributeRegistry<Augment> registry = ToolsPlugin.getPlugin().getAugmentRegistry();
+		final AttributeRegistry<Augment> registry = ToolsPlugin.getPlugin().getAugmentRegistry();
 
 		for (String str : list) {
 			final String[] strs = str.split(":");

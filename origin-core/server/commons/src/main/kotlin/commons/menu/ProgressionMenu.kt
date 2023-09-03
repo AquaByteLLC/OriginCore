@@ -1,7 +1,5 @@
-/*
 package commons.menu
 
-import commons.menu.MenuSorter
 import me.vadim.util.menu.MenuList
 import me.vadim.util.menu.button
 import me.vadim.util.menu.impl.ListMenu
@@ -41,4 +39,3 @@ class ProgressionMenuYX<T>(plugin: Plugin, menu: MenuList<T>, private val opts: 
 	}
 
 }
- */

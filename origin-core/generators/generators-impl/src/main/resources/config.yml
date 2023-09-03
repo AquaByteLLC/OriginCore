@@ -1,4 +1,4 @@
- drop_rate_seconds: 5
+drop_rate_seconds: 5
 default_slots: 10
 autosave_interval_minutes: 20
 

@@ -28,5 +28,11 @@
     "name": "Zlurpy",
     "level": 4,
     "bypassesPlayerLimit": false
+  },
+  {
+    "uuid": "9ee3773f-8631-4153-8053-86b2e2437cbc",
+    "name": "Lautiste",
+    "level": 4,
+    "bypassesPlayerLimit": false
   }
 ]

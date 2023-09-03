@@ -12,12 +12,12 @@ import tools.impl.attribute.BaseAttributeCommand;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.ToolAugmentFactory;
 import tools.impl.attribute.augments.impl.item.AugmentApplier;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 
 @CommandAlias("augments")
 public class AugmentCommands extends BaseCommand implements BaseAttributeCommand<Augment, ToolAugmentFactory> {
 
-	private final BaseAttributeRegistry<Augment> registry;
+	private final AttributeRegistry<Augment> registry;
 	private final ToolAugmentFactory factory;
 
 	public AugmentCommands() {
@@ -26,7 +26,7 @@ public class AugmentCommands extends BaseCommand implements BaseAttributeCommand
 	}
 
 	@Override
-	public BaseAttributeRegistry<Augment> getRegistry() {
+	public AttributeRegistry<Augment> getRegistry() {
 		return this.registry;
 	}
 

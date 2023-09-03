@@ -13,7 +13,7 @@ import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.attribute.augments.impl.ToolAugmentFactory;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.IBaseTool;
 import tools.impl.tool.type.IAugmentedTool;
 
@@ -28,7 +28,7 @@ public class AugmentedTool implements IAugmentedTool {
 
 	private final ItemStack itemStack;
 
-	private static BaseAttributeRegistry<Augment> getRegistry() {
+	private static AttributeRegistry<Augment> getRegistry() {
 		return ToolsPlugin.getPlugin().getAugmentRegistry();
 	}
 

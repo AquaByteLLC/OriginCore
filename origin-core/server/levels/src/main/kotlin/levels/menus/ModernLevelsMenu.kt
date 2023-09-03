@@ -1,7 +1,6 @@
-/*
 package levels.menus
 
-import commons.menu.MenuAdapter
+import commons.menu.MenuListAdapter
 import commons.menu.toProgressionYX
 import levels.Level
 import levels.LevelsPlugin
@@ -18,7 +17,7 @@ import org.bukkit.entity.Player
  * @author vadim
  */
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
-class ModernLevelsMenu(private val plugin: LevelsPlugin, private val owner: Player) : MenuAdapter<Level>() {
+class ModernLevelsMenu(private val plugin: LevelsPlugin, private val owner: Player) : MenuListAdapter<Level>() {
 
 	override val MENU_SIZE = 9 * 6
 	override val BACK_SLOT = 48
@@ -58,4 +57,3 @@ class ModernLevelsMenu(private val plugin: LevelsPlugin, private val owner: Play
 
 	override fun queryItems(): MutableList<Level> = reg.levels
 }
- */

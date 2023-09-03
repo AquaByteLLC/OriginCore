@@ -1,28 +1,17 @@
 package menu.enchant
 
-import commons.menu.MenuAdapter
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder
 import me.vadim.util.menu.*
+import menu.AttributeMenu
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import tools.impl.ToolsPlugin
 import tools.impl.attribute.enchants.Enchant
-import tools.impl.conf.attr.EnchantMenuConfig
-import tools.impl.registry.AttributeRegistry
 import tools.impl.tool.impl.EnchantedTool
 import tools.impl.tool.type.IEnchantedTool
 
-class EnchantMenuBase(
-    private val plugin: ToolsPlugin,
-    private val item: IEnchantedTool,
-    private val config: EnchantMenuConfig
-) : MenuAdapter<Enchant>() {
-    override val MENU_SIZE = 9 * 4
-    override val BACK_SLOT = 30
-    override val DONE_SLOT = 31
-    override val NEXT_SLOT = 32
+class EnchantMenuBase(plugin: ToolsPlugin, item: IEnchantedTool) : AttributeMenu<Enchant, IEnchantedTool>(plugin, plugin.enchantRegistry, item) {
 
-    private val registry: AttributeRegistry<Enchant> = plugin.enchantRegistry
 
     private fun Menu.getSubMenu(enchant: Enchant): Menu = menu(9 * 3) {
         title = config.enchantMenuTitle.format(StringPlaceholder.of("name", item.itemStack.itemMeta.displayName))
@@ -53,18 +42,15 @@ class EnchantMenuBase(
             var price = 0.0
 
             /* Feel free to use this as a replacement. Can't be asked to modify it, but this should be a lot better.
-
             AreaUnderCurve { x ->
                 x.plus(EnchantedTool.calc(enchant, enchant.costType, lvl_current, enchant.startCost, enchant.maxCost).toDouble())
             }.apply {
                 price.plus(IntSimpson(lvl_current.toDouble(), (lvl_new + 1).toDouble(), (lvl_new + 1).toInt()));
             }
-
-
              */
 
             for (l in lvl_current until (lvl_new + 1))
-                price.plus(
+                price += (
                     EnchantedTool.calc(enchant, enchant.costType, l, enchant.startCost, enchant.maxCost).toDouble()
                 )
 
@@ -82,16 +68,14 @@ class EnchantMenuBase(
                 .set("currentCost", item.getCost(enchant.key).toString())
 
             if (doUpgrade) {
+                println("Item $lvl_current -> $lvl_new")
+                println("Item Before ${item.getLevel(enchant.key)}")
                 item.addEnchant(enchant.key, lvl_new)
+                println("Item After ${item.getLevel(enchant.key)}")
                 // todo: econ
             }
 
-            return config.menuUpgrade.format(enchant.menuItem.type, pl.build()).amount(n_lvls).build()
-        }
-
-        close = {
-            refresh()
-            parent!!.open(it.player)
+            return config.enchantMenuUpgrade.format(enchant.menuItem.type, pl.build()).amount(n_lvls).build()
         }
 
         for (i in 1..7)
@@ -102,7 +86,7 @@ class EnchantMenuBase(
                     regen()
                 }
             } into (i + 9)
-    }.apply { regen() }
+    }.apply { generate() }
 
     override val menu: MenuList<Enchant> = template.toList(queryItems(), transformer = {
         item.formatMenuItemFor(it.key).apply {
@@ -125,8 +109,10 @@ class EnchantMenuBase(
         select = { event, button, enchant ->
             getSubMenu(enchant).open(event.whoClicked)
         }
-    }
+    }.apply { generate() }
 
-    override fun queryItems(): MutableList<Enchant> = registry.allAttributes
+    override fun test(e: Enchant, item: IEnchantedTool): Boolean = true
+
+//    override fun queryItems(): MutableList<Enchant> = registry.allAttributes
 
 }

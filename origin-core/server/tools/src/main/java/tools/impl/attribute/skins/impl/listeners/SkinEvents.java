@@ -15,7 +15,7 @@ import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.skins.Skin;
 import tools.impl.attribute.skins.impl.events.ApplySkinEvent;
 import tools.impl.attribute.skins.impl.events.RemoveSkinEvent;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
 import tools.impl.tool.impl.SkinnedTool;
 import tools.impl.tool.type.ISkinnedTool;
@@ -24,7 +24,7 @@ import java.util.List;
 
 public class SkinEvents implements Listener {
 	private final EventRegistry registry;
-	private final BaseAttributeRegistry<Skin> skinRegistry;
+	private final AttributeRegistry<Skin> skinRegistry;
 
 	public SkinEvents(EventRegistry registry) {
 		this.registry = registry;

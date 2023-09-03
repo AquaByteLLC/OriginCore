@@ -22,5 +22,4 @@ dependencies {
     compileOnly(Dependencies.MENUS)
     compileOnly(project(":commons"))
     compileOnly(project(":settings-api"))
-
 }

@@ -1,29 +1,18 @@
 package menu.augment
-/*
-import commons.menu.MenuAdapter
+
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder
 import me.vadim.util.menu.MenuList
 import me.vadim.util.menu.frame
 import me.vadim.util.menu.frameWith
 import me.vadim.util.menu.toList
+import menu.AttributeMenu
 import org.bukkit.enchantments.Enchantment
 import tools.impl.ToolsPlugin
 import tools.impl.attribute.augments.Augment
-import tools.impl.conf.attr.AugmentMenuConfig
-import tools.impl.registry.AttributeRegistry
 import tools.impl.tool.type.IAugmentedTool
 
-class AugmentsMenuBase(
-    private val plugin: ToolsPlugin,
-    private val item: IAugmentedTool,
-    private val config: AugmentMenuConfig
-) : MenuAdapter<Augment>() {
-    override val MENU_SIZE = 9 * 3
-    override val BACK_SLOT = 21
-    override val DONE_SLOT = 22
-    override val NEXT_SLOT = 23
+class AugmentsMenuBase(plugin: ToolsPlugin, item: IAugmentedTool) : AttributeMenu<Augment, IAugmentedTool>(plugin, plugin.augmentRegistry, item) {
 
-    private val registry: AttributeRegistry<Augment> = plugin.augmentRegistry
 
     override val menu: MenuList<Augment> = template.toList(queryItems(), transformer = {
 
@@ -34,7 +23,7 @@ class AugmentsMenuBase(
             }
         }
 
-        for (i in 0..item.openSlots)
+//        for (i in 0..item.openSlots)
 
 
     }) {
@@ -48,22 +37,11 @@ class AugmentsMenuBase(
 
         frameWith(blank())
 
-        select = { event, button, enchant ->
-            getSubMenu(enchant).open(event.whoClicked)
+        select = { event, button, augment ->
+//            getSubMenu(augment).open(event.whoClicked)
         }
-    }
+    }.apply { generate() }
 
-    override fun queryItems(): MutableList<Augment> {
-        val list = mutableListOf<Augment>()
+    override fun test(e: Augment, item: IAugmentedTool): Boolean = item.hasAugment(e.key)
 
-        for (e in registry.allAttributes)
-            if (e != null) {
-                if (item.hasAugment(e.key))
-                    list.add(e)
-            }
-
-        return list
-    }
 }
-
- */

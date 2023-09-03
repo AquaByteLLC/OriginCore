@@ -30,7 +30,9 @@ public class RandomXS128 extends Random {
 	 * <p>
 	 * This implementation creates a {@link Random} instance to generate the initial seed.
 	 */
-
+	public RandomXS128() {
+		setSeed(new Random().nextLong());
+	}
 
 	/**
 	 * Creates a new random number generator using a single {@code long} seed.

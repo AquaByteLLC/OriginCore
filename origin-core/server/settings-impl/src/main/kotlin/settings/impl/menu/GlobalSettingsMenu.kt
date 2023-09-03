@@ -1,6 +1,6 @@
 package settings.impl.menu
 
-import commons.menu.MenuAdapter
+import commons.menu.MenuListAdapter
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder
 import me.vadim.util.menu.MenuList
 import me.vadim.util.menu.frame
@@ -15,7 +15,7 @@ import settings.registry.SettingsHolder
 import settings.setting.SettingSection
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
-class GlobalSettingsMenu(private val plugin: SettingsPlugin, private val holder: SettingsHolder) : MenuAdapter<SettingSection>() {
+class GlobalSettingsMenu(private val plugin: SettingsPlugin, private val holder: SettingsHolder) : MenuListAdapter<SettingSection>() {
 
 	override val MENU_SIZE = 9 * 5
 	override val BACK_SLOT = 39

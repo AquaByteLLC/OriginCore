@@ -1,37 +1,57 @@
 package menu
 
 import commons.menu.MenuAdapter
-import me.vadim.util.menu.*
-import org.bukkit.enchantments.Enchantment
+import me.vadim.util.menu.Menu
+import me.vadim.util.menu.button
+import me.vadim.util.menu.menu
+import menu.augment.AugmentsMenuBase
+import menu.enchant.EnchantMenuBase
+import menu.skin.SkinsMenuBase
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import tools.impl.ToolsPlugin
-import tools.impl.attribute.augments.Augment
-import tools.impl.attribute.enchants.Enchant
-import tools.impl.attribute.skins.Skin
-import tools.impl.conf.MenuConfig
-import tools.impl.registry.AttributeRegistry
+import tools.impl.conf.Config
+import tools.impl.tool.impl.AugmentedTool
 import tools.impl.tool.impl.EnchantedTool
+import tools.impl.tool.impl.SkinnedTool
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class ToolMenuBase(
-    private val plugin: ToolsPlugin,
-    private val item: ItemStack,
-    private val isEnchant: Boolean,
-    private val isAugment: Boolean,
-    private val isSkin: Boolean,
-    private val config: MenuConfig
-) : MenuAdapter<ItemStack>() {
+	private val plugin: ToolsPlugin,
+	private val item: ItemStack
+				  ) : MenuAdapter() {
 
-    override val MENU_SIZE = 9 * 4
-    override val BACK_SLOT = 30
-    override val DONE_SLOT = 31
-    override val NEXT_SLOT = 32
-    override val menu: MenuList<ItemStack>
-        get() = TODO("Not yet implemented")
+	private val isAugment = AugmentedTool.canAugment(item)
+	private val isSkin = SkinnedTool.canSkin(item)
+	private val isEnchant = EnchantedTool.canEnchant(item)
+	private fun config(): Config = plugin.config()
 
-    override fun queryItems(): MutableList<ItemStack> {
-        TODO("Not yet implemented")
-    }
+	override val MENU_SIZE = 0
+	override val DONE_SLOT = 0
 
+	override val menu: Menu = menu(InventoryType.HOPPER) {
+		title = "General Tools Menu"
 
+		if(isAugment)
+		button(config().augmentsItem) {
+			click = { event, _ ->
+				AugmentsMenuBase(plugin, plugin.augmentFactory.wrapItemStack(item)).menu.open(event.whoClicked)
+			}
+		} into 3
+
+		if(isSkin)
+		button(config().skinsItem) {
+			click = { event, _ ->
+				SkinsMenuBase(plugin, plugin.skinFactory.wrapItemStack(item)).menu.open(event.whoClicked)
+			}
+		} into 2
+
+		if(isEnchant)
+		button(config().enchantsItem) {
+			click = { event, _ ->
+				EnchantMenuBase(plugin, plugin.enchantFactory.wrapItemStack(item)).menu.open(event.whoClicked)
+			}
+		} into 1
+
+	}.apply{ generate() }
 }

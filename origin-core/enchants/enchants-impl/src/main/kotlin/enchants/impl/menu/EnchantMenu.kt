@@ -1,6 +1,6 @@
 package enchants.impl.menu
 
-import commons.menu.MenuAdapter
+import commons.menu.MenuListAdapter
 import enchants.EnchantRegistry
 import enchants.impl.EnchantPlugin
 import enchants.impl.conf.EnchantPlaceholder
@@ -11,13 +11,12 @@ import enchants.item.EnchantedItem
 import me.vadim.util.menu.*
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
-import java.math.BigDecimal
 
 /**
  * @author vadim
  */
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
-class EnchantMenu(private val plugin: EnchantPlugin, private val item: EnchantedItem) : MenuAdapter<Enchant>() {
+class EnchantMenu(private val plugin: EnchantPlugin, private val item: EnchantedItem) : MenuListAdapter<Enchant>() {
 
 	override val MENU_SIZE = 9 * 4
 	override val BACK_SLOT = 30
@@ -78,11 +77,6 @@ class EnchantMenu(private val plugin: EnchantPlugin, private val item: Enchanted
 			return config().menuUpgrade.format(enchant.menuItem.type, pl.build()).amount(n_lvls).build()
 		}
 
-		close = {
-			refresh()
-			parent!!.open(it.player)
-		}
-
 		for (i in 1..7)
 			button(the(i)) {
 				click = { event, button ->
@@ -117,5 +111,4 @@ class EnchantMenu(private val plugin: EnchantPlugin, private val item: Enchanted
 	}
 
 	override fun queryItems(): MutableList<Enchant> = registry.allEnchants
-
 }

@@ -3,8 +3,9 @@ package commons.menu
 import commons.Commons
 import commons.conf.CommonsConfig
 import me.vadim.util.item.createItem
-import me.vadim.util.menu.*
+import me.vadim.util.menu.Menu
 import me.vadim.util.menu.builder.MenuBuilder
+import me.vadim.util.menu.button
 import me.vadim.util.menu.button.Button
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -13,32 +14,16 @@ import org.bukkit.inventory.ItemFlag
 /**
  * @author vadim
  */
-abstract class MenuAdapter<T> {
+abstract class MenuAdapter {
 
 	abstract val MENU_SIZE: Int
-	abstract val BACK_SLOT: Int
 	abstract val DONE_SLOT: Int
-	abstract val NEXT_SLOT: Int
 
 	protected fun global(): CommonsConfig = Commons.config()
 
-	protected open val template: Menu
-		get() = menu(MENU_SIZE) {
-			frameWith(blank())
-			previous()
+	public abstract val menu: Menu
 
-			button(global().menuNext) {} into NEXT_SLOT
-			button(global().menuBack) {} into BACK_SLOT
-		}
-
-	public abstract val menu: MenuList<T>
-
-	protected abstract fun queryItems(): MutableList<T>
-
-	fun refresh() {
-		menu.items = queryItems()
-		menu.regen()
-	}
+	open fun refresh() {}
 
 	protected fun MenuBuilder.blank(): Button =
 		button(createItem(Material.GRAY_STAINED_GLASS_PANE) {
@@ -60,4 +45,5 @@ abstract class MenuAdapter<T> {
 			}
 		} to (slot ?: DONE_SLOT)
 	}
+
 }

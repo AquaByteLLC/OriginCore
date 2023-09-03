@@ -14,21 +14,25 @@ import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.enchants.Enchant;
 import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
-import tools.impl.registry.impl.BaseAttributeRegistry;
 import tools.impl.progression.ProgressionType;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.IBaseTool;
 import tools.impl.tool.type.IEnchantedTool;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class EnchantedTool implements IEnchantedTool {
 	private static final NamespacedKey reqKey = new NamespacedKey("enchants", "_enchantable");
 	private static final String reqValue = "isEnchantable";
 
-	private static BaseAttributeRegistry<Enchant> getRegistry() {
+	private static AttributeRegistry<Enchant> getRegistry() {
 		return ToolsPlugin.getPlugin().getEnchantRegistry();
 	}
 

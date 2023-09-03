@@ -15,7 +15,7 @@ import tools.impl.ability.cache.types.impl.PlayerCachedAttribute;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.skins.Skin;
 import tools.impl.attribute.skins.impl.ToolSkinFactory;
-import tools.impl.registry.impl.BaseAttributeRegistry;
+import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.IBaseTool;
 import tools.impl.tool.type.ISkinnedTool;
 
@@ -33,7 +33,7 @@ public class SkinnedTool implements ISkinnedTool {
 
 	private ItemStack itemStack;
 
-	private static BaseAttributeRegistry<Skin> getRegistry() {
+	private static AttributeRegistry<Skin> getRegistry() {
 		return ToolsPlugin.getPlugin().getSkinRegistry();
 	}
 

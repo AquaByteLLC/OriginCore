@@ -1,7 +1,7 @@
 package generators.impl.menu
 
 import commons.data.account.AccountStorage
-import commons.menu.MenuAdapter
+import commons.menu.MenuListAdapter
 import generators.GeneratorRegistry
 import generators.impl.GensPlugin
 import generators.impl.conf.Config
@@ -12,7 +12,7 @@ import me.vadim.util.conf.ConfigurationProvider
 /**
  * @author vadim
  */
-abstract class GenMenu<T>(plugin: GensPlugin) : MenuAdapter<T>() {
+abstract class GenMenu<T>(plugin: GensPlugin) : MenuListAdapter<T>() {
 
     final override val MENU_SIZE = 6 * 9
     final override val BACK_SLOT = 48
