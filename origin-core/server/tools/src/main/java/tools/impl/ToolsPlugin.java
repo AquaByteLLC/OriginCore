@@ -80,6 +80,9 @@ public class ToolsPlugin extends JavaPlugin implements ResourceProvider {
 		return lfc.open(Config.class);
 	}
 
+	private AugmentEvents augmentEvents;
+	private SkinEvents skinEvents;
+
 	@Override
 	public void onEnable() {
 		plugin = this;
@@ -129,8 +132,8 @@ public class ToolsPlugin extends JavaPlugin implements ResourceProvider {
 
 		commands.registerCommand(new TC(this));
 
-		new AugmentEvents(registry);
-		new SkinEvents(registry);
+		this.augmentEvents = new AugmentEvents(registry);
+		this.skinEvents = new SkinEvents(registry);
 		Shelves.init();
 		CacheInvalidator.init();
 	}
