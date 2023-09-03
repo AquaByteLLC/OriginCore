@@ -1,6 +1,7 @@
 package tools.impl.tool.builder.typed.impl;
 
 import com.mojang.datafixers.util.Pair;
+import commons.util.BukkitUtil;
 import commons.util.StringUtil;
 import lombok.Getter;
 import me.lucko.helper.item.ItemStackBuilder;
@@ -46,7 +47,7 @@ public class UniqueItemBuilder {
 	}
 
 	public UniqueItemBuilder write(Consumer<PersistentDataContainer> consumer) {
-		IBaseTool.writeContainer(build(), consumer);
+		BukkitUtil.writeContainer(build(), consumer);
 		return this;
 	}
 

@@ -3,11 +3,12 @@ package tools.impl.attribute.augments;
 import commons.events.impl.EventSubscriber;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
+import tools.impl.attribute.AttributeBuilder;
 import tools.impl.target.ToolTarget;
 
 import java.util.function.Consumer;
 
-public interface AugmentBuilder {
+public interface AugmentBuilder extends AttributeBuilder {
 
 	AugmentBuilder setMinimumBoost(long boost);
 

@@ -10,39 +10,33 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import tools.impl.ToolsPlugin;
+import tools.impl.attribute.AttributeFactory;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.augments.Augment;
-import tools.impl.attribute.augments.impl.ToolAugmentFactory;
+import tools.impl.attribute.augments.AugmentBuilder;
 import tools.impl.registry.AttributeRegistry;
-import tools.impl.tool.IBaseTool;
 import tools.impl.tool.type.IAugmentedTool;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class AugmentedTool implements IAugmentedTool {
-
-	private final ItemStack itemStack;
-
-	private static AttributeRegistry<Augment> getRegistry() {
-		return ToolsPlugin.getPlugin().getAugmentRegistry();
-	}
-
-	private static ToolAugmentFactory getFactory() {
-		return ToolsPlugin.getPlugin().getAugmentFactory();
-	}
+public class AugmentedTool extends ToolBase<Augment, IAugmentedTool, AugmentBuilder> implements IAugmentedTool {
 
 	public AugmentedTool(ItemStack itemStack) {
-		this.itemStack = itemStack;
+		super(itemStack);
 	}
 
 	@Override
-	public ItemStack getItemStack() {
-		return this.itemStack;
+	protected AttributeRegistry<Augment> getRegistry() {
+		return ToolsPlugin.getPlugin().getAugmentRegistry();
+	}
+
+	@Override
+	protected AttributeFactory<IAugmentedTool, AugmentBuilder> getFactory() {
+		return ToolsPlugin.getPlugin().getAugmentFactory();
 	}
 
 	@Override
@@ -62,14 +56,6 @@ public class AugmentedTool implements IAugmentedTool {
 		final ItemStack item = augment.getAugmentStack();
 		BukkitUtil.formatItem(pl, item);
 		return item;
-	}
-
-	private PersistentDataContainer readContainer() {
-		return this.itemStack.getItemMeta().getPersistentDataContainer();
-	}
-
-	private void writeContainer(Consumer<PersistentDataContainer> consumer) {
-		IBaseTool.writeContainer(this.itemStack, consumer);
 	}
 
 	@Override
@@ -137,7 +123,19 @@ public class AugmentedTool implements IAugmentedTool {
 
 	@Override
 	public int getOpenSlots() {
-		return readContainer().get(amountKey, PersistentDataType.INTEGER);
+		Integer i = readContainer().get(amountKey, PersistentDataType.INTEGER);
+		return i == null ? 0 : i;
+	}
+
+	@Override
+	public int getMaxSlots() {
+		Integer i = readContainer().get(maxSlotsKey, PersistentDataType.INTEGER);
+		return i == null ? 0 : i;
+	}
+
+	@Override
+	public void setMaxSlots(int max) {
+		writeContainer(pdc -> pdc.set(maxSlotsKey, PersistentDataType.INTEGER, max));
 	}
 
 	@Override
@@ -188,9 +186,8 @@ public class AugmentedTool implements IAugmentedTool {
 		return item.hasItemMeta() && canAugment(item.getItemMeta().getPersistentDataContainer());
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	public static boolean canAugment(PersistentDataContainer container) {
-		return container.has(reqKey) && container.get(reqKey, PersistentDataType.STRING).equals(reqValue);
+		return container.has(reqKey) && reqValue.equals(container.get(reqKey, PersistentDataType.STRING));
 	}
 
 	public static void setCanAugment(ItemStack item, boolean canAugment) {

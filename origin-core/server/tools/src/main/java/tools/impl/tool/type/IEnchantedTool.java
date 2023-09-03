@@ -1,6 +1,6 @@
 package tools.impl.tool.type;
 
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.NamespacedKey;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.tool.IBaseTool;
 
@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Set;
 
 public interface IEnchantedTool extends IBaseTool {
-	ItemStack formatMenuItemFor(AttributeKey key);
+
+	NamespacedKey reqKey = new NamespacedKey("enchants", "_enchantable");
+	String reqValue = "isEnchantable";
 
 	void addEnchant(AttributeKey enchantKey, long level);
 

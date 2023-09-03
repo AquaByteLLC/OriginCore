@@ -3,6 +3,7 @@ package tools.impl.attribute.enchants;
 import commons.events.impl.EventSubscriber;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
+import tools.impl.attribute.AttributeBuilder;
 import tools.impl.progression.ProgressionType;
 import tools.impl.target.ToolTarget;
 
@@ -10,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Consumer;
 
-public interface EnchantBuilder {
+public interface EnchantBuilder extends AttributeBuilder {
 	EnchantBuilder setLore(String lore);
 
 	EnchantBuilder setInfo(List<String> information);

@@ -23,8 +23,6 @@ public interface ISkinnedTool extends IBaseTool {
 
 	String reqValue = "isSkinnable";
 
-	ItemStack formatMenuItemFor(AttributeKey key);
-
 	void addSkin(AttributeKey enchantKey);
 
 	void removeSkin();
@@ -49,7 +47,7 @@ public interface ISkinnedTool extends IBaseTool {
 				.set("targets", StringUtil.colorize(skin.getAttributeTargets().stream().map(Enum::name).collect(Collectors.joining("\n")))).build();
 
 		final ItemStack item = skin.getSkinStack();
-		IBaseTool.writeContainer(item, pdc -> pdc.set(applierKey, PersistentDataType.STRING, type));
+		BukkitUtil.writeContainer(item, pdc -> pdc.set(applierKey, PersistentDataType.STRING, type));
 		BukkitUtil.formatItem(pl, item);
 
 		return item;

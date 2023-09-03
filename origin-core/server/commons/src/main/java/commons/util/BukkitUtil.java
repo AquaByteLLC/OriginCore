@@ -14,10 +14,13 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
 
 /**
  * @author vadim
@@ -112,6 +115,20 @@ public class BukkitUtil {
 		chunk.g.get(HeightMap.Type.f).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.MOTION_BLOCKING_NO_LEAVES)).update(j, i, l, blockstate);
 		chunk.g.get(HeightMap.Type.d).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.OCEAN_FLOOR)).update(j, i, l, blockstate);
 		chunk.g.get(HeightMap.Type.b).a(x, y, z, data); // ((Heightmap)this.heightmaps.get(Types.WORLD_SURFACE)).update(j, i, l, blockstate);
+	}
+
+	/**
+	 * Write to the {@link PersistentDataContainer} of an {@link ItemStack} via the consumer {@code pdc}.
+	 */
+	public static void writeContainer(ItemStack item, Consumer<PersistentDataContainer> pdc) {
+		item.editMeta(meta -> pdc.accept(meta.getPersistentDataContainer()));
+	}
+
+	/**
+	 * Open the {@link PersistentDataContainer} of an {@link ItemStack} in a read-only state.
+	 */
+	public static PersistentDataContainer readContainer(ItemStack item) {
+		return item.hasItemMeta() && item.getItemMeta() != null ? item.getItemMeta().getPersistentDataContainer() : null;
 	}
 
 }

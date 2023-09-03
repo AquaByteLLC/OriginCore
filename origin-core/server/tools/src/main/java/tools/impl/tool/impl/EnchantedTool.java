@@ -11,12 +11,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import tools.impl.ToolsPlugin;
+import tools.impl.attribute.AttributeFactory;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.enchants.Enchant;
-import tools.impl.attribute.enchants.impl.CustomEnchantFactory;
+import tools.impl.attribute.enchants.EnchantBuilder;
 import tools.impl.progression.ProgressionType;
 import tools.impl.registry.AttributeRegistry;
-import tools.impl.tool.IBaseTool;
 import tools.impl.tool.type.IEnchantedTool;
 
 import java.math.BigDecimal;
@@ -26,24 +26,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Consumer;
 
-public class EnchantedTool implements IEnchantedTool {
-	private static final NamespacedKey reqKey = new NamespacedKey("enchants", "_enchantable");
-	private static final String reqValue = "isEnchantable";
+public class EnchantedTool extends ToolBase<Enchant, IEnchantedTool, EnchantBuilder> implements IEnchantedTool {
 
-	private static AttributeRegistry<Enchant> getRegistry() {
+
+	public EnchantedTool(ItemStack itemStack) {
+		super(itemStack);
+	}
+
+	@Override
+	protected AttributeRegistry<Enchant> getRegistry() {
 		return ToolsPlugin.getPlugin().getEnchantRegistry();
 	}
 
-	private static CustomEnchantFactory getFactory() {
+	@Override
+	protected AttributeFactory<IEnchantedTool, EnchantBuilder> getFactory() {
 		return ToolsPlugin.getPlugin().getEnchantFactory();
-	}
-
-	private final ItemStack itemStack;
-
-	public EnchantedTool(ItemStack itemStack) {
-		this.itemStack = itemStack;
 	}
 
 	@Override
@@ -68,14 +66,6 @@ public class EnchantedTool implements IEnchantedTool {
 		ItemStack item = enchant.getMenuItem();
 		BukkitUtil.formatItem(pl, item);
 		return item;
-	}
-
-	private PersistentDataContainer readContainer() {
-		return this.itemStack.getItemMeta().getPersistentDataContainer();
-	}
-
-	private void writeContainer(Consumer<PersistentDataContainer> consumer) {
-		IBaseTool.writeContainer(this.itemStack, consumer);
 	}
 
 	@Override
@@ -264,9 +254,8 @@ public class EnchantedTool implements IEnchantedTool {
 		return item.hasItemMeta() && canEnchant(item.getItemMeta().getPersistentDataContainer());
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	public static boolean canEnchant(PersistentDataContainer container) {
-		return container.has(reqKey) && container.get(reqKey, PersistentDataType.STRING).equals(reqValue);
+		return container.has(reqKey) && reqValue.equals(container.get(reqKey, PersistentDataType.STRING));
 	}
 
 	public static void setCanEnchant(ItemStack item, boolean canEnchant) {

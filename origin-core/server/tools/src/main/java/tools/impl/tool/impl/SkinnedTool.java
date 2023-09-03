@@ -12,14 +12,13 @@ import tools.impl.ToolsPlugin;
 import tools.impl.ability.cache.impl.AttributeCache;
 import tools.impl.ability.cache.types.PlayerBasedCachedAttribute;
 import tools.impl.ability.cache.types.impl.PlayerCachedAttribute;
+import tools.impl.attribute.AttributeFactory;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.skins.Skin;
-import tools.impl.attribute.skins.impl.ToolSkinFactory;
+import tools.impl.attribute.skins.SkinBuilder;
 import tools.impl.registry.AttributeRegistry;
-import tools.impl.tool.IBaseTool;
 import tools.impl.tool.type.ISkinnedTool;
 
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -29,25 +28,20 @@ import java.util.stream.Collectors;
  * <p>
  * Perhaps add an ability registry which can then be binded to a skin? Need to think of a nice way to do a builder for abilitites.
  */
-public class SkinnedTool implements ISkinnedTool {
-
-	private ItemStack itemStack;
-
-	private static AttributeRegistry<Skin> getRegistry() {
-		return ToolsPlugin.getPlugin().getSkinRegistry();
-	}
-
-	private static ToolSkinFactory getFactory() {
-		return ToolsPlugin.getPlugin().getSkinFactory();
-	}
+public class SkinnedTool extends ToolBase<Skin, ISkinnedTool, SkinBuilder> implements ISkinnedTool {
 
 	public SkinnedTool(ItemStack itemStack) {
-		this.itemStack = itemStack;
+		super(itemStack);
 	}
 
 	@Override
-	public ItemStack getItemStack() {
-		return this.itemStack;
+	protected AttributeRegistry<Skin> getRegistry() {
+		return ToolsPlugin.getPlugin().getSkinRegistry();
+	}
+
+	@Override
+	protected AttributeFactory<ISkinnedTool, SkinBuilder> getFactory() {
+		return ToolsPlugin.getPlugin().getSkinFactory();
 	}
 
 	@Override
@@ -123,14 +117,6 @@ public class SkinnedTool implements ISkinnedTool {
 		return String.format(getSkin() == null ? replacementForNull : StringPlaceholder.builder().set("name", skin.getKey().getName()).build().format(skin.getAppliedLore()));
 	}
 
-	private PersistentDataContainer readContainer() {
-		return this.itemStack.getItemMeta().getPersistentDataContainer();
-	}
-
-	private void writeContainer(Consumer<PersistentDataContainer> consumer) {
-		IBaseTool.writeContainer(this.itemStack, consumer);
-	}
-
 	@Override
 	public boolean hasSkin(AttributeKey skinKey) {
 		if (!itemStack.getItemMeta().hasCustomModelData()) return false;
@@ -152,9 +138,8 @@ public class SkinnedTool implements ISkinnedTool {
 		return item.hasItemMeta() && canSkin(item.getItemMeta().getPersistentDataContainer());
 	}
 
-	@SuppressWarnings("DataFlowIssue")
 	public static boolean canSkin(PersistentDataContainer container) {
-		return container.has(reqKey) && container.get(reqKey, PersistentDataType.STRING).equals(reqValue);
+		return container.has(reqKey) && reqValue.equals(container.get(reqKey, PersistentDataType.STRING));
 	}
 
 	public static void setCanSkin(ItemStack item, boolean canAugment) {

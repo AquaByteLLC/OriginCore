@@ -1,7 +1,6 @@
 package tools.impl.tool.type;
 
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.tool.IBaseTool;
 
@@ -12,12 +11,11 @@ public interface IAugmentedTool extends IBaseTool {
 
 	NamespacedKey reqKey = new NamespacedKey("augments", "_augmentable");
 	NamespacedKey amountKey = new NamespacedKey("augments", "slots_open");
+	NamespacedKey maxSlotsKey = new NamespacedKey("augments", "slots_max");
 	NamespacedKey applierKey = new NamespacedKey("augments", "applicable");
 	NamespacedKey applierData = new NamespacedKey("augments", "applicable_amount");
 
 	String reqValue = "isAugmentable";
-
-	ItemStack formatMenuItemFor(AttributeKey key);
 
 	void addAugment(AttributeKey enchantKey, long boost);
 
@@ -38,6 +36,10 @@ public interface IAugmentedTool extends IBaseTool {
 	boolean hasOpenSlot();
 
 	void setOpenSlots(int slots);
+
+	int getMaxSlots();
+
+	void setMaxSlots(int max);
 
 	Set<AttributeKey> getAllAugments();
 
