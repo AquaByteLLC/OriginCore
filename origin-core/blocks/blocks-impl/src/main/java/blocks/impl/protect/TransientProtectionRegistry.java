@@ -5,7 +5,7 @@ import blocks.block.protect.ProtectedObject;
 import blocks.block.protect.ProtectedRegion;
 import blocks.block.protect.ProtectionRegistry;
 import blocks.block.util.Cuboid;
-import commons.util.PackUtil;
+import commons.util.num.PackUtil;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.bukkit.World;
 import org.bukkit.block.Block;

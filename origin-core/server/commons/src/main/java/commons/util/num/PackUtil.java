@@ -1,4 +1,4 @@
-package commons.util;
+package commons.util.num;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

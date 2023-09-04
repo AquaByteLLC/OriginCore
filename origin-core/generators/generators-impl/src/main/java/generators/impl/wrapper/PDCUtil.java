@@ -1,6 +1,6 @@
 package generators.impl.wrapper;
 
-import commons.util.PackUtil;
+import commons.util.num.PackUtil;
 import generators.wrapper.Drop;
 import generators.wrapper.Generator;
 import org.bukkit.Bukkit;

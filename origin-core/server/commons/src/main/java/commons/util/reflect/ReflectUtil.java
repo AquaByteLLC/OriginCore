@@ -1,4 +1,4 @@
-package commons.util;
+package commons.util.reflect;
 
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;

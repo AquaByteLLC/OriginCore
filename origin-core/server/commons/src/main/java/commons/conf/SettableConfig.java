@@ -7,7 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 
-import static commons.util.ReflectUtil.sneaky;
+import static commons.util.reflect.ReflectUtil.sneaky;
 
 public class SettableConfig {
 

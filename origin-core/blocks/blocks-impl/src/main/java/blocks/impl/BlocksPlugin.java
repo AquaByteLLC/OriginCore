@@ -29,7 +29,7 @@ import commons.Commons;
 import commons.CommonsPlugin;
 import commons.OriginModule;
 import commons.data.account.AccountStorage;
-import commons.util.ReflectUtil;
+import commons.util.reflect.ReflectUtil;
 import lombok.Getter;
 import me.vadim.util.conf.ConfigurationManager;
 import me.vadim.util.conf.ResourceProvider;

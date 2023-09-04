@@ -6,7 +6,7 @@ import blocks.block.protect.ProtectedObject;
 import blocks.block.protect.ProtectedRegion;
 import commons.Commons;
 import commons.events.api.Subscribe;
-import commons.util.PackUtil;
+import commons.util.num.PackUtil;
 import io.papermc.paper.event.entity.EntityInsideBlockEvent;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;

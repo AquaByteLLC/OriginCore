@@ -4,7 +4,7 @@ import commons.events.api.EventRegistry;
 import commons.events.api.impl.PluginEventRegistry;
 import commons.events.impl.impl.BukkitEventListener;
 import commons.events.impl.impl.PacketEventListener;
-import commons.util.ReflectUtil;
+import commons.util.reflect.ReflectUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;

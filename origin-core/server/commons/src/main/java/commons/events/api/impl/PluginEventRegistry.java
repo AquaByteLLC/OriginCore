@@ -1,7 +1,7 @@
 package commons.events.api.impl;
 
 import commons.events.api.*;
-import commons.util.ReflectUtil;
+import commons.util.reflect.ReflectUtil;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;

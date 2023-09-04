@@ -5,7 +5,7 @@ import commons.events.api.EventContext;
 import commons.events.api.EventExecutionException;
 import commons.events.api.EventRegistry;
 import commons.events.impl.EventListener;
-import commons.util.ReflectUtil;
+import commons.util.reflect.ReflectUtil;
 import lombok.SneakyThrows;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;

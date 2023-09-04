@@ -1,4 +1,4 @@
-package commons.util;
+package commons.util.collection;
 
 import commons.util.collection.MapStream;
 

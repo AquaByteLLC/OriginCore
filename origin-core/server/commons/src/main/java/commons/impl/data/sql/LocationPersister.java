@@ -4,7 +4,7 @@ import com.j256.ormlite.field.FieldType;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.field.types.BaseDataType;
 import com.j256.ormlite.support.DatabaseResults;
-import commons.util.PackUtil;
+import commons.util.num.PackUtil;
 import org.bukkit.Location;
 
 import java.sql.SQLException;

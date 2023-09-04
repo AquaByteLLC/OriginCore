@@ -5,7 +5,7 @@ import commons.events.api.EventExecutionException;
 import commons.events.api.EventRegistry;
 import commons.events.api.Subscribe;
 import commons.events.impl.EventListener;
-import commons.util.ReflectUtil;
+import commons.util.reflect.ReflectUtil;
 import commons.util.reflect.FieldAccess;
 import commons.util.reflect.Reflection;
 import io.netty.channel.Channel;

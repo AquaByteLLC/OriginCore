@@ -1,6 +1,6 @@
 package commons.sched.impl;
 
-import commons.util.ReflectUtil;
+import commons.util.reflect.ReflectUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.BlockingQueue;

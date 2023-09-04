@@ -19,6 +19,8 @@ import commons.interpolation.impl.swing.SwingOut;
 import commons.math.MathUtils;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
+
 public enum InterpolationType {
 
 	linear(a -> a),
@@ -55,6 +57,9 @@ public enum InterpolationType {
 	sine(a -> (1 - MathUtils.cos(a * MathUtils.PI)) / 2),
 	sineIn(a -> 1 - MathUtils.cos(a * MathUtils.HALF_PI)),
 	sineOut(a -> MathUtils.sin(a * MathUtils.HALF_PI)),
+	cosine(a -> (1 - MathUtils.sin(a * MathUtils.PI)) / 2),
+	cosineIn(a -> 1 - MathUtils.sin(a * MathUtils.HALF_PI)),
+	cosineOut(a -> MathUtils.cos(a * MathUtils.HALF_PI)),
 	exponential10(new Exponential(2, 10)),
 	exponential10In(new ExponentialIn(2, 10)),
 	exponential10Out(new ExponentialOut(2, 10)),
@@ -95,5 +100,12 @@ public enum InterpolationType {
 
 	InterpolationType(Interpolation interpolation) {
 		this.interpolation = interpolation;
+	}
+
+	public static @Nullable InterpolationType fromString(String name) {
+		for (InterpolationType value : values())
+			if (value.name().equalsIgnoreCase(name))
+				return value;
+		return null;
 	}
 }

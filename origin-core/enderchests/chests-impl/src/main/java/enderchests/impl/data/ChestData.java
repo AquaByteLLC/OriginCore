@@ -2,7 +2,7 @@ package enderchests.impl.data;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import commons.util.PackUtil;
+import commons.util.num.PackUtil;
 import enderchests.NetworkColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

@@ -17,8 +17,6 @@
  */
 package commons.util.collection;
 
-import commons.util.CollectorUtil;
-
 import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.Iterator;
