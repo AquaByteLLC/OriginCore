@@ -1,5 +1,6 @@
 package commons.util;
 
+import com.google.common.base.Preconditions;
 import commons.OriginModule;
 import commons.interpolation.impl.InterpolationType;
 import commons.math.RangeUntilKt;
@@ -9,6 +10,7 @@ import org.bukkit.command.CommandSender;
 
 import java.awt.*;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,6 +98,33 @@ public class StringUtil {
 			String hex = String.format("#%02x%02x%02x", values[0], values[1], values[2]);
 			builder.append("&").append(hex).append(c);
 			tick++;
+		}
+
+		return builder.toString();
+	}
+
+	public static String interpolateColor(String msg, Color[] colors, double[] portions, InterpolationType type) {
+		final double[] p;
+		if (portions == null) {
+			p = new double[colors.length - 1];
+			Arrays.fill(p, 1 / (double) p.length);
+		} else {
+			p = portions;
+		}
+
+		Preconditions.checkArgument(colors.length >= 2);
+		Preconditions.checkArgument(p.length == colors.length - 1);
+
+		final StringBuilder builder = new StringBuilder();
+		int strIndex = 0;
+
+		for (int i = 0; i < colors.length - 1; i++) {
+			builder.append(interpolateColor(
+					msg.substring(strIndex, strIndex + (int) (p[i] * msg.length())),
+					colors[i],
+					colors[i + 1],
+					type));
+			strIndex += p[i] * msg.length();
 		}
 
 		return builder.toString();

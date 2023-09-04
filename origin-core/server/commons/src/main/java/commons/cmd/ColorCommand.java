@@ -25,7 +25,18 @@ public class ColorCommand extends BaseCommand {
 	@Default
 	public void test(CommandSender sender) {
 		sender.sendMessage(StringUtil.colorize(
-				StringUtil.interpolateColor("Testing With This Message", new Color(0, 255, 224), new Color(0, 86, 255), InterpolationType.elastic)
+				StringUtil.interpolateColor("Testing With ",
+						new Color[]{
+								new Color(255, 0, 0),
+								new Color(192, 102, 0),
+								new Color(54, 255, 0),
+								new Color(85, 53, 255)
+						},
+						new double[]{
+								0.1,
+								0.8,
+								0.1
+						}, InterpolationType.smoothStep2)
 		));
 	}
 

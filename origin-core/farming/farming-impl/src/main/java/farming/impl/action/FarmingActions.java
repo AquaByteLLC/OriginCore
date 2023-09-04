@@ -97,7 +97,6 @@ public enum FarmingActions {
 	public static void send(FarmingActions action, Player player, Placeholder placeholder) {
 		action.getMessageSender().sendMessage(player, action.getMessage(), placeholder);
 		action.getEffectsSender().sendEffect(player, action.getEffects());
-
 	}
 
 	public static void init() {}
