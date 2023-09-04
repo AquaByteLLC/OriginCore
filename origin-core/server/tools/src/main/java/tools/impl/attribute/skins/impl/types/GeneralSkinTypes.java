@@ -34,7 +34,6 @@ public enum GeneralSkinTypes implements AttributeKey {
 			subscribe(BlockBreakEvent.class, (key, ctx, event) -> {
 				final ItemStack playersItem = ctx.getPlayer().getInventory().getItemInMainHand();
 				if (playersItem.getType().isAir()) return;
-
 				final SkinnedTool item = new SkinnedTool(playersItem);
 				final AttributeCache<Skin, PlayerBasedCachedAttribute<Skin>> cache = ToolsPlugin.getPlugin().getSkinCache();
 				final Skin skin = ToolsPlugin.getPlugin().getSkinRegistry().getByKey(key);

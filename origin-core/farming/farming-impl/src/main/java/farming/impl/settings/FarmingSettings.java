@@ -31,7 +31,6 @@ public enum FarmingSettings implements EnumeratedSetting {
 				   .setDefaultOption(0)
 				   .setMenuItem(ItemStackBuilder.of(Material.NOTE_BLOCK).build())
 				   .build())
-
 	;
 
 	public static final SettingSection section;

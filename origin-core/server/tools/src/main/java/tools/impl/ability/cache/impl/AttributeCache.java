@@ -3,8 +3,8 @@ package tools.impl.ability.cache.impl;
 import dev.oop778.shelftor.api.expiring.policy.implementation.TimedExpiringPolicy;
 import dev.oop778.shelftor.api.shelf.Shelf;
 import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
-import tools.impl.ability.cache.IAttributeCache;
 import tools.impl.ability.cache.CachedAttribute;
+import tools.impl.ability.cache.IAttributeCache;
 import tools.impl.attribute.ExpiringAttribute;
 import tools.impl.sched.CacheInvalidator;
 
@@ -13,7 +13,9 @@ import java.util.concurrent.TimeUnit;
 public class AttributeCache<T extends ExpiringAttribute, A extends CachedAttribute<T>> implements IAttributeCache<T, A> {
 
 	private final ExpiringShelf<A> shelf;
+	private final CacheInvalidator<A> cacheInvalidator;
 
+	@SuppressWarnings("all")
 	public AttributeCache() {
 		this.shelf = Shelf.<A>builder()
 				.concurrent()
@@ -24,9 +26,12 @@ public class AttributeCache<T extends ExpiringAttribute, A extends CachedAttribu
 					final long time = $.getAttribute().getAmount();
 					System.out.println(time + " TIME!");
 					return new TimedExpiringPolicy.TimedExpirationData(unit, time, false);
-				})).expireCheckInterval(2)
+				}))
 				.build();
-		CacheInvalidator.add(this.shelf);
+
+		this.cacheInvalidator = new CacheInvalidator<>();
+		this.cacheInvalidator.add(this.shelf);
+		this.cacheInvalidator.activate();
 	}
 
 	@Override

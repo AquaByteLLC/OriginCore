@@ -1,7 +1,7 @@
 package tools.impl.ability.cache;
 
-import tools.impl.attribute.ExpiringAttribute;
+import tools.impl.attribute.BaseAttribute;
 
-public interface CachedAttribute<T extends ExpiringAttribute> {
+public interface CachedAttribute<T extends BaseAttribute> {
 	T getAttribute();
 }

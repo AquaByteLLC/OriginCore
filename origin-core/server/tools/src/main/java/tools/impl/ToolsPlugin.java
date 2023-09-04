@@ -30,7 +30,6 @@ import tools.impl.cmd.TC;
 import tools.impl.conf.Config;
 import tools.impl.registry.AttributeRegistry;
 import tools.impl.registry.impl.BaseAttributeRegistry;
-import tools.impl.sched.CacheInvalidator;
 
 public class ToolsPlugin extends JavaPlugin implements ResourceProvider {
 
@@ -133,9 +132,8 @@ public class ToolsPlugin extends JavaPlugin implements ResourceProvider {
 		commands.registerCommand(new TC(this));
 
 		this.augmentEvents = new AugmentEvents(registry);
-		this.skinEvents = new SkinEvents(registry);
+		// this.skinEvents = new SkinEvents(registry);
 		Shelves.init();
-		CacheInvalidator.init();
 	}
 
 	@Override

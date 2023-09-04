@@ -90,13 +90,6 @@ public class ConfigurableMessage implements MessageVersioned {
 			final ConfigurationSection messageSectionLegacyCfg = getOrCreate(configuration, messageSectionLegacyReplaced);
 			final ConfigurationSection messageSectionNonLegacyCfg = getOrCreate(configuration, messageSectionNonLegacyReplaced);
 
-			assert effectsSectionCfg != null;
-			assert baseSection != null;
-			assert legacySection != null;
-			assert nonLegacySection != null;
-			assert messageSectionLegacyCfg != null;
-			assert messageSectionNonLegacyCfg != null;
-
 			messageSectionLegacyCfg.set(getAsRelative(messageLegacy), baseMessageLegacy);
 			messageSectionNonLegacyCfg.set(getAsRelative(messageNonLegacy), baseMessageNonLegacy);
 

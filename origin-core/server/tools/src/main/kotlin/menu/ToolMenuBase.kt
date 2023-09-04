@@ -17,14 +17,14 @@ import tools.impl.tool.impl.SkinnedTool
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class ToolMenuBase(
-	private val plugin: ToolsPlugin,
+	private val tplugin: ToolsPlugin,
 	private val item: ItemStack
 				  ) : MenuAdapter() {
 
 	private val isAugment = AugmentedTool.canAugment(item)
 	private val isSkin = SkinnedTool.canSkin(item)
 	private val isEnchant = EnchantedTool.canEnchant(item)
-	private fun config(): Config = plugin.config()
+	private fun config(): Config = tplugin.config()
 
 	override val MENU_SIZE = 0
 	override val DONE_SLOT = 0
@@ -35,21 +35,21 @@ class ToolMenuBase(
 		if(isAugment)
 		button(config().augmentsItem) {
 			click = { event, _ ->
-				AugmentsMenuBase(plugin, plugin.augmentFactory.wrapItemStack(item)).menu.open(event.whoClicked)
+				AugmentsMenuBase(tplugin, tplugin.augmentFactory.wrapItemStack(item)).menu.open(event.whoClicked)
 			}
 		} into 3
 
 		if(isSkin)
 		button(config().skinsItem) {
 			click = { event, _ ->
-				SkinsMenuBase(plugin, plugin.skinFactory.wrapItemStack(item)).menu.open(event.whoClicked)
+				SkinsMenuBase(tplugin, tplugin.skinFactory.wrapItemStack(item)).menu.open(event.whoClicked)
 			}
 		} into 2
 
 		if(isEnchant)
 		button(config().enchantsItem) {
 			click = { event, _ ->
-				EnchantMenuBase(plugin, plugin.enchantFactory.wrapItemStack(item)).menu.open(event.whoClicked)
+				EnchantMenuBase(tplugin, tplugin.enchantFactory.wrapItemStack(item)).menu.open(event.whoClicked)
 			}
 		} into 1
 

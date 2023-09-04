@@ -12,9 +12,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import commons.versioning.VersionSender;
-import farming.impl.action.Messages;
-import farming.impl.hoe.OriginHoe;
+import farming.impl.action.FarmingActions;
 import me.vadim.util.conf.wrapper.Placeholder;
 import me.vadim.util.conf.wrapper.impl.StringPlaceholder;
 import org.bukkit.entity.Player;
@@ -24,18 +22,15 @@ public class FarmingCommands extends BaseCommand {
 
 	private final BlockRegistry registry;
 	private final RegionRegistry regionRegistry;
-	private final VersionSender sender;
 
 	public FarmingCommands(BlockRegistry registry, RegionRegistry regionRegistry) {
 		this.registry = registry;
 		this.regionRegistry = regionRegistry;
-		this.sender = Messages.versionSender;
 	}
 
 	@Subcommand("tool give")
 	public void giveHoe(@Flags("other") Player target) {
-		OriginHoe hoe = new OriginHoe();
-		hoe.give(target);
+
 	}
 
 	@Subcommand("region register")
@@ -48,7 +43,7 @@ public class FarmingCommands extends BaseCommand {
 				.build();
 
 		if (!registry.getBlocks().containsKey(blockName)) {
-			sender.sendMessage(player, Messages.BLOCK_NOT_FOUND, pl);
+			FarmingActions.send(FarmingActions.BLOCK_NOT_FOUND, player, pl);
 			return;
 		}
 
@@ -57,12 +52,12 @@ public class FarmingCommands extends BaseCommand {
 		final RegionManager regionManager = regionContainer.get(world);
 
 		if (!regionManager.getRegions().containsKey(regionName)) {
-			sender.sendMessage(player, Messages.WG_REGION_NOT_FOUND, pl);
+			FarmingActions.send(FarmingActions.WG_REGION_NOT_FOUND, player, pl);
 			return;
 		}
 
 		OriginRegion region = new OriginRegion(regionName, blockName, player.getWorld());
-		sender.sendMessage(player, Messages.REGION_REGISTER, pl);
+		FarmingActions.send(FarmingActions.REGION_REGISTER, player, pl);
 		region.newInstance(regionRegistry);
 	}
 
@@ -80,16 +75,16 @@ public class FarmingCommands extends BaseCommand {
 				.build();
 
 		if (!regionManager.getRegions().containsKey(regionName)) {
-			sender.sendMessage(player, Messages.WG_REGION_NOT_FOUND, pl);
+			FarmingActions.send(FarmingActions.WG_REGION_NOT_FOUND, player, pl);
 			return;
 		}
 
 		if (!regionRegistry.getRegions().containsKey(regionName)) {
-			sender.sendMessage(player, Messages.REGION_NOT_REGISTERED, pl);
+			FarmingActions.send(FarmingActions.REGION_NOT_REGISTERED, player, pl);
 			return;
 		}
 
 		OriginRegion region = regionRegistry.getRegions().get(regionName).getRegion();
-		sender.sendMessage(player, Messages.REGION_REMOVE, pl);
+		FarmingActions.send(FarmingActions.REGION_REMOVE, player, pl);
 	}
 }

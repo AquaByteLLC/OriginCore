@@ -20,6 +20,7 @@ dependencies {
     compileOnly(Dependencies.ITEMS)
     compileOnly(Dependencies.MENUS)
     compileOnly(Dependencies.WORLDGUARD)
+    compileOnly(Dependencies.SHELFTOR)
     compileOnly(project(":commons"))
     compileOnly(project(":blocks-api"))
     compileOnly(project(":settings-api"))

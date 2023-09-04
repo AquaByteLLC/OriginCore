@@ -11,12 +11,12 @@ import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
 import tools.impl.attribute.augments.Augment;
 import tools.impl.registry.AttributeRegistry;
-import tools.impl.tool.IBaseTool;
 
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static tools.impl.tool.type.IAugmentedTool.*;
+import static tools.impl.tool.type.IAugmentedTool.applierData;
+import static tools.impl.tool.type.IAugmentedTool.applierKey;
 
 public class AugmentApplier {
 
@@ -37,8 +37,8 @@ public class AugmentApplier {
 				.set("targets", StringUtil.colorize(augment.getAttributeTargets().stream().map(Enum::name).collect(Collectors.joining("\n")))).build();
 
 		final ItemStack item = augment.getAugmentStack();
-		IBaseTool.writeContainer(item, pdc -> pdc.set(applierKey, PersistentDataType.STRING, type));
-		IBaseTool.writeContainer(item, pdc -> pdc.set(applierData, PersistentDataType.LONG, boost));
+		BukkitUtil.writeContainer(item, pdc -> pdc.set(applierKey, PersistentDataType.STRING, type));
+		BukkitUtil.writeContainer(item, pdc -> pdc.set(applierData, PersistentDataType.LONG, boost));
 
 		BukkitUtil.formatItem(pl, item);
 		return item;

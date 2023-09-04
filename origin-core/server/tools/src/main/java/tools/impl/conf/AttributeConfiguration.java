@@ -8,15 +8,19 @@ import tools.impl.ToolsPlugin;
 import tools.impl.attribute.AttributeKey;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class AttributeConfiguration {
+
+	@Getter private static final HashMap<AttributeKey, FileConfiguration> configurations = new HashMap<>();
 	@Getter private final SettableConfig conf;
 	@Getter private final AttributeKey key;
 
 	public AttributeConfiguration(AttributeKey key, String parent) {
 		this.key = key;
 		this.conf = new SettableConfig(key.getName() + ".yml", parent, ToolsPlugin.getPlugin());
+		configurations.put(key, conf.getFileConfiguration());
 	}
 
 	public void writeAndSave(Consumer<FileConfiguration> consumer) {

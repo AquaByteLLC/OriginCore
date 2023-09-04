@@ -13,7 +13,6 @@ public interface Shelves {
 			.concurrent()
 			.expiring()
 			.usePolicy(TimedExpiringPolicy.create(10, TimeUnit.SECONDS, false))
-			.expireCheckInterval(2)
 			.build();
 
 	static void init() {}

@@ -1,10 +1,13 @@
 package commons.util;
 
 import commons.OriginModule;
+import commons.interpolation.impl.InterpolationType;
+import commons.math.RangeUntilKt;
+import commons.math.RangesKt;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import java.text.DecimalFormat;
+import java.awt.*;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -81,6 +84,45 @@ public class StringUtil {
 			);
 		}
 		return matcher.appendTail(builder).toString();
+	}
+
+	public static String interpolateColor(String msg, Color color1, Color color2, InterpolationType type) {
+		final StringBuilder builder = new StringBuilder();
+		int tick = 0;
+		int life = msg.toCharArray().length;
+
+		for (char c : msg.toCharArray()) {
+			int[] values = interpolatedValues(color1, color2, type, tick, life);
+			String hex = String.format("#%02x%02x%02x", values[0], values[1], values[2]);
+			builder.append("&").append(hex).append(c);
+			tick++;
+		}
+
+		return builder.toString();
+	}
+
+	private static int[] interpolatedValues(Color color1, Color color2, InterpolationType type, int tick, int life) {
+		final int blue = (int) RangesKt.interpolate(
+				RangeUntilKt.rangeUntil((float) color1.getBlue(), (float) color2.getBlue()),
+				RangesKt.coerceAtMost((float) tick/life, 1f),
+				type.getInterpolation());
+
+		final int red = (int) RangesKt.interpolate(
+				RangeUntilKt.rangeUntil((float) color1.getRed(), (float) color2.getRed()),
+				RangesKt.coerceAtMost((float) tick/life, 1f),
+				type.getInterpolation());
+
+		final int green = (int) RangesKt.interpolate(
+				RangeUntilKt.rangeUntil((float) color1.getGreen(), (float) color2.getGreen()),
+				RangesKt.coerceAtMost((float) tick/life, 1f),
+				type.getInterpolation());
+
+		final int alpha = (int) RangesKt.interpolate(
+				RangeUntilKt.rangeUntil((float) color1.getAlpha(), (float) color2.getAlpha()),
+				RangesKt.coerceAtMost((float) tick/life, 1f),
+				type.getInterpolation());
+
+		return new int[]{red, green, blue, alpha};
 	}
 
 	private static final Pattern STRIP_AMP = Pattern.compile("(?i)[&" + COLOR_CHAR + "][0-9A-FK-ORX]");

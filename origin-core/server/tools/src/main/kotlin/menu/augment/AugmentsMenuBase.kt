@@ -15,7 +15,6 @@ class AugmentsMenuBase(plugin: ToolsPlugin, item: IAugmentedTool) : AttributeMen
 
 
     override val menu: MenuList<Augment> = template.toList(queryItems(), transformer = {
-
         item.formatMenuItemFor(it.key).apply {
             editMeta { meta ->
                 if (item.hasAugment(it.key))

@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.util.function.Predicate;
 
 public record VersionSender(File file, YamlConfiguration cfg) {
 
@@ -26,6 +27,13 @@ public record VersionSender(File file, YamlConfiguration cfg) {
 		final String sendableMessage = player.hasResourcePack() ? messageVersioned.nonLegacy().format(placeholder) : messageVersioned.legacy().format(placeholder);
 
 		player.sendMessage(ChatColor.translateAlternateColorCodes('&', sendableMessage));
+	}
+
+	public void sendEffect(Player player, EffectGroupVersioned effectGroupVersioned) {
+		final EffectGroup legacy = effectGroupVersioned.legacy();
+		final EffectGroup nonLegacy = effectGroupVersioned.nonLegacy();
+		legacy.sendToIf(player, player.getLocation(), Player::hasResourcePack, player.getLocation(), Player::hasResourcePack);
+		nonLegacy.sendToIf(player, player.getLocation(), Predicate.not(Player::hasResourcePack), player.getLocation(), Predicate.not(Player::hasResourcePack));
 	}
 
 	public String getMessage(Player player, MessageVersioned messageVersioned, Placeholder placeholder) {

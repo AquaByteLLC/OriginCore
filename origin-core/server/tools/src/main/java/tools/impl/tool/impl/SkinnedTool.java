@@ -80,7 +80,6 @@ public class SkinnedTool extends ToolBase<Skin, ISkinnedTool, SkinBuilder> imple
 			writeContainer(pdc -> pdc.set(hasSkin, PersistentDataType.STRING, skinKey.getName()));
 			this.itemStack.editMeta(meta -> meta.setCustomModelData(skin.getModelData()));
 		}
-
 	}
 
 	@Override

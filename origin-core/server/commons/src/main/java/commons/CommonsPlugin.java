@@ -35,7 +35,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;

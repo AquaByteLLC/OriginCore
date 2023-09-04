@@ -10,7 +10,7 @@ import tools.impl.ToolsPlugin;
 /**
  * @author vadim
  */
-@CommandAlias("sex")
+@CommandAlias("testing")
 public class TC extends BaseCommand {
 
 
@@ -22,7 +22,7 @@ public class TC extends BaseCommand {
 
 	@Default
 	void thrusting(Player p){
-		new ToolMenuBase(plugin, p.getItemInHand()).getMenu().open(p);
+		new ToolMenuBase(plugin, p.getInventory().getItemInMainHand()).getMenu().open(p);
 		p.sendMessage("3x");
 	}
 }

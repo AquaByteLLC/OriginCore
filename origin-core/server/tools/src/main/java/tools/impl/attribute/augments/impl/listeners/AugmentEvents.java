@@ -33,6 +33,7 @@ public class AugmentEvents implements Listener {
 	public AugmentEvents(EventRegistry registry) {
 		this.registry = registry;
 		this.augmentRegistry = ToolsPlugin.getPlugin().getAugmentRegistry();
+
 		this.inventoryClickEventDetachedSubscriber = new DetachedSubscriber<>(InventoryClickEvent.class, ((context, event) -> {
 			final ItemStack cursor = event.getCursor();
 			final ItemStack clicked = event.getCurrentItem();
@@ -43,7 +44,6 @@ public class AugmentEvents implements Listener {
 			if (!cursorPdc.has(AugmentedTool.applierKey)) return;
 			final String type = cursorPdc.get(AugmentedTool.applierKey, PersistentDataType.STRING);
 
-			System.out.println(type);
 			if (type.isBlank()) return;
 			if (type.isEmpty()) return;
 
@@ -54,11 +54,12 @@ public class AugmentEvents implements Listener {
 
 			if (!(event.getWhoClicked() instanceof Player who)) return;
 			if (!(event.getClickedInventory() instanceof PlayerInventory)) return;
+			System.out.println("Here Number 3");
 
 			if (event.getAction().equals(InventoryAction.SWAP_WITH_CURSOR)) {
-				System.out.println("Here");
 				if (isApplicable(clicked, cursor)) {
-					System.out.println("Here2");
+					System.out.println("Here Number 5");
+
 					final ApplyAugmentEvent applyEvent = new ApplyAugmentEvent("augments", key, who, clicked, cursor);
 					applyEvent.callEvent();
 					event.setCancelled(true);
@@ -78,8 +79,10 @@ public class AugmentEvents implements Listener {
 			final AugmentedTool clickedAugmentedTool = new AugmentedTool(clicked);
 			final AttributeKey key = augmentRegistry.keyFromName(type);
 
+			System.out.println("Here Number 1");
 			if (isApplicable(clicked, cursor)) {
 				clickedAugmentedTool.addAugment(key, boost);
+				System.out.println("Here Number 2");
 
 				final UniqueItemBuilder temp = UniqueItemBuilder.fromStack(clicked);
 				final EnchantedTool tool = new EnchantedTool(clicked);
@@ -133,11 +136,8 @@ public class AugmentEvents implements Listener {
 
 		final String type = cursorPdc.get(AugmentedTool.applierKey, PersistentDataType.STRING);
 
-		System.out.println("Here3");
 		if (clickedAugmentedTool.isAugmentable()) {
-			System.out.println("Here4");
 			if (clickedAugmentedTool.hasOpenSlot()) {
-				System.out.println("Here5");
 				System.out.println(type);
 				return (new AugmentApplier().hasKeys(type, cursor));
 			}
@@ -147,6 +147,9 @@ public class AugmentEvents implements Listener {
 	}
 
 	private boolean hasMeta(ItemStack clicked, ItemStack cursor) {
+		if (clicked == null || cursor == null) return false;
+		if (clicked.getType().isAir() || cursor.getType().isAir()) return false;
+		if (clicked.getItemMeta() == null || cursor.getItemMeta() == null) return false;
 		return clicked.hasItemMeta() && cursor.hasItemMeta();
 	}
 }

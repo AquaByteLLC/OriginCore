@@ -141,7 +141,6 @@ public class FarmingEvents {
 						}
 						if (effect.getEffectType() instanceof OriginSound) {
 							if (FarmingSettings.CUSTOM_BLOCK_SOUNDS.isEnabled(player)) {
-								System.out.println("ENABLED");
 								effect.getEffectType().handleEffect(player, block.getLocation());
 							}
 						}

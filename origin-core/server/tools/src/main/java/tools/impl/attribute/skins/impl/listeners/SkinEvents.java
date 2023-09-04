@@ -17,6 +17,7 @@ import tools.impl.attribute.skins.impl.events.ApplySkinEvent;
 import tools.impl.attribute.skins.impl.events.RemoveSkinEvent;
 import tools.impl.registry.AttributeRegistry;
 import tools.impl.tool.builder.typed.impl.UniqueItemBuilder;
+import tools.impl.tool.impl.AugmentedTool;
 import tools.impl.tool.impl.SkinnedTool;
 import tools.impl.tool.type.ISkinnedTool;
 
@@ -37,6 +38,7 @@ public class SkinEvents implements Listener {
 		final ItemStack cursor = event.getCursor();
 		final ItemStack clicked = event.getCurrentItem();
 
+		if (!hasMeta(clicked, cursor)) return;
 		final PersistentDataContainer cursorPdc = cursor.getItemMeta().getPersistentDataContainer();
 
 		final String type = cursorPdc.get(SkinnedTool.applierKey, PersistentDataType.STRING);
@@ -81,7 +83,6 @@ public class SkinEvents implements Listener {
 		final SkinnedTool clickedSkinnedTool = new SkinnedTool(clicked);
 
 		clickedSkinnedTool.removeSkin();
-		UniqueItemBuilder.updateItem(clicked, List.of(), "");
 	}
 
 	private boolean isApplicable(ItemStack clicked, ItemStack cursor) {
@@ -90,6 +91,7 @@ public class SkinEvents implements Listener {
 		final PersistentDataContainer cursorPdc = cursor.getItemMeta().getPersistentDataContainer();
 
 		final SkinnedTool clickedSkinnedTool = new SkinnedTool(clicked);
+		if (!cursorPdc.has(AugmentedTool.applierKey)) return false;
 		final String type = cursorPdc.get(SkinnedTool.applierKey, PersistentDataType.STRING);
 
 		if (clickedSkinnedTool.isSkinnable()) {
@@ -101,6 +103,9 @@ public class SkinEvents implements Listener {
 	}
 
 	private boolean hasMeta(ItemStack clicked, ItemStack cursor) {
+		if (clicked == null || cursor == null) return false;
+		if (clicked.getType().isAir() || cursor.getType().isAir()) return false;
+		if (clicked.getItemMeta() == null || cursor.getItemMeta() == null) return false;
 		return clicked.hasItemMeta() && cursor.hasItemMeta();
 	}
 }

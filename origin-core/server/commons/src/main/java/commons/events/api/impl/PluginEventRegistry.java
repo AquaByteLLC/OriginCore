@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 public class PluginEventRegistry implements EventRegistry {
 
 	private static class Subscription {
-
 		WeakReference<Object> listener;
 		Set<Class<?>> events;
 		Map<Class<?>, List<Subscriber<?>>> callbacks;

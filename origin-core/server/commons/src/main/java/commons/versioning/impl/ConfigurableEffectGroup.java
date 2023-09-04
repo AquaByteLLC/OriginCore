@@ -118,15 +118,6 @@ public class ConfigurableEffectGroup implements EffectGroupVersioned {
 			final ConfigurationSection particlesSectionLegacyCfg = getOrCreate(configuration, particleSectionLegacy);
 			final ConfigurationSection particlesSectionNonLegacyCfg = getOrCreate(configuration, particleSectionNonLegacy);
 
-			assert effectsSectionCfg != null;
-			assert baseSection != null;
-			assert legacySection != null;
-			assert nonLegacySection != null;
-			assert soundsSectionNonLegacyCfg != null;
-			assert soundsSectionLegacyCfg != null;
-			assert particlesSectionLegacyCfg != null;
-			assert particlesSectionNonLegacyCfg != null;
-
 			soundsSectionLegacyCfg.set(getAsRelative(soundTypeLegacy), soundEffectLegacy.sound.toString());
 			soundsSectionNonLegacyCfg.set(getAsRelative(soundTypeNonLegacy), soundEffectNonLegacy.sound.toString());
 

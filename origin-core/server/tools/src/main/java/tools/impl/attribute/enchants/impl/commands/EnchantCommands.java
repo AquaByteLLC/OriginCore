@@ -63,7 +63,7 @@ public class EnchantCommands extends BaseCommand implements BaseAttributeCommand
 
 	@Subcommand("test")
 	public void testItem(Player player) {
-		ItemStack stack = ItemStackBuilder.of(Material.WOODEN_PICKAXE).lore("&c{enchants}", "&d{augments}", "&e{skin}", "&f{blocks}")
+		ItemStack stack = ItemStackBuilder.of(Material.WOODEN_HOE).lore("&c{enchants}", "&d{augments}", "&e{skin}", "&f{blocks}")
 				.name("&cTesting").build();
 
 		stack = new UniqueItemBuilder(stack)

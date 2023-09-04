@@ -3,20 +3,26 @@ package tools.impl.ability.builder.impl;
 import commons.Commons;
 import commons.events.impl.impl.UnexpiringSubscriber;
 import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
+import lombok.Getter;
 import org.bukkit.event.Event;
 import tools.impl.ability.builder.IAbilityCreator;
 import tools.impl.ability.cache.CachedAttribute;
-import tools.impl.attribute.ExpiringAttribute;
+import tools.impl.attribute.BaseAttribute;
 import tools.impl.sched.CacheInvalidator;
 
 import java.util.function.Consumer;
 
-public class AbilityCreator<T extends ExpiringAttribute, A extends CachedAttribute<T>> implements IAbilityCreator<T, A> {
+public class AbilityCreator<T extends BaseAttribute, A extends CachedAttribute<T>> implements IAbilityCreator<T, A> {
 
-	private ExpiringShelf<A> cache;
+	@Getter private ExpiringShelf<A> cache;
+	private final CacheInvalidator<A> invalidator;
 	private Consumer<? extends Event> whileIn;
 	private Consumer<? extends Event> whileOut;
 	private ExpiringShelf.ExpirationHandler<A> expirationHandler;
+
+	public AbilityCreator() {
+		this.invalidator = new CacheInvalidator<>();
+	}
 
 	@Override
 	public IAbilityCreator<T, A> setExpiringShelf(ExpiringShelf<A> cache) {
@@ -50,6 +56,7 @@ public class AbilityCreator<T extends ExpiringAttribute, A extends CachedAttribu
 
 	public void build() {
 		this.cache.onExpire(this.expirationHandler);
-		CacheInvalidator.add(this.cache);
+		this.invalidator.add(this.cache);
+		this.invalidator.activate();
 	}
 }
