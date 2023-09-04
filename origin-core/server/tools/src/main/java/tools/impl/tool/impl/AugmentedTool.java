@@ -65,11 +65,17 @@ public class AugmentedTool extends ToolBase<Augment, IAugmentedTool, AugmentBuil
 			return;
 		writeContainer(pdc -> {
 			if (canAugment(pdc))
-				if (hasOpenSlot()) {
-					pdc.set(augmentKey.getNamespacedKey(), PersistentDataType.LONG, boost);
-					removeAugmentSlot(1);
+				if (!hasKey(augmentKey, this.itemStack)) {
+					if (hasOpenSlot()) {
+						pdc.set(augmentKey.getNamespacedKey(), PersistentDataType.LONG, boost);
+						removeAugmentSlot(1);
+					}
 				}
 		});
+	}
+
+	public static boolean hasKey(AttributeKey key, ItemStack stack) {
+		return (BukkitUtil.readContainer(stack).has(key.getNamespacedKey()));
 	}
 
 	@Override

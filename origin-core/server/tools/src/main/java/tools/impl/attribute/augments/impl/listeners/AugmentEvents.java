@@ -135,11 +135,14 @@ public class AugmentEvents implements Listener {
 		if (!cursorPdc.has(AugmentedTool.applierKey)) return false;
 
 		final String type = cursorPdc.get(AugmentedTool.applierKey, PersistentDataType.STRING);
-
-		if (clickedAugmentedTool.isAugmentable()) {
-			if (clickedAugmentedTool.hasOpenSlot()) {
-				System.out.println(type);
-				return (new AugmentApplier().hasKeys(type, cursor));
+		final AttributeKey key = ToolsPlugin.getPlugin().getAugmentRegistry().keyFromName(type);
+		if (!AugmentedTool.hasKey(key, clicked)) {
+			if (clickedAugmentedTool.isAugmentable()) {
+				if (clickedAugmentedTool.hasOpenSlot()) {
+					System.out.println(type);
+					System.out.println(clickedAugmentedTool.getOpenSlots() + " : Open slots!");
+					return (new AugmentApplier().hasKeys(type, cursor));
+				}
 			}
 		}
 
