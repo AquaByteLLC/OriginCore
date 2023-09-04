@@ -8,6 +8,7 @@ import blocks.impl.data.account.BlockAccount;
 import blocks.impl.events.BreakEvent;
 import commons.events.impl.EventSubscriber;
 import commons.events.impl.impl.DetachedSubscriber;
+import commons.util.StringUtil;
 import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
 import farming.impl.action.FarmingActions;
 import farming.impl.hoe.enchants.abilities.Abilities;
@@ -108,8 +109,8 @@ public enum EnchantTypes implements AttributeKey {
 		final Placeholder pl = StringPlaceholder.builder()
 				.set("name", key.getName())
 				.set("chance", item.getChance(key))
-				.set("length", configuration.getInt("AbilityLength"))
-				.set("unit", configuration.getString("AbilityUnit"))
+				.set("length", configuration.getInt("Ability.Length"))
+				.set("unit", StringUtil.convertToUserFriendlyCase(configuration.getString("Ability.Unit")))
 				.build();
 
 		if (BlocksAPI.inRegion(block.getLocation())) {
@@ -125,8 +126,9 @@ public enum EnchantTypes implements AttributeKey {
 			}
 		}
 	}), writer -> {
-		writer.set("AbilityLength", 10);
-		writer.set("AbilityUnit", TimeUnit.SECONDS.toString());
+		if (writer.isConfigurationSection("Ability")) return;
+		writer.set("Ability.Length", 10);
+		writer.set("Ability.Unit", TimeUnit.SECONDS.toString());
 	}, ToolTarget.HOE);
 	private final String name;
 	private final NamespacedKey key;

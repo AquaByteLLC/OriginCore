@@ -15,9 +15,11 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
+import static farming.impl.action.FarmingActions.Senders.*;
+
 public enum FarmingActions {
 	REGION_REGISTER("region_register",
-			List.of("&2&l[!] &aThe region &f{region_name} has been successfully registered with block type &f{block_name}&a."), // legacy colors
+			List.of("&2&l[!] &aThe region &f{region_name} &ahas been successfully registered with block type &f{block_name}&a."), // legacy colors
 			List.of("&#3cdd3c&l[!] &#93ec93The region &f{region_name}&#93ec93 has been successfully registered with block type &f{block_name}&#93ec93."), // modern (hex) colors
 			new EffectSound(Sound.BLOCK_ANVIL_BREAK, 1, 1),
 			new EffectSound(Sound.BLOCK_ANVIL_BREAK, 1, 1),
@@ -82,12 +84,21 @@ public enum FarmingActions {
 	),
 	;
 
-	@Getter private final ConfigurableMessage message;
-	@Getter private final ConfigurableEffectGroup effects;
-	@Getter private final SettableConfig effectsCfg = new SettableConfig("effects.yml", "general", FarmingPlugin.getInjector().getInstance(FarmingPlugin.class));
-	@Getter private final SettableConfig messageCfg = new SettableConfig("messages.yml", "general", FarmingPlugin.getInjector().getInstance(FarmingPlugin.class));
-	@Getter private final VersionSender messageSender = new VersionSender(messageCfg.getFile(), messageCfg.getFileConfiguration());
-	@Getter private final VersionSender effectsSender = new VersionSender(effectsCfg.getFile(), effectsCfg.getFileConfiguration());
+	protected static class Senders {
+		@Getter
+		public static SettableConfig effectsCfg = new SettableConfig("effects.yml", "general", FarmingPlugin.getInjector().getInstance(FarmingPlugin.class));
+		@Getter
+		public static SettableConfig messageCfg = new SettableConfig("messages.yml", "general", FarmingPlugin.getInjector().getInstance(FarmingPlugin.class));
+		@Getter
+		public static VersionSender messageSender = new VersionSender(messageCfg.getFile(), messageCfg.getFileConfiguration());
+		@Getter
+		public static VersionSender effectsSender = new VersionSender(effectsCfg.getFile(), effectsCfg.getFileConfiguration());
+	}
+
+	@Getter
+	private final ConfigurableMessage message;
+	@Getter
+	private final ConfigurableEffectGroup effects;
 
 	FarmingActions(String key, List<String> legacyMessage, List<String> modernMessage, EffectSound soundEffectLegacy, EffectSound soundEffectNonLegacy, EffectParticle particleEffectLegacy, EffectParticle particleEffectNonLegacy) {
 		this.message = new ConfigurableMessage(messageSender, key, legacyMessage, modernMessage);
@@ -95,8 +106,8 @@ public enum FarmingActions {
 	}
 
 	public static void send(FarmingActions action, Player player, Placeholder placeholder) {
-		action.getMessageSender().sendMessage(player, action.getMessage(), placeholder);
-		action.getEffectsSender().sendEffect(player, action.getEffects());
+		messageSender.sendMessage(player, action.getMessage(), placeholder);
+		effectsSender.sendEffect(player, action.getEffects());
 	}
 
 	public static void init() {}

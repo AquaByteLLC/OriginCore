@@ -3,6 +3,7 @@ package farming.impl.hoe.enchants.abilities;
 import blocks.BlocksAPI;
 import blocks.block.builder.FixedAspectHolder;
 import blocks.impl.events.BreakEvent;
+import commons.util.StringUtil;
 import dev.oop778.shelftor.api.expiring.policy.implementation.TimedExpiringPolicy;
 import dev.oop778.shelftor.api.shelf.Shelf;
 import dev.oop778.shelftor.api.shelf.expiring.ExpiringShelf;
@@ -34,7 +35,7 @@ public enum Abilities {
 					final Player player = cachedAttribute.getPlayer();
 					final Enchant enchant = cachedAttribute.getAttribute();
 					final FileConfiguration configuration = enchant.getConfig().getConf().getFileConfiguration();
-					return new TimedExpiringPolicy.TimedExpirationData(TimeUnit.valueOf(configuration.getString("AbilityUnit")), configuration.getInt("AbilityLength"), false);
+					return new TimedExpiringPolicy.TimedExpirationData(TimeUnit.valueOf(configuration.getString("Ability.Unit")), configuration.getInt("Ability.Length"), false);
 				}))
 				.build();
 
@@ -47,8 +48,8 @@ public enum Abilities {
 
 			final Placeholder pl = StringPlaceholder.builder()
 					.set("name", enchant.getKey().getName())
-					.set("length", configuration.getInt("AbilityLength"))
-					.set("unit", configuration.getString("AbilityUnit"))
+					.set("length", configuration.getInt("Ability.Length"))
+					.set("unit", StringUtil.convertToUserFriendlyCase(configuration.getString("Ability.Unit")))
 					.build();
 
 			FarmingActions.send(FarmingActions.FIRE_FEET_ENCHANT_DEACTIVATION, player, pl);

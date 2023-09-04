@@ -100,7 +100,6 @@ public class FarmingPlugin extends JavaPlugin implements ResourceProvider, Origi
 								.getAccount(player)
 								.getRegenerationRegistry()
 								.getRegenerations()));
-
 	}
 
 	@Override
