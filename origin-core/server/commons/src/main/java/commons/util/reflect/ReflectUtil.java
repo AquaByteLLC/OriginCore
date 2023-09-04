@@ -109,4 +109,9 @@ public class ReflectUtil {
 		}
 	}
 
+	public static <E extends Enum<E>> @Nullable E getEnum(Class<E> clazz, String name, String def) {
+		E value = getEnum(clazz, name);
+		return value == null ? getEnum(clazz, def) : value;
+	}
+
 }

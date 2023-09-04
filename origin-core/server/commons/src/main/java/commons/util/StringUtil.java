@@ -74,6 +74,11 @@ public class StringUtil {
 		return string == null ? null : ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(parseGradients(string)));
 	}
 
+	// todo
+	public static String colorizeLegacy(String string) {
+		return colorize(string);
+	}
+
 	private static String translateHexColorCodes(String message) {
 		Matcher       matcher = HEX.matcher(message);
 		StringBuilder builder = new StringBuilder(message.length() + 4 * 8);
