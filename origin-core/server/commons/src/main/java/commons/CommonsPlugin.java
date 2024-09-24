@@ -187,25 +187,7 @@ public class CommonsPlugin extends ExtendedJavaPlugin implements OriginModule, L
 		DataPersisterManager.registerDataPersisters(new LocationPersister());
 		getDataFolder().mkdirs();
 
-		// Fuck you, underscore11code, inventor of this gay shit: https://github.com/PaperMC/Paper/commit/ed1dc272e65a367cf1e405f9208a42911e4e19ba
-		// Additionaly, fuck anyone who contributed to this obscenity:
-		//  - Proximyst
-		//	- TheLukeGuy
-		//	- electronicboy
-		//	- jpenilla
-		//	- Machine-Maker
-		//	- kennytv
-		// == Complete list of motherfuckers as of 2023-07-07
-		class gayness_remover extends PrintStream {
-
-			gayness_remover(@NotNull OutputStream out) {
-				super(out);
-			}
-
-		}
-		System.setOut(new gayness_remover(System.out));
-		System.setErr(new gayness_remover(System.err));
-		System.out.println("If this message is not prepended by [STDOUT], then the gayass paper logger has been disabled.");
+		
 	}
 
 	private PaperCommandManager commands;
